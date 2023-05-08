@@ -1,10 +1,10 @@
 // import sgMail from "@sendgrid/mail";
 // import nodemailer from "nodemailer";
-// import { config } from "../config/index.js";
+// import { config } from "../config/index";
 // import {
 //   generateCredentialsMailTemplate,
 //   generateResetPasswdMailTemplate,
-// } from "./index.js";
+// } from "./index";
 
 // const { SENDGRID_API_KEY } = config.SENDGRID;
 // const {

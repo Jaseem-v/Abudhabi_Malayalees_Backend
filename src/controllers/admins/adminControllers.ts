@@ -1,8 +1,8 @@
-import { ErrorResponse } from "../classes";
-import { adminHelpers } from "../helpers";
+import { ErrorResponse } from "../../classes";
+import { adminHelpers } from "../../helpers";
 
-import { config } from "../config";
-import { ApiParams } from "../types";
+import { config } from "../../config";
+import { ApiParams } from "../../types";
 
 const { NODE_ENV, SERVER_ACCESS_TOKEN_KEY, SERVER_ACCESS_TOKEN_EXPIRE } =
   config.SERVER;

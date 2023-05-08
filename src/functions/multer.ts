@@ -4,7 +4,7 @@
 // import fs from "fs";
 // import { v4 as uuidv4 } from "uuid";
 
-// import { config } from "../config/index.js";
+// import { config } from "../config/index";
 
 // const { SERVER_UPLOADS_PATH } = config.SERVER;
 // const { AWS_BUCKET_NAME, AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET_REGION } =

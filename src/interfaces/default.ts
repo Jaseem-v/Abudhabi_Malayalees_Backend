@@ -11,3 +11,8 @@ export interface IRequest extends Request {
     [name: string]: string;
   };
 }
+
+export interface IImage {
+  key: string;
+  mimetype: string;
+}

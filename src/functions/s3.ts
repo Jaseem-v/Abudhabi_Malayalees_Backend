@@ -1,5 +1,5 @@
 // import { S3 } from "@aws-sdk/client-s3";
-// import { config } from "../config/index.js";
+// import { config } from "../config/index";
 
 // const { AWS_BUCKET_NAME, AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET_REGION } =
 //   config.AWS;

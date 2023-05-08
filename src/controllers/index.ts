@@ -1,5 +1,21 @@
-import * as adminControllers from "./adminControllers";
-import * as categoryControllers from "./categoryController";
-import * as userControllers from "./userControllers";
+import * as adminControllers from "./admins/adminControllers";
+import * as categoryControllers from "./categorys/categoryController";
+import * as userControllers from "./users/userControllers";
+import * as businessAccountControllers from "./users/businessAccountControllers";
+import * as personalAccountControllers from "./users/personalAccountControllers";
+import * as eventControllers from "./events/eventControllers";
+import * as jobControllers from "./jobs/jobControllers";
+import * as advertisementControllers from "./advertisements/advertisementControllers";
+import * as newsControllers from "./news/newsControllers";
 
-export { adminControllers, categoryControllers, userControllers };
+export {
+  adminControllers,
+  categoryControllers,
+  userControllers,
+  businessAccountControllers,
+  personalAccountControllers,
+  eventControllers,
+  jobControllers,
+  advertisementControllers,
+  newsControllers,
+};

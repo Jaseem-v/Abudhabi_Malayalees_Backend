@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { userControllers } from "../controllers";
-import { adminAccess, superAdminAccess } from "../middlewares";
+import { userControllers } from "../../controllers";
+import { adminAccess, superAdminAccess } from "../../middlewares";
 const {
   getUsers,
   getUser,

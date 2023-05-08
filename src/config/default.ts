@@ -90,7 +90,14 @@ const MONGO = {
 const MONGO_COLLECTIONS = {
   ADMINS: "Admins",
   USERS: "Users",
+  BUSINESS_ACCOUNTS: "Business_Accounts",
+  PERSONAL_ACCOUNTS: "Personal_Accounts",
   CATEGORIES: "Categories",
+  ADVERTISEMENTS: "Advertisements",
+  JOBS: "Jobs",
+  GALLERYS: "Gallerys",
+  NEWS: "News",
+  EVENTS: "Events",
 };
 
 //  JWT

@@ -1,5 +1,5 @@
 // import firebase from "firebase-admin";
-import { config } from "../config/index.js";
+import { config } from "../config/index";
 
 // const { FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY, FIREBASE_PROJECT_ID } =
 //   config.FIREBASE;

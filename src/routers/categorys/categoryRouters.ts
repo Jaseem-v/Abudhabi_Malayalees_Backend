@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { categoryControllers } from "../controllers";
-import { adminAccess, superAdminAccess } from "../middlewares";
+import { categoryControllers } from "../../controllers";
+import { adminAccess, superAdminAccess } from "../../middlewares";
 const {
   getCategories,
   getCategory,

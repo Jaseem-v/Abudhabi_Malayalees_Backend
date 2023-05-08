@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import { config } from "../config/index.js";
-import { Category } from "../models";
-import { ThrowError } from "../classes";
-import { IRoles } from "../types/default.js";
+import { config } from "../../config/index";
+import { Category } from "../../models";
+import { ThrowError } from "../../classes";
+import { IRoles } from "../../types/default";
 
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;
@@ -14,7 +14,7 @@ const { NODE_ENV } = config.SERVER;
 export const getCategories = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const query = ["SuperCategory", "Developer"].includes(role ?? "")
+      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
         ? { isDeleted: true }
         : {};
       const categorys = await Category.find({ ...query }).sort({
@@ -46,7 +46,7 @@ export const getCategory = (categoryId: string, role?: IRoles) => {
       if (!categoryId || !isValidObjectId(categoryId))
         throw new ThrowError("Provide vaild category id", 404);
 
-      const query = ["SuperCategory", "Developer"].includes(role ?? "")
+      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
         ? { isDeleted: true }
         : {};
       const category = await Category.findOne({ _id: categoryId, ...query });
@@ -76,9 +76,19 @@ export const getCategory = (categoryId: string, role?: IRoles) => {
 export const addCategory = (data: any) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { name, image, status, visibility } = data;
-      if (!name || !image || !status || !visibility)
-        throw new ThrowError("Please Provide name, and image", 400);
+      const { name, type, image, status, visibility } = data;
+      if (
+        !name ||
+        !type ||
+        ["JOB", "BUSINESS"].includes(type) ||
+        !image ||
+        !status ||
+        !visibility
+      )
+        throw new ThrowError(
+          "Please Provide name, type('JOB', 'BUSINESS') and image",
+          400
+        );
 
       const categoryExists = await Category.findOne({
         name: name,

@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import { config } from "../config/index.js";
-import { Admin } from "../models";
-import { generateToken, verifyToken } from "../utils";
-import { generatePassword } from "../functions";
-import { ThrowError } from "../classes";
-import { IRoles } from "../types/default.js";
+import { config } from "../../config/index";
+import { Admin } from "../../models";
+import { generateToken, verifyToken } from "../../utils";
+import { generatePassword } from "../../functions";
+import { ThrowError } from "../../classes";
+import { IRoles } from "../../types/default";
 
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;

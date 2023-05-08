@@ -1,23 +1,23 @@
-import { ErrorResponse } from "../classes";
-import { categoryHelpers } from "../helpers";
+import { ErrorResponse } from "../../classes";
+import { newsHelpers } from "../../helpers";
 
-import { ApiParams } from "../types";
+import { ApiParams } from "../../types";
 
 /**
- * Get all categorys
+ * Get all news
  * METHOD : GET
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const getCategories: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .getCategories(req.client!.role)
+export const getNews: ApiParams = (req, res, next) => {
+  newsHelpers
+    .getNews(req.client!.role)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.categorys,
+        data: resp.news,
       });
     })
     .catch((error: any) => {
@@ -28,20 +28,20 @@ export const getCategories: ApiParams = (req, res, next) => {
 };
 
 /**
- * Get a particular category
+ * Get a particular news
  * METHOD : GET
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const getCategory: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .getCategory(req.params.cid, req.client!.role)
+export const getSingleNews: ApiParams = (req, res, next) => {
+  newsHelpers
+    .getSingleNews(req.params.nid, req.client!.role)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.category,
+        data: resp.news,
       });
     })
     .catch((error: any) => {
@@ -52,20 +52,21 @@ export const getCategory: ApiParams = (req, res, next) => {
 };
 
 /**
- * To Signup a new category
+ * To Signup a new news
  * METHOD : POST
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const addCategory: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .addCategory(req.body)
+export const addNews: ApiParams = (req, res, next) => {
+  req.body.image = req.file;
+  newsHelpers
+    .addNews(req.body)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        category: resp.category,
+        news: resp.news,
       });
     })
     .catch((error: any) => {
@@ -76,20 +77,21 @@ export const addCategory: ApiParams = (req, res, next) => {
 };
 
 /**
- * To edit a category
+ * To edit a news
  * METHOD : PATCH
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const editCategory: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .editCategory(req.params.cid, req.body, req.client)
+export const editNews: ApiParams = (req, res, next) => {
+  req.body.image = req.file;
+  newsHelpers
+    .editNews(req.params.nid, req.body, req.client)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.category,
+        data: resp.news,
       });
     })
     .catch((error: any) => {
@@ -98,36 +100,15 @@ export const editCategory: ApiParams = (req, res, next) => {
 };
 
 /**
- * To change category status
+ * To change news visibility
  * METHOD : PATCH
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const changeCategoryStatus: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .changeCategoryStatus(req.params.cid)
-    .then((resp: any) => {
-      res.status(200).json({
-        success: true,
-        message: resp.message,
-      });
-    })
-    .catch((error: any) => {
-      return next(new ErrorResponse(error.message, 402, error.code));
-    });
-};
-
-/**
- * To change category visibility
- * METHOD : PATCH
- * @param {*} req
- * @param {*} res
- * @param {*} next
- */
-export const changeCategoryVisibility: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .changeCategoryVisibility(req.params.cid)
+export const changeNewsVisibility: ApiParams = (req, res, next) => {
+  newsHelpers
+    .changeNewsVisibility(req.params.nid)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -140,15 +121,15 @@ export const changeCategoryVisibility: ApiParams = (req, res, next) => {
 };
 
 /**
- * To delete a non deleted category temporarily
+ * To delete a non deleted news temporarily
  * METHOD : DELETE
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const deleteCategory: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .deleteCategory(req.params.cid)
+export const deleteNews: ApiParams = (req, res, next) => {
+  newsHelpers
+    .deleteNews(req.params.nid)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -163,20 +144,20 @@ export const deleteCategory: ApiParams = (req, res, next) => {
 };
 
 /**
- * To restore a deleted category
+ * To restore a deleted news
  * METHOD : PUT
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const restoreCategory: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .restoreCategory(req.params.cid)
+export const restoreNews: ApiParams = (req, res, next) => {
+  newsHelpers
+    .restoreNews(req.params.nid)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.category,
+        data: resp.news,
       });
     })
     .catch((error: any) => {
@@ -187,15 +168,15 @@ export const restoreCategory: ApiParams = (req, res, next) => {
 };
 
 /**
- * To delete a category permanently
+ * To delete a news permanently
  * METHOD : DELETE
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const pDeleteCategory: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .pDeleteCategory(req.params.cid)
+export const pDeleteNews: ApiParams = (req, res, next) => {
+  newsHelpers
+    .pDeleteNews(req.params.nid)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -210,15 +191,15 @@ export const pDeleteCategory: ApiParams = (req, res, next) => {
 };
 
 /**
- * To delete all category in development mode
+ * To delete all news in development mode
  * METHOD : DELETE
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const deleteAllCategory: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .deleteAllCategory()
+export const deleteAllNews: ApiParams = (req, res, next) => {
+  newsHelpers
+    .deleteAllNews()
     .then((resp: any) => {
       res.status(200).json({
         success: true,

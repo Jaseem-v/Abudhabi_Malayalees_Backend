@@ -1,27 +1,27 @@
-import { ErrorResponse } from "../classes";
-import { userHelpers } from "../helpers";
+import { ErrorResponse } from "../../classes";
+import { personalAccountHelpers } from "../../helpers";
 
-import { config } from "../config";
-import { ApiParams } from "../types";
+import { config } from "../../config";
+import { ApiParams } from "../../types";
 
 const { NODE_ENV, SERVER_ACCESS_TOKEN_KEY, SERVER_ACCESS_TOKEN_EXPIRE } =
   config.SERVER;
 
 /**
- * Get all users
+ * Get all personalAccounts
  * METHOD : GET
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const getUsers: ApiParams = (req, res, next) => {
-  userHelpers
-    .getUsers(req.client!.role)
+export const getPersonalAccounts: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .getPersonalAccounts(req.client!.role)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.users,
+        data: resp.personalAccounts,
       });
     })
     .catch((error: any) => {
@@ -32,20 +32,20 @@ export const getUsers: ApiParams = (req, res, next) => {
 };
 
 /**
- * Get a particular user
+ * Get a particular personalAccount
  * METHOD : GET
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const getUser: ApiParams = (req, res, next) => {
-  userHelpers
-    .getUser(req.params.uid,req.client!.role)
+export const getPersonalAccount: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .getPersonalAccount(req.params.paid,req.client!.role)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.user,
+        data: resp.personalAccount,
       });
     })
     .catch((error: any) => {
@@ -56,20 +56,20 @@ export const getUser: ApiParams = (req, res, next) => {
 };
 
 /**
- * Get a particular user's profile
+ * Get a particular personalAccount's profile
  * METHOD : GET
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const getUserProfile: ApiParams = (req, res, next) => {
-  userHelpers
-    .getUser(req.client!.id)
+export const getPersonalAccountProfile: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .getPersonalAccount(req.client!.id)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.user,
+        data: resp.personalAccount,
       });
     })
     .catch((error: any) => {
@@ -80,16 +80,16 @@ export const getUserProfile: ApiParams = (req, res, next) => {
 };
 
 /**
- * To login a a user by email and password
+ * To login a a personalAccount by email and password
  * METHOD : PATCH
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const userLogin: ApiParams = (req, res, next) => {
-  const { email, phone, password } = req.body;
-  userHelpers
-    .userLogin(email, phone, password)
+export const personalAccountLogin: ApiParams = (req, res, next) => {
+  const { username, email, phone, password } = req.body;
+  personalAccountHelpers
+    .personalAccountLogin(username, email, phone, password)
     .then((resp: any) => {
       res.cookie(SERVER_ACCESS_TOKEN_KEY, resp.token, {
         secure: NODE_ENV.toLocaleLowerCase() === "production",
@@ -112,19 +112,19 @@ export const userLogin: ApiParams = (req, res, next) => {
 };
 
 /**
- * To Signup a new user
+ * To Signup a new personalAccount
  * METHOD : POST
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const addUser: ApiParams = (req, res, next) => {
-  userHelpers
-    .addUser(req.body)
+export const addPersonalAccount: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .addPersonalAccount(req.body)
     .then((resp: any) => {
       res
         .status(200)
-        .json({ success: true, message: resp.message, user: resp.user });
+        .json({ success: true, message: resp.message, personalAccount: resp.personalAccount });
     })
     .catch((error: any) => {
       return next(
@@ -134,20 +134,20 @@ export const addUser: ApiParams = (req, res, next) => {
 };
 
 /**
- * To edit a user
+ * To edit a personalAccount
  * METHOD : PATCH
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const editUser: ApiParams = (req, res, next) => {
-  userHelpers
-    .editUser(req.params.uid, req.body, req.client)
+export const editPersonalAccount: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .editPersonalAccount(req.params.paid, req.body, req.client)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.user,
+        data: resp.personalAccount,
       });
     })
     .catch((error: any) => {
@@ -156,20 +156,20 @@ export const editUser: ApiParams = (req, res, next) => {
 };
 
 /**
- * To edit a user profile
+ * To edit a personalAccount profile
  * METHOD : PATCH
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const updateUserProfile: ApiParams = (req, res, next) => {
-  userHelpers
-    .updateUserProfile(req.client!.id, req.body)
+export const updatePersonalAccountProfile: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .updatePersonalAccountProfile(req.client!.id, req.body)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.user,
+        data: resp.personalAccount,
       });
     })
     .catch((error: any) => {
@@ -184,9 +184,9 @@ export const updateUserProfile: ApiParams = (req, res, next) => {
  * @param {*} res
  * @param {*} next
  */
-export const forgotUserPassword: ApiParams = (req, res, next) => {
-  userHelpers
-    .forgotUserPassword(req.body.email)
+export const forgotPersonalAccountPassword: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .forgotPersonalAccountPassword(req.body.email)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -199,35 +199,15 @@ export const forgotUserPassword: ApiParams = (req, res, next) => {
 };
 
 /**
- * To change user password
+ * To change personalAccount password
  * METHOD : PATCH
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const resetUserPassword: ApiParams = (req, res, next) => {
-  userHelpers
-    .resetUserPassword(req.body.token, req.body.password)
-    .then((resp: any) => {
-      res.status(200).json({
-        success: true,
-        message: resp.message,
-      });
-    })
-    .catch((error: any) => {
-      return next(new ErrorResponse(error.message, 402, error.code));
-    });
-};
-/**
- * To change user password
- * METHOD : PATCH
- * @param {*} req
- * @param {*} res
- * @param {*} next
- */
-export const changeUserPassword: ApiParams = (req, res, next) => {
-  userHelpers
-    .changeUserPassword(req.client!.id, req.body)
+export const resetPersonalAccountPassword: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .resetPersonalAccountPassword(req.body.token, req.body.password)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -240,15 +220,41 @@ export const changeUserPassword: ApiParams = (req, res, next) => {
 };
 
 /**
- * To change user password
+ * To check availablility for personalAccount's username
  * METHOD : PATCH
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const changeUserEmail: ApiParams = (req, res, next) => {
-  userHelpers
-    .changeUserEmail(req.client!.id, req.body.email)
+export const checkPersonalAccountUsernameAvailability: ApiParams = (
+  req,
+  res,
+  next
+) => {
+  personalAccountHelpers
+    .checkPersonalAccountUsernameAvailability(req.body.username)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        availability: resp.availability,
+      });
+    })
+    .catch((error: any) => {
+      return next(new ErrorResponse(error.message, 402, error.code));
+    });
+};
+
+/**
+ * To change personalAccount password
+ * METHOD : PATCH
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const changePersonalAccountPassword: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .changePersonalAccountPassword(req.client!.id, req.body)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -261,15 +267,15 @@ export const changeUserEmail: ApiParams = (req, res, next) => {
 };
 
 /**
- * To change user phone
+ * To change personalAccount password
  * METHOD : PATCH
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const changeUserPhone: ApiParams = (req, res, next) => {
-  userHelpers
-    .changeUserPhone(req.client!.id, req.body.phone)
+export const changePersonalAccountEmail: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .changePersonalAccountEmail(req.client!.id, req.body.email)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -282,15 +288,15 @@ export const changeUserPhone: ApiParams = (req, res, next) => {
 };
 
 /**
- * To change a username for user
+ * To change personalAccount phone
  * METHOD : PATCH
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const changeUsername: ApiParams = (req, res, next) => {
-  userHelpers
-    .changeUsername(req.client!.id, req.body.phone)
+export const changePersonalAccountPhone: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .changePersonalAccountPhone(req.client!.id, req.body.phone)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -303,20 +309,41 @@ export const changeUsername: ApiParams = (req, res, next) => {
 };
 
 /**
- * To change a status user  for paticular user
+ * To change a personalAccountname for personalAccount
  * METHOD : PATCH
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const changeUserStatus: ApiParams = (req, res, next) => {
-  userHelpers
-    .changeUserStatus(req.params.uid, req.body.status)
+export const changePersonalAccountUsername: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .changePersonalAccountUsername(req.client!.id, req.body.phone)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.user,
+      });
+    })
+    .catch((error: any) => {
+      return next(new ErrorResponse(error.message, 402, error.code));
+    });
+};
+
+/**
+ * To change a status personalAccount  for paticular personalAccount
+ * METHOD : PATCH
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const changePersonalAccountStatus: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .changePersonalAccountStatus(req.params.paid, req.body.status)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.personalAccount,
       });
     })
     .catch((error: any) => {
@@ -327,15 +354,15 @@ export const changeUserStatus: ApiParams = (req, res, next) => {
 };
 
 /**
- * To delete a non deleted user temporarily
+ * To delete a non deleted personalAccount temporarily
  * METHOD : DELETE
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const deleteUser: ApiParams = (req, res, next) => {
-  userHelpers
-    .deleteUser(req.params.uid)
+export const deletePersonalAccount: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .deletePersonalAccount(req.params.paid)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -350,20 +377,20 @@ export const deleteUser: ApiParams = (req, res, next) => {
 };
 
 /**
- * To restore a deleted user
+ * To restore a deleted personalAccount
  * METHOD : PUT
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const restoreUser: ApiParams = (req, res, next) => {
-  userHelpers
-    .restoreUser(req.params.uid)
+export const restorePersonalAccount: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .restorePersonalAccount(req.params.paid)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.user,
+        data: resp.personalAccount,
       });
     })
     .catch((error: any) => {
@@ -374,15 +401,15 @@ export const restoreUser: ApiParams = (req, res, next) => {
 };
 
 /**
- * To delete a user permanently
+ * To delete a personalAccount permanently
  * METHOD : DELETE
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const pDeleteUser: ApiParams = (req, res, next) => {
-  userHelpers
-    .pDeleteUser(req.params.uid)
+export const pDeletePersonalAccount: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .pDeletePersonalAccount(req.params.paid)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -397,15 +424,15 @@ export const pDeleteUser: ApiParams = (req, res, next) => {
 };
 
 /**
- * To delete all user in development mode
+ * To delete all personalAccount in development mode
  * METHOD : DELETE
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const deleteAllUser: ApiParams = (req, res, next) => {
-  userHelpers
-    .deleteAllUser()
+export const deleteAllPersonalAccount: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .deleteAllPersonalAccount()
     .then((resp: any) => {
       res.status(200).json({
         success: true,

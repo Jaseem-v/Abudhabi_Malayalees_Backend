@@ -1,10 +1,10 @@
 import { IImage } from "./default";
 
-export interface ICategory {
-  name: string;
-  type: "JOB" | "BUSINESS";
+export interface INews {
+  code: string;
+  title: string;
   image: IImage;
-  status: "Active" | "Inactive";
+  body: string;
   visibility: "Show" | "Hide";
   isDeleted: boolean;
   deletedAt?: string | Date;

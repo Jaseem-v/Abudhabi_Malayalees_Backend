@@ -1,7 +1,7 @@
 /* Imported Modules */
 import { Response, NextFunction } from "express";
 import { IAdmin, IRequest } from "../interfaces";
-export type IRoles = IAdmin["role"] | "PersonalUser" | "BusinessUser";
+export type IRoles = IAdmin["role"] | "PersonalAccount" | "BusinessAccount";
 
 /* Custom Types */
 export type ApiParams = (

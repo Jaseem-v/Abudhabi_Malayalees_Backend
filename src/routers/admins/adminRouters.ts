@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { adminControllers } from "../controllers";
-import { adminAccess, superAdminAccess } from "../middlewares";
+import { adminControllers } from "../../controllers";
+import { adminAccess, superAdminAccess } from "../../middlewares";
 const {
   getAdmins,
   getAdmin,

@@ -1,7 +1,64 @@
+import { Document } from "mongoose";
+import { IImage } from "./default";
+
+export interface IBusinessAccount {
+  name: string;
+  username: string;
+  phone: string;
+  email: string;
+  password?: string;
+  category: string | Document["_id"];
+  website: string;
+  location: string;
+  state: string;
+  city: string;
+  address: string;
+  about?: string;
+  services?: string[];
+  images?: IImage[];
+  locationType?: string;
+  numberOfEmployees?: string;
+  socialMediaLinks?: string;
+  yearEstablished?: string;
+  contactDetails: {
+    fname: string;
+    lname: string;
+    email: string;
+    phone: string;
+  };
+  resetPasswordAccess: boolean;
+  status: "Active" | "Inactive" | "Suspended" | "Blocked";
+  lastSync: string | Date;
+  lastUsed: string | Date;
+  isDeleted: boolean;
+  deletedAt?: string | Date;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
+export interface IPersonalAccount {
+  fname: string;
+  lname: string;
+  username: string;
+  phone: string;
+  email: string;
+  password?: string;
+  about: string;
+  images?: IImage[];
+  resetPasswordAccess: boolean;
+  status: "Active" | "Inactive" | "Suspended" | "Blocked";
+  lastSync: string | Date;
+  lastUsed: string | Date;
+  isDeleted: boolean;
+  deletedAt?: string | Date;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
 export interface IUser {
   fname: string;
   lname: string;
-  type: "Personal" | "Business";
+  type: "PersonalAccount" | "BusinessAccount";
   email: string;
   phone: string;
   username: string;

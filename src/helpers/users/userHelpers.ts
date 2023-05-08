@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
-import { config } from "../config/index.js";
-import { User } from "../models";
-import { generateToken, verifyToken } from "../utils";
-import { ThrowError } from "../classes";
-import { IRoles } from "../types/default.js";
+import { config } from "../../config/index";
+import { User } from "../../models/index";
+import { generateToken, verifyToken } from "../../utils/index";
+import { ThrowError } from "../../classes/index";
+import { IRoles } from "../../types/default";
 
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;
@@ -101,7 +101,7 @@ export const userLogin = (email: string, phone: string, password: string) => {
         const token = await generateToken({
           id: user._id.toString(),
           name: `${user.fname} ${user.lname}`,
-          role: user.type === "Personal" ? "PersonalUser" : "BusinessUser",
+          role: user.type,
           type: "AccessToken",
         });
         resolve({
@@ -155,7 +155,7 @@ export const addUser = (data: any) => {
         !email ||
         !phone ||
         !password ||
-        (type === "Business" &&
+        (type === "BusinessAccount" &&
           (!companyName ||
             !companyCategory ||
             !isValidObjectId(companyCategory) ||
@@ -168,7 +168,7 @@ export const addUser = (data: any) => {
       )
         throw new ThrowError(
           `Please Provide fname, lname, email, type, phone ${
-            type === "Business"
+            type === "BusinessAccount"
               ? "companyName, valid companyCategory, companyPhone, companyWebsite, companyLocation, companyState, companyCity, companyAddress and"
               : "and"
           } password`,
@@ -193,7 +193,7 @@ export const addUser = (data: any) => {
         lastUsed: new Date(),
       });
 
-      if (user.type === "Business") {
+      if (user.type === "BusinessAccount") {
         user.companyDetails = {
           companyName,
           companyCategory,
@@ -288,7 +288,7 @@ export const editUser = (userId: string, data: any, client: any) => {
       user.email = email || user.email;
       user.phone = phone || user.phone;
 
-      if (user.type === "Business") {
+      if (user.type === "BusinessAccount") {
         user.companyDetails!.companyName =
           companyName || user.companyDetails!.companyName;
         user.companyDetails!.companyCategory =
@@ -356,7 +356,7 @@ export const updateUserProfile = (userId: string, data: any) => {
       // Update a values in db
       user.fname = fname || user.fname;
       user.lname = lname || user.lname;
-      if (user.type === "Business") {
+      if (user.type === "BusinessAccount") {
         user.companyDetails!.companyName =
           companyName || user.companyDetails!.companyName;
         user.companyDetails!.companyCategory =
@@ -413,7 +413,7 @@ export const checkUserStatus = (userId: string, status: string[]) => {
           user: {
             id: user._id,
             name: `${user.fname} ${user.lname}`,
-            role: user.type === "Personal" ? "PersonalUser" : "BusinessUser",
+            role: user.type,
             status: user.status,
           },
         });
@@ -537,7 +537,7 @@ export const changeUserEmail = (userId: string, email: string) => {
       const userExists = await User.findOne({
         _id: { $ne: userId },
         email,
-        role: user.type === "Personal" ? "PersonalUser" : "BusinessUser",
+        role: user.type,
       });
       if (userExists)
         throw new ThrowError("Email already exist for other user", 400);
@@ -585,7 +585,7 @@ export const changeUserPhone = (userId: string, phone: string) => {
       const userExists = await User.findOne({
         _id: { $ne: userId },
         phone,
-        role: user.type === "Personal" ? "PersonalUser" : "BusinessUser",
+        role: user.type,
       });
       if (userExists)
         throw new ThrowError("Phone number already exist for other user", 400);
@@ -674,7 +674,7 @@ export const forgotUserPassword = (email: string) => {
         token = await generateToken({
           id: user._id.toString(),
           name: user.fname + user.lname,
-          role: user.type === "Personal" ? "PersonalUser" : "BusinessUser",
+          role: user.type,
           type: "ResetToken",
         });
 

@@ -1,5 +1,5 @@
 import { IRoles } from './../types/default';
-import { config } from "../config/index.js";
+import { config } from "../config/index";
 const { CLIENT_DOMAIN, CLIENT_ADMIN_DOMAIN } = config.CLIENT;
 const { APP_NAME, APP_LOGO_URL } = config.APP;
 
