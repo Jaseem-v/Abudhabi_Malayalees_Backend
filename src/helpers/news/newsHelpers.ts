@@ -76,14 +76,8 @@ export const getSingleNews = (newsId: string, role?: IRoles) => {
 export const addNews = (data: any) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { title, body, image, status, visibility } = data;
-      if (
-        !title ||
-        !body ||
-        !image ||
-        !status ||
-        !visibility
-      )
+      const { title, body, image, visibility } = data;
+      if (!title || !body || !image)
         throw new ThrowError(
           "Please Provide title, body, image and visibility",
           400
@@ -93,18 +87,25 @@ export const addNews = (data: any) => {
         title: title,
       });
 
-      if (newsExists)
-        throw new ThrowError("News title already exist!", 401);
+      if (newsExists) throw new ThrowError("News title already exist!", 401);
+
+      const lastCode = await News.find({}, { code: 1, _id: 0 })
+        .limit(1)
+        .sort({ createdAt: -1 });
+      const code =
+        lastCode.length === 1
+          ? "NEWS" + (parseInt(lastCode[0].code.slice(4)) + 1)
+          : "NEWS100";
 
       const news = await new News({
-        code:"",
+        code: code,
         title,
         body,
         image: {
-          key: image.key,
+          key: image.key.split("/").slice(-1)[0],
           mimetype: image.mimetype,
         },
-        visibility: "Show",
+        visibility: visibility || "Show",
       });
 
       const nnews = await news.save();
@@ -158,7 +159,7 @@ export const editNews = (newsId: string, data: any, client: any) => {
       if (image && image.key && image.mimetype) {
         // Delete Image
         news.image = {
-          key: image.key,
+          key: image.key.split("/").slice(-1)[0],
           mimetype: image.mimetype,
         };
       }
@@ -319,10 +320,7 @@ export const pDeleteNews = (newsId: string) => {
           message: `${news.title} news was deleted`,
         });
       }
-      throw new ThrowError(
-        `Not able to delete news in ${NODE_ENV} mode`,
-        401
-      );
+      throw new ThrowError(`Not able to delete news in ${NODE_ENV} mode`, 401);
     } catch (error: any) {
       reject({
         message: error.message || error.msg,

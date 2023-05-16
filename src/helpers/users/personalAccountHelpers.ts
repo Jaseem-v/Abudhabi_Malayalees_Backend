@@ -177,7 +177,7 @@ export const addPersonalAccount = (data: any) => {
         phone,
         email,
         password,
-        location,
+        // location,
         lastSync: new Date(),
         lastUsed: new Date(),
       });

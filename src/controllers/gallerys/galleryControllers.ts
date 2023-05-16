@@ -1,23 +1,23 @@
 import { ErrorResponse } from "../../classes";
-import { categoryHelpers } from "../../helpers";
+import { galleryHelpers } from "../../helpers";
 
 import { ApiParams } from "../../types";
 
 /**
- * Get all categorys
+ * Get all gallerys
  * METHOD : GET
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const getCategories: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .getCategories(req.client!.role)
+export const getGallerys: ApiParams = (req, res, next) => {
+  galleryHelpers
+    .getGallerys(req.client!.role)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.categorys,
+        data: resp.gallerys,
       });
     })
     .catch((error: any) => {
@@ -28,20 +28,20 @@ export const getCategories: ApiParams = (req, res, next) => {
 };
 
 /**
- * Get a particular category
+ * Get a particular gallery
  * METHOD : GET
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const getCategory: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .getCategory(req.params.cid, req.client!.role)
+export const getGallery: ApiParams = (req, res, next) => {
+  galleryHelpers
+    .getGallery(req.params.cid, req.client!.role)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.category,
+        data: resp.gallery,
       });
     })
     .catch((error: any) => {
@@ -52,21 +52,21 @@ export const getCategory: ApiParams = (req, res, next) => {
 };
 
 /**
- * To Signup a new category
+ * To Signup a new gallery
  * METHOD : POST
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const addCategory: ApiParams = (req, res, next) => {
+export const addGallery: ApiParams = (req, res, next) => {
   req.body.image = req.file;
-  categoryHelpers
-    .addCategory(req.body)
+  galleryHelpers
+    .addGallery(req.body)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        category: resp.category,
+        gallery: resp.gallery,
       });
     })
     .catch((error: any) => {
@@ -77,21 +77,21 @@ export const addCategory: ApiParams = (req, res, next) => {
 };
 
 /**
- * To edit a category
+ * To edit a gallery
  * METHOD : PATCH
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const editCategory: ApiParams = (req, res, next) => {
+export const editGallery: ApiParams = (req, res, next) => {
   req.body.image = req.file;
-  categoryHelpers
-    .editCategory(req.params.cid, req.body, req.client)
+  galleryHelpers
+    .editGallery(req.params.cid, req.body, req.client)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.category,
+        data: resp.gallery,
       });
     })
     .catch((error: any) => {
@@ -100,15 +100,15 @@ export const editCategory: ApiParams = (req, res, next) => {
 };
 
 /**
- * To change category status
+ * To change gallery visibility
  * METHOD : PATCH
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const changeCategoryStatus: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .changeCategoryStatus(req.params.cid)
+export const changeGalleryVisibility: ApiParams = (req, res, next) => {
+  galleryHelpers
+    .changeGalleryVisibility(req.params.cid)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -121,36 +121,15 @@ export const changeCategoryStatus: ApiParams = (req, res, next) => {
 };
 
 /**
- * To change category visibility
- * METHOD : PATCH
- * @param {*} req
- * @param {*} res
- * @param {*} next
- */
-export const changeCategoryVisibility: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .changeCategoryVisibility(req.params.cid)
-    .then((resp: any) => {
-      res.status(200).json({
-        success: true,
-        message: resp.message,
-      });
-    })
-    .catch((error: any) => {
-      return next(new ErrorResponse(error.message, 402, error.code));
-    });
-};
-
-/**
- * To delete a non deleted category temporarily
+ * To delete a non deleted gallery temporarily
  * METHOD : DELETE
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const deleteCategory: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .deleteCategory(req.params.cid)
+export const deleteGallery: ApiParams = (req, res, next) => {
+  galleryHelpers
+    .deleteGallery(req.params.cid)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -165,20 +144,20 @@ export const deleteCategory: ApiParams = (req, res, next) => {
 };
 
 /**
- * To restore a deleted category
+ * To restore a deleted gallery
  * METHOD : PUT
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const restoreCategory: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .restoreCategory(req.params.cid)
+export const restoreGallery: ApiParams = (req, res, next) => {
+  galleryHelpers
+    .restoreGallery(req.params.cid)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        data: resp.category,
+        data: resp.gallery,
       });
     })
     .catch((error: any) => {
@@ -189,15 +168,15 @@ export const restoreCategory: ApiParams = (req, res, next) => {
 };
 
 /**
- * To delete a category permanently
+ * To delete a gallery permanently
  * METHOD : DELETE
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const pDeleteCategory: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .pDeleteCategory(req.params.cid)
+export const pDeleteGallery: ApiParams = (req, res, next) => {
+  galleryHelpers
+    .pDeleteGallery(req.params.cid)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -212,15 +191,15 @@ export const pDeleteCategory: ApiParams = (req, res, next) => {
 };
 
 /**
- * To delete all category in development mode
+ * To delete all gallery in development mode
  * METHOD : DELETE
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const deleteAllCategory: ApiParams = (req, res, next) => {
-  categoryHelpers
-    .deleteAllCategory()
+export const deleteAllGallery: ApiParams = (req, res, next) => {
+  galleryHelpers
+    .deleteAllGallery()
     .then((resp: any) => {
       res.status(200).json({
         success: true,

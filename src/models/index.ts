@@ -7,5 +7,17 @@ import Event from "./events/eventModel";
 import Job from "./jobs/jobModel";
 import Advertisement from "./advertisements/advertisementModel";
 import News from "./news/newsModel";
+import Gallery from "./gallerys/galleryModel";
 
-export { Admin, Category, User, BusinessAccount, PersonalAccount, Event, Job, Advertisement, News };
+export {
+  Admin,
+  Category,
+  User,
+  BusinessAccount,
+  PersonalAccount,
+  Event,
+  Job,
+  Advertisement,
+  News,
+  Gallery,
+};

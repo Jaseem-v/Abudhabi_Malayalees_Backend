@@ -4,9 +4,6 @@ export interface IEvent {
   title: string;
   desc: string;
   date: Date;
-//   image: IImage;
-//   date: string;
-//   time: string;
   visibility: "Show" | "Hide";
   isDeleted: boolean;
   deletedAt?: string | Date;

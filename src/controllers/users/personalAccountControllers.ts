@@ -124,7 +124,7 @@ export const addPersonalAccount: ApiParams = (req, res, next) => {
     .then((resp: any) => {
       res
         .status(200)
-        .json({ success: true, message: resp.message, personalAccount: resp.personalAccount });
+        .json({ success: true, message: resp.message, data: resp.personalAccount });
     })
     .catch((error: any) => {
       return next(

@@ -28,8 +28,9 @@ const router = Router();
 router
   .route("/")
   .get(superAdminAccess, getBusinessAccounts)
-  .post(addBusinessAccount);
+  .post(superAdminAccess, addBusinessAccount);
 router.route("/login").patch(businessAccountLogin);
+router.route("/signup").post(addBusinessAccount);
 router.route("/forget-password").patch(forgotBusinessAccountPassword);
 router.route("/reset-password").patch(resetBusinessAccountPassword);
 router.route("/profile").get(adminAccess, getBusinessAccountProfile);

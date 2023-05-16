@@ -96,7 +96,7 @@ export const addAdvertisement = (data: any) => {
         code: "",
         desc,
         image: {
-          key: image.key,
+          key: image.key.split("/").slice(-1)[0],
           mimetype: image.mimetype,
         },
         type: type,
@@ -146,9 +146,12 @@ export const editAdvertisement = (
       advertisement.desc = desc || advertisement.desc;
       advertisement.visibility = visibility || advertisement.visibility;
 
-      if (image) {
-        advertisement.image.key = image.key;
-        advertisement.image.mimetype = image.mimetype;
+      if (image && image.key && image.mimetype) {
+        // Delete Image
+        advertisement.image = {
+          key: image.key.split("/").slice(-1)[0],
+          mimetype: image.mimetype,
+        };
       }
 
       const nadvertisement = await advertisement.save();

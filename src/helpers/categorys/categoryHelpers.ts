@@ -77,14 +77,7 @@ export const addCategory = (data: any) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { name, type, image, status, visibility } = data;
-      if (
-        !name ||
-        !type ||
-        ["JOB", "BUSINESS"].includes(type) ||
-        !image ||
-        !status ||
-        !visibility
-      )
+      if (!name || !type || ["JOB", "BUSINESS"].includes(type) || !image)
         throw new ThrowError(
           "Please Provide name, type('JOB', 'BUSINESS') and image",
           400
@@ -100,11 +93,11 @@ export const addCategory = (data: any) => {
       const category = await new Category({
         name,
         image: {
-          key: image.key,
+          key: image.key.split("/").slice(-1)[0],
           mimetype: image.mimetype,
         },
-        status: "Active",
-        visibility: "Show",
+        status: status || "Active",
+        visibility: visibility || "Show",
       });
 
       const ncategory = await category.save();
@@ -158,7 +151,7 @@ export const editCategory = (categoryId: string, data: any, client: any) => {
       if (image && image.key && image.mimetype) {
         // Delete Image
         category.image = {
-          key: image.key,
+          key: image.key.split("/").slice(-1)[0],
           mimetype: image.mimetype,
         };
       }

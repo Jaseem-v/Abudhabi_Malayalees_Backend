@@ -7,6 +7,7 @@ import * as eventControllers from "./events/eventControllers";
 import * as jobControllers from "./jobs/jobControllers";
 import * as advertisementControllers from "./advertisements/advertisementControllers";
 import * as newsControllers from "./news/newsControllers";
+import * as galleryControllers from "./gallerys/galleryControllers";
 
 export {
   adminControllers,
@@ -18,4 +19,5 @@ export {
   jobControllers,
   advertisementControllers,
   newsControllers,
+  galleryControllers,
 };

@@ -7,6 +7,7 @@ import * as eventHelpers from "./events/eventHelpers";
 import * as jobHelpers from "./jobs/jobHelpers";
 import * as advertisementHelpers from "./advertisements/advertisementHelpers";
 import * as newsHelpers from "./news/newsHelpers";
+import * as galleryHelpers from "./gallerys/galleryHelpers";
 
 export {
   adminHelpers,
@@ -17,5 +18,6 @@ export {
   eventHelpers,
   jobHelpers,
   advertisementHelpers,
-  newsHelpers
+  newsHelpers,
+  galleryHelpers
 };

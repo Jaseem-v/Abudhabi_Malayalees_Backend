@@ -28,8 +28,9 @@ const router = Router();
 router
   .route("/")
   .get(superAdminAccess, getPersonalAccounts)
-  .post(addPersonalAccount);
+  .post(superAdminAccess, addPersonalAccount);
 router.route("/login").patch(personalAccountLogin);
+router.route("/signup").post(addPersonalAccount);
 router.route("/forget-password").patch(forgotPersonalAccountPassword);
 router.route("/reset-password").patch(resetPersonalAccountPassword);
 router.route("/profile").get(adminAccess, getPersonalAccountProfile);
