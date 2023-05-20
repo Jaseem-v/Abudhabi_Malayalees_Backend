@@ -3,7 +3,7 @@
  * @param {String} date - DD-MM-YYYY
  * @returns YYYY-MM-DD
  */
-export const convertDateFormat = (date) => {
+export const convertDateFormat = (date: string) => {
     return new Promise((resolve, reject) => {
   
       if (
