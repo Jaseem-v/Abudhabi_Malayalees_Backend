@@ -10,7 +10,7 @@ const router = Router();
 
 router.use("/admin", adminRouters);
 router.use("/category", categoryRouters);
-router.use("/user", userRouters);
+// router.use("/user", userRouters);
 router.use("/user/business", businessAccountRouters);
 router.use("/user/personal", personalAccountRouters);
 

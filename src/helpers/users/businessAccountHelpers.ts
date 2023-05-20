@@ -8,7 +8,7 @@ import { IRoles } from "../../types/default";
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;
 
-const BUSINESS_ACCOUNT_USERNAME_STARTS_WITH = "ba-"
+const BUSINESS_ACCOUNT_USERNAME_STARTS_WITH = "ba-";
 
 /**
  * To get all businessAccounts
@@ -166,8 +166,11 @@ export const addBusinessAccount = (data: any) => {
         city,
         address,
         about,
+        socialMediaLinks,
+        services,
         contactDetails,
       } = data;
+
       if (
         !name ||
         !username ||
@@ -180,10 +183,11 @@ export const addBusinessAccount = (data: any) => {
         !state ||
         !city ||
         !address ||
-        !about ||
+        !services ||
+        !socialMediaLinks ||
         !contactDetails ||
         !contactDetails.fname ||
-        !contactDetails.fname ||
+        !contactDetails.lname ||
         !contactDetails.email ||
         !contactDetails.phone
       )
@@ -196,7 +200,12 @@ export const addBusinessAccount = (data: any) => {
         throw new ThrowError("Invalid Username", 404);
 
       const businessAccountExists = await BusinessAccount.findOne({
-        $or: [{ email }, { phone }, { username }],
+        $or: [
+          { email },
+          { phone },
+          { username },
+          { "contactDetails.email": contactDetails.email },
+        ],
       });
 
       if (businessAccountExists)
@@ -214,7 +223,9 @@ export const addBusinessAccount = (data: any) => {
         state,
         city,
         address,
+        services,
         about,
+        socialMediaLinks,
         contactDetails: {
           fname: contactDetails.fname,
           lname: contactDetails.lname,
@@ -232,6 +243,7 @@ export const addBusinessAccount = (data: any) => {
         businessAccount: nbusinessAccount,
       });
     } catch (error: any) {
+      console.log(error);
       return reject({
         message: error.message || error.msg,
         statusCode: error.statusCode,
@@ -272,6 +284,8 @@ export const editBusinessAccount = (
         website,
         location,
         state,
+        services,
+        socialMediaLinks,
         city,
         address,
         contactDetails,
@@ -325,7 +339,10 @@ export const editBusinessAccount = (
       businessAccount.location = location || businessAccount.location;
       businessAccount.state = state || businessAccount.state;
       businessAccount.city = city || businessAccount.city;
+      businessAccount.socialMediaLinks =
+        socialMediaLinks || businessAccount.socialMediaLinks;
       businessAccount.address = address || businessAccount.address;
+      businessAccount.services = services || businessAccount.services;
 
       if (category && isValidObjectId(category)) {
         businessAccount.category = category;
@@ -392,8 +409,11 @@ export const updateBusinessAccountProfile = (
         location,
         state,
         city,
+        about,
         address,
+        services,
         contactDetails,
+        socialMediaLinks,
       } = data;
 
       // Update a values in db
@@ -403,6 +423,10 @@ export const updateBusinessAccountProfile = (
       businessAccount.state = state || businessAccount.state;
       businessAccount.city = city || businessAccount.city;
       businessAccount.address = address || businessAccount.address;
+      businessAccount.about = about || businessAccount.about;
+      businessAccount.services = services || businessAccount.services;
+      businessAccount.socialMediaLinks =
+        socialMediaLinks || businessAccount.socialMediaLinks;
 
       if (category && isValidObjectId(category)) {
         businessAccount.category = category;
@@ -448,7 +472,7 @@ export const checkBusinessAccountStatus = (
   businessAccountId: string,
   status: string[]
 ) => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<any>(async (resolve, reject) => {
     try {
       if (
         !businessAccountId ||
@@ -505,7 +529,7 @@ export const checkBusinessAccountUsernameAvailability = (username: string) => {
     try {
       if (!username) throw new ThrowError("Provide username", 400);
 
-    if (!username.includes(BUSINESS_ACCOUNT_USERNAME_STARTS_WITH)) {
+      if (!username.includes(BUSINESS_ACCOUNT_USERNAME_STARTS_WITH)) {
         return resolve({
           message: "Username unavailable",
           availability: false,

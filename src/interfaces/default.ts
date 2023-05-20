@@ -6,6 +6,7 @@ export interface IRequest extends Request {
     id: string;
     name: string;
     role: IRoles;
+    status: string;
   };
   query: {
     [name: string]: string;

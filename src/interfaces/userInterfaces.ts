@@ -18,7 +18,10 @@ export interface IBusinessAccount {
   images?: IImage[];
   locationType?: string;
   numberOfEmployees?: string;
-  socialMediaLinks?: string;
+  socialMediaLinks?: {
+    title: "";
+    link: "";
+  }[];
   yearEstablished?: string;
   contactDetails: {
     fname: string;
@@ -45,6 +48,10 @@ export interface IPersonalAccount {
   password?: string;
   about: string;
   images?: IImage[];
+  socialMediaLinks?: {
+    title: "";
+    link: "";
+  }[];
   resetPasswordAccess: boolean;
   status: "Active" | "Inactive" | "Suspended" | "Blocked";
   lastSync: string | Date;

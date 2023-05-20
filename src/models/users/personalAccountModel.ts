@@ -44,6 +44,12 @@ const personalAccountSchema = new mongoose.Schema<IPersonalAccountDocument>(
       required: true,
       default: "NO ABOUT",
     },
+    socialMediaLinks: [
+      {
+        title: String,
+        link: String,
+      },
+    ],
     resetPasswordAccess: {
       type: Boolean,
       default: false,

@@ -1,6 +1,6 @@
 import { ErrorResponse } from "../classes";
 import { verifyToken } from "../utils";
-import { adminHelpers, userHelpers } from "../helpers";
+import { personalAccountHelpers, businessAccountHelpers,  userHelpers } from "../helpers";
 import { config } from "../config";
 import { ApiParams } from "../types";
 
@@ -15,6 +15,7 @@ export const superAdminAccess: ApiParams = async (req, res, next) => {
       throw new ErrorResponse("Unathenticated", 403);
     }
     const authorizationToken = req.headers.authorization.split(" ")[1];
+
     // const cookieToken = req.cookies[SERVER_ACCESS_TOKEN_KEY];
     // console.log(authorizationToken, req.cookies, cookieToken);
     if (
@@ -26,7 +27,8 @@ export const superAdminAccess: ApiParams = async (req, res, next) => {
       throw new ErrorResponse("Unathenticated", 403);
     }
 
-    const decoded = await verifyToken(authorizationToken, "AccessToken");
+    const decoded = (await verifyToken(authorizationToken, "AccessToken"))
+      .payload;
     if (decoded && ["SuperAdmin", "Developer"].includes(decoded.role ?? "")) {
       // const admin = await (
       //   await adminHelpers.checkAdminStatus(decoded.id, ["Active"])
@@ -66,7 +68,8 @@ export const adminAccess: ApiParams = async (req, res, next) => {
       throw new ErrorResponse("Unathenticated", 403);
     }
 
-    const decoded = await verifyToken(authorizationToken, "AccessToken");
+    const decoded = (await verifyToken(authorizationToken, "AccessToken"))
+      .payload;
     if (
       decoded &&
       ["SuperAdmin", "Developer", "Admin"].includes(decoded.role ?? "")
@@ -98,6 +101,7 @@ export const userAccess: ApiParams = async (req, res, next) => {
       throw new ErrorResponse("Unathenticated", 403);
     }
     const authorizationToken = req.headers.authorization.split(" ")[1];
+    console.log(authorizationToken);
     // const cookieToken = req.cookies[SERVER_ACCESS_TOKEN_KEY];
     // console.log(authorizationToken, req.cookies, cookieToken);
     if (
@@ -109,10 +113,12 @@ export const userAccess: ApiParams = async (req, res, next) => {
       throw new ErrorResponse("Unathenticated", 403);
     }
 
-    const decoded = await verifyToken(authorizationToken, "AccessToken");
+    const decoded = (await verifyToken(authorizationToken, "AccessToken"))
+      .payload;
+    console.log(decoded);
     if (
       decoded &&
-      ["PersonalUser", "BusinessUser"].includes(decoded.role ?? "")
+      ["PersonalAccount", "BusinessAccount"].includes(decoded.role ?? "")
     ) {
       // const user = await (
       //   await userHelpers.checkAdminStatus(decoded.id, ["Active"])
@@ -123,6 +129,92 @@ export const userAccess: ApiParams = async (req, res, next) => {
       //   status: user.status,
       //   role: user.role,
       // };
+      return next();
+    } else {
+      return next(new ErrorResponse("Unathenticated", 403));
+    }
+  } catch (error: any) {
+    return next(new ErrorResponse("Unathenticated", error.statusCode || 403));
+  }
+};
+
+export const personalAccountAccess: ApiParams = async (req, res, next) => {
+  try {
+    if (
+      !req.headers.authorization ||
+      !req.headers.authorization?.includes("Bearer")
+    ) {
+      throw new ErrorResponse("Unathenticated", 403);
+    }
+    const authorizationToken = req.headers.authorization.split(" ")[1];
+    console.log(authorizationToken);
+    // const cookieToken = req.cookies[SERVER_ACCESS_TOKEN_KEY];
+    // console.log(authorizationToken, req.cookies, cookieToken);
+    if (
+      !authorizationToken
+      //  ||
+      // !cookieToken ||
+      // authorizationToken != cookieToken
+    ) {
+      throw new ErrorResponse("Unathenticated", 403);
+    }
+
+    const decoded = (await verifyToken(authorizationToken, "AccessToken"))
+      .payload;
+    console.log(decoded);
+    if (decoded && decoded.role === "PersonalAccount") {
+      const personalAccount = await (
+        await personalAccountHelpers.checkPersonalAccountStatus(decoded.id, ["Active"])
+      ).personalAccount;
+      req.client = {
+        id: personalAccount.id,
+        name: personalAccount.name,
+        status: personalAccount.status,
+        role: personalAccount.role,
+      };
+      return next();
+    } else {
+      return next(new ErrorResponse("Unathenticated", 403));
+    }
+  } catch (error: any) {
+    return next(new ErrorResponse("Unathenticated", error.statusCode || 403));
+  }
+};
+
+export const businessAccountAccess: ApiParams = async (req, res, next) => {
+  try {
+    if (
+      !req.headers.authorization ||
+      !req.headers.authorization?.includes("Bearer")
+    ) {
+      throw new ErrorResponse("Unathenticated", 403);
+    }
+    const authorizationToken = req.headers.authorization.split(" ")[1];
+    console.log(authorizationToken);
+    // const cookieToken = req.cookies[SERVER_ACCESS_TOKEN_KEY];
+    // console.log(authorizationToken, req.cookies, cookieToken);
+    if (
+      !authorizationToken
+      //  ||
+      // !cookieToken ||
+      // authorizationToken != cookieToken
+    ) {
+      throw new ErrorResponse("Unathenticated", 403);
+    }
+
+    const decoded = (await verifyToken(authorizationToken, "AccessToken"))
+      .payload;
+      console.log(decoded);
+      if (decoded && decoded.role === "BusinessAccount") {
+        const businessAccount = await (
+          await businessAccountHelpers.checkBusinessAccountStatus(decoded.id, ["Active"])
+        ).businessAccount;
+        req.client = {
+          id: businessAccount.id,
+          name: businessAccount.name,
+          status: businessAccount.status,
+          role: businessAccount.role,
+        };
       return next();
     } else {
       return next(new ErrorResponse("Unathenticated", 403));
@@ -152,7 +244,8 @@ export const allRoleAccess: ApiParams = async (req, res, next) => {
       throw new ErrorResponse("Unathenticated", 403);
     }
 
-    const decoded = await verifyToken(authorizationToken, "AccessToken");
+    const decoded = (await verifyToken(authorizationToken, "AccessToken"))
+      .payload;
     if (decoded && ["SuperAdmin", "Developer"].includes(decoded.role ?? "")) {
       // const admin = await (
       //   await adminHelpers.checkAdminStatus(decoded.id, ["Active"])

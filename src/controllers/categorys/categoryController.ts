@@ -66,7 +66,7 @@ export const addCategory: ApiParams = (req, res, next) => {
       res.status(200).json({
         success: true,
         message: resp.message,
-        category: resp.category,
+        data: resp.category,
       });
     })
     .catch((error: any) => {

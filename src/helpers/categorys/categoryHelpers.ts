@@ -77,7 +77,7 @@ export const addCategory = (data: any) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { name, type, image, status, visibility } = data;
-      if (!name || !type || ["JOB", "BUSINESS"].includes(type) || !image)
+      if (!name || !type || !["JOB", "BUSINESS"].includes(type) || !image)
         throw new ThrowError(
           "Please Provide name, type('JOB', 'BUSINESS') and image",
           400
@@ -92,6 +92,7 @@ export const addCategory = (data: any) => {
 
       const category = await new Category({
         name,
+        type,
         image: {
           key: image.key.split("/").slice(-1)[0],
           mimetype: image.mimetype,

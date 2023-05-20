@@ -1,6 +1,5 @@
 export interface IAdmin {
     name: string;
-    username:string;
     email: string;
     phone: string;
     role: "SuperAdmin" | "Admin" |  "Developer";

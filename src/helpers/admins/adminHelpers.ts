@@ -71,6 +71,7 @@ export const getAdmin = (adminId: string, role?: IRoles) => {
 /**
  * To login a admin's account by email and password
  * @param {String} email
+ * @param {String} username
  * @param {String} phone
  * @param {String} password
  * @returns {String} token
@@ -79,10 +80,10 @@ export const adminLogin = (email: string, phone: string, password: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       if ((!email && !phone) || !password)
-        throw new ThrowError("Provide email and password", 400);
+        throw new ThrowError("Provide email or phone and password", 400);
 
       const admin = await Admin.findOne(
-        { $or: [{ email }, { phone }] },
+        { $or: [{ email }, { phone } ]},
         { password: 1, name: 1, role: 1, status: 1, lastSync: 1 }
       );
 

@@ -58,9 +58,26 @@ const businessAccountSchema = new mongoose.Schema<IBusinessAccountDocument>(
     },
     about: {
       type: String,
-      required: true,
       default: "NO ABOUT",
     },
+    socialMediaLinks: [
+      {
+        title: String,
+        link: String,
+      },
+    ],
+    images: [
+      {
+        key: {
+          type: String,
+          required: true,
+        },
+        mimetype: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
     contactDetails: {
       fname: {
         type: String,

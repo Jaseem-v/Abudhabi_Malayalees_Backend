@@ -98,7 +98,7 @@ export const personalAccountLogin = (
 
       const personalAccount = await PersonalAccount.findOne(
         { $or: [{ email }, { email }, { phone }] },
-        { password: 1, name: 1, role: 1, status: 1, lastSync: 1 }
+        { password: 1, fname: 1, role: 1, status: 1, lastSync: 1 }
       );
 
       if (!personalAccount)
@@ -153,7 +153,7 @@ export const personalAccountLogin = (
 export const addPersonalAccount = (data: any) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { fname, lname, username, phone, email, password } = data;
+      const { fname, lname, username, phone, about, socialMediaLinks, email, password } = data;
       if (!fname || !lname || !username || !phone || !email || !password)
         throw new ThrowError(
           `Please Provide fname, lname, username, phone, email and password`,
@@ -176,8 +176,9 @@ export const addPersonalAccount = (data: any) => {
         username,
         phone,
         email,
+        about,
+        socialMediaLinks,
         password,
-        // location,
         lastSync: new Date(),
         lastUsed: new Date(),
       });
@@ -219,7 +220,7 @@ export const editPersonalAccount = (
       if (!personalAccount)
         throw new ThrowError("PersonalAccount not found", 404);
 
-      const { fname, lname, username, phone, email, password } = data;
+      const { fname, lname, username, phone, about, socialMediaLinks,  email, password } = data;
 
       if (username && !username.includes(PERSONAL_ACCOUNT_USERNAME_STARTS_WITH))
         throw new ThrowError("Invalid Username", 404);
@@ -266,6 +267,8 @@ export const editPersonalAccount = (
       personalAccount.username = username || personalAccount.username;
       personalAccount.email = email || personalAccount.email;
       personalAccount.phone = phone || personalAccount.phone;
+      personalAccount.about = about || personalAccount.about;
+      personalAccount.socialMediaLinks = socialMediaLinks || personalAccount.socialMediaLinks;
 
       if (password) {
         personalAccount.password = password;
@@ -307,11 +310,13 @@ export const updatePersonalAccountProfile = (
       if (!personalAccount)
         throw new ThrowError("PersonalAccount not found", 404);
 
-      const { fname, lname } = data;
+      const { fname, lname, about, socialMediaLinks } = data;
 
       // Update a values in db
       personalAccount.fname = fname || personalAccount.fname;
       personalAccount.lname = lname || personalAccount.lname;
+      personalAccount.about = about || personalAccount.about;
+      personalAccount.socialMediaLinks = socialMediaLinks || personalAccount.socialMediaLinks;
 
       const npersonalAccount = await personalAccount.save();
 
@@ -338,7 +343,7 @@ export const checkPersonalAccountStatus = (
   personalAccountId: string,
   status: string[]
 ) => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<any>(async (resolve, reject) => {
     try {
       if (
         !personalAccountId ||
