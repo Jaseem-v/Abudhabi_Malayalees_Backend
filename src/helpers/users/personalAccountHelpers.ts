@@ -8,7 +8,7 @@ import { IRoles } from "../../types/default";
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;
 
-const PERSONAL_ACCOUNT_USERNAME_STARTS_WITH = "pa-"
+const PERSONAL_ACCOUNT_USERNAME_STARTS_WITH = "pa-";
 
 /**
  * To get all personalAccounts
@@ -153,7 +153,16 @@ export const personalAccountLogin = (
 export const addPersonalAccount = (data: any) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { fname, lname, username, phone, about, socialMediaLinks, email, password } = data;
+      const {
+        fname,
+        lname,
+        username,
+        phone,
+        about,
+        socialMediaLinks,
+        email,
+        password,
+      } = data;
       if (!fname || !lname || !username || !phone || !email || !password)
         throw new ThrowError(
           `Please Provide fname, lname, username, phone, email and password`,
@@ -177,6 +186,8 @@ export const addPersonalAccount = (data: any) => {
         phone,
         email,
         about,
+        profilePicture: null,
+        gallerys: [],
         socialMediaLinks,
         password,
         lastSync: new Date(),
@@ -220,7 +231,16 @@ export const editPersonalAccount = (
       if (!personalAccount)
         throw new ThrowError("PersonalAccount not found", 404);
 
-      const { fname, lname, username, phone, about, socialMediaLinks,  email, password } = data;
+      const {
+        fname,
+        lname,
+        username,
+        phone,
+        about,
+        socialMediaLinks,
+        email,
+        password,
+      } = data;
 
       if (username && !username.includes(PERSONAL_ACCOUNT_USERNAME_STARTS_WITH))
         throw new ThrowError("Invalid Username", 404);
@@ -268,7 +288,8 @@ export const editPersonalAccount = (
       personalAccount.email = email || personalAccount.email;
       personalAccount.phone = phone || personalAccount.phone;
       personalAccount.about = about || personalAccount.about;
-      personalAccount.socialMediaLinks = socialMediaLinks || personalAccount.socialMediaLinks;
+      personalAccount.socialMediaLinks =
+        socialMediaLinks || personalAccount.socialMediaLinks;
 
       if (password) {
         personalAccount.password = password;
@@ -316,7 +337,8 @@ export const updatePersonalAccountProfile = (
       personalAccount.fname = fname || personalAccount.fname;
       personalAccount.lname = lname || personalAccount.lname;
       personalAccount.about = about || personalAccount.about;
-      personalAccount.socialMediaLinks = socialMediaLinks || personalAccount.socialMediaLinks;
+      personalAccount.socialMediaLinks =
+        socialMediaLinks || personalAccount.socialMediaLinks;
 
       const npersonalAccount = await personalAccount.save();
 
@@ -328,6 +350,237 @@ export const updatePersonalAccountProfile = (
       return reject({
         message: error.message || error.msg,
         statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * to change a personalAccount profile pic
+ * @param {String} personalAccountId
+ * @param {Object} image
+ * @returns personalAccount
+ */
+export const changePersonalAccountProfileImage = (
+  personalAccountId: string,
+  image: any
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!personalAccountId || !isValidObjectId(personalAccountId) || !image) {
+        return reject({
+          message: "Provide valid personalAccount id and image",
+          statusCode: 400,
+        });
+      }
+
+      const personalAccount = await PersonalAccount.findById(personalAccountId);
+
+      if (!personalAccount) {
+        return reject({
+          message: "Personal Account not found",
+          statusCode: 404,
+        });
+      }
+
+      personalAccount.profilePicture = {
+        key: image.key.split("/").slice(-1)[0],
+        mimetype: image.mimetype,
+      };
+
+      const npersonalAccount = await personalAccount.save();
+
+      resolve({
+        message: "Personal Account profile picture changed successfully",
+        personalAccount: npersonalAccount,
+      });
+    } catch (error: any) {
+      reject({
+        message: error.message || error.msg,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * to remove a personalAccount profile pic
+ * @param {String} personalAccountId
+ * @param {Object} image
+ * @returns personalAccount
+ */
+export const removePersonalAccountProfileImage = (
+  personalAccountId: string
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!personalAccountId || !isValidObjectId(personalAccountId)) {
+        return reject({
+          message: "Provide valid personalAccount id",
+          statusCode: 400,
+        });
+      }
+
+      const personalAccount = await PersonalAccount.findById(personalAccountId);
+
+      if (!personalAccount) {
+        return reject({
+          message: "Personal Account not found",
+          statusCode: 404,
+        });
+      }
+
+      personalAccount.profilePicture = null;
+
+      const npersonalAccount = await personalAccount.save();
+
+      resolve({
+        message: "Personal Account profile picture removed successfully",
+        personalAccount: npersonalAccount,
+      });
+    } catch (error: any) {
+      reject({
+        message: error.message || error.msg,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * Add a new personalAccount image
+ * @param {String} personalAccountId
+ * @param {Object} image
+ * @returns personalAccount
+ */
+export const addGalleryImage = (personalAccountId: string, image: any) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!personalAccountId || !isValidObjectId(personalAccountId) || !image) {
+        return reject({
+          message: "Provide valid personalAccount id and image",
+          statusCode: 400,
+        });
+      }
+
+      const personalAccount = await PersonalAccount.findById(personalAccountId);
+
+      if (!personalAccount) {
+        return reject({
+          message: "Personal Account not found",
+          statusCode: 404,
+        });
+      }
+
+      personalAccount.gallerys.push({
+        _id: new mongoose.Types.ObjectId().toString(),
+        key: image.key.split("/").slice(-1)[0],
+        mimetype: image.mimetype,
+      });
+
+      const npersonalAccount = await personalAccount.save();
+
+      resolve({
+        message: "Personal Account gallery added successfully",
+        personalAccount: npersonalAccount,
+      });
+    } catch (error: any) {
+      reject({
+        message: error.message || error.msg,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * Remove a personalAccount image
+ * @param {String} personalAccountId
+ * @param {String} galleryId
+ * @returns personalAccount
+ */
+export const removeGalleryImage = (
+  personalAccountId: string,
+  galleryId: string
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (
+        !personalAccountId ||
+        !isValidObjectId(personalAccountId) ||
+        !galleryId ||
+        !isValidObjectId(galleryId)
+      ) {
+        return reject({
+          message: "Provide valid personalAccount id and gallery id ",
+          statusCode: 400,
+        });
+      }
+
+      const personalAccount = await PersonalAccount.findById(personalAccountId);
+
+      if (!personalAccount) {
+        return reject({
+          message: "Personal Account not found",
+          statusCode: 404,
+        });
+      }
+
+      personalAccount.gallerys = personalAccount.gallerys.filter(
+        (gallery) => gallery._id.toString() != galleryId.toString()
+      );
+
+      const npersonalAccount = await personalAccount.save();
+
+      resolve({
+        message: "Personal Account gallery removed successfully",
+        personalAccount: npersonalAccount,
+      });
+    } catch (error: any) {
+      reject({
+        message: error.message || error.msg,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * Remove all image from a personalAccount
+ * @param {String} personalAccountId
+ * @returns personalAccount
+ */
+export const removeAllGalleryImages = (personalAccountId: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!personalAccountId || !isValidObjectId(personalAccountId)) {
+        return reject({
+          message: "Provide valid personalAccount id",
+          statusCode: 400,
+        });
+      }
+
+      const personalAccount = await PersonalAccount.findById(personalAccountId);
+
+      if (!personalAccount) {
+        return reject({
+          message: "Personal Account not found",
+          statusCode: 404,
+        });
+      }
+
+      personalAccount.gallerys = [];
+
+      const npersonalAccount = await personalAccount.save();
+
+      resolve({
+        message: "Personal Account gallery images removed successfully",
+        personalAccount: npersonalAccount,
+      });
+    } catch (error: any) {
+      reject({
+        message: error.message || error.msg,
         code: error.code || error.name,
       });
     }

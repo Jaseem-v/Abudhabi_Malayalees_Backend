@@ -115,7 +115,6 @@ export const userAccess: ApiParams = async (req, res, next) => {
 
     const decoded = (await verifyToken(authorizationToken, "AccessToken"))
       .payload;
-    console.log(decoded);
     if (
       decoded &&
       ["PersonalAccount", "BusinessAccount"].includes(decoded.role ?? "")
@@ -161,7 +160,6 @@ export const personalAccountAccess: ApiParams = async (req, res, next) => {
 
     const decoded = (await verifyToken(authorizationToken, "AccessToken"))
       .payload;
-    console.log(decoded);
     if (decoded && decoded.role === "PersonalAccount") {
       const personalAccount = await (
         await personalAccountHelpers.checkPersonalAccountStatus(decoded.id, ["Active"])
@@ -177,6 +175,7 @@ export const personalAccountAccess: ApiParams = async (req, res, next) => {
       return next(new ErrorResponse("Unathenticated", 403));
     }
   } catch (error: any) {
+    console.log(error);
     return next(new ErrorResponse("Unathenticated", error.statusCode || 403));
   }
 };
@@ -204,7 +203,6 @@ export const businessAccountAccess: ApiParams = async (req, res, next) => {
 
     const decoded = (await verifyToken(authorizationToken, "AccessToken"))
       .payload;
-      console.log(decoded);
       if (decoded && decoded.role === "BusinessAccount") {
         const businessAccount = await (
           await businessAccountHelpers.checkBusinessAccountStatus(decoded.id, ["Active"])

@@ -1,6 +1,12 @@
 import { Router } from "express";
+import { config } from "../../config";
 import { businessAccountControllers } from "../../controllers";
-import { adminAccess, superAdminAccess } from "../../middlewares";
+import {
+  adminAccess,
+  businessAccountAccess,
+  superAdminAccess,
+} from "../../middlewares";
+import { s3Upload } from "../../functions/multer";
 const {
   getBusinessAccounts,
   getBusinessAccount,
@@ -9,6 +15,11 @@ const {
   addBusinessAccount,
   editBusinessAccount,
   updateBusinessAccountProfile,
+  changeBusinessAccountProfileImage,
+  removeBusinessAccountProfileImage,
+  addGalleryImage,
+  removeGalleryImage,
+  removeAllGalleryImages,
   checkBusinessAccountUsernameAvailability,
   changeBusinessAccountEmail,
   changeBusinessAccountUsername,
@@ -22,6 +33,10 @@ const {
   pDeleteBusinessAccount,
   deleteAllBusinessAccount,
 } = businessAccountControllers;
+const {
+  AWS_S3_BUSINESS_ACCOUNT_GALLERY_RESOURCES,
+  AWS_S3_BUSINESS_ACCOUNT_PROFILE_RESOURCES,
+} = config.AWS_S3;
 
 const router = Router();
 
@@ -35,6 +50,26 @@ router.route("/forget-password").patch(forgotBusinessAccountPassword);
 router.route("/reset-password").patch(resetBusinessAccountPassword);
 router.route("/profile").get(adminAccess, getBusinessAccountProfile);
 router.route("/profile").patch(adminAccess, updateBusinessAccountProfile);
+router
+  .route("/change-profile-picture")
+  .patch(
+    businessAccountAccess,
+    s3Upload(AWS_S3_BUSINESS_ACCOUNT_PROFILE_RESOURCES, "single", "image"),
+    changeBusinessAccountProfileImage
+  );
+router
+  .route("/remove-profile-picture")
+  .delete(businessAccountAccess, removeBusinessAccountProfileImage);
+router
+  .route("/add-gallery")
+  .patch(
+    businessAccountAccess,
+    s3Upload(AWS_S3_BUSINESS_ACCOUNT_GALLERY_RESOURCES, "single", "image"),
+    addGalleryImage
+  );
+router
+  .route("/remove-all-gallerys")
+  .delete(businessAccountAccess, removeAllGalleryImages);
 router
   .route("/check-username-availablility")
   .patch(checkBusinessAccountUsernameAvailability);
@@ -50,6 +85,9 @@ router.route("/change-email").patch(adminAccess, changeBusinessAccountEmail);
 router
   .route("/change-username")
   .patch(adminAccess, changeBusinessAccountUsername);
+router
+  .route("/remove-gallery/:gid")
+  .delete(businessAccountAccess, removeGalleryImage);
 router.route("/delete/:baid").delete(superAdminAccess, pDeleteBusinessAccount);
 router.route("/restore/:baid").put(superAdminAccess, restoreBusinessAccount);
 router

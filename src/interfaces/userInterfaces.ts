@@ -1,5 +1,5 @@
 import { Document } from "mongoose";
-import { IImage } from "./default";
+import { IImage, IImages } from "./default";
 
 export interface IBusinessAccount {
   name: string;
@@ -15,12 +15,13 @@ export interface IBusinessAccount {
   address: string;
   about?: string;
   services?: string[];
-  images?: IImage[];
+  gallerys: IImages[];
+  profilePicture: IImage | null;
   locationType?: string;
   numberOfEmployees?: string;
   socialMediaLinks?: {
-    title: "";
-    link: "";
+    title: string;
+    link: string;
   }[];
   yearEstablished?: string;
   contactDetails: {
@@ -47,10 +48,11 @@ export interface IPersonalAccount {
   email: string;
   password?: string;
   about: string;
-  images?: IImage[];
+  gallerys: IImages[];
+  profilePicture: IImage | null;
   socialMediaLinks?: {
-    title: "";
-    link: "";
+    title: string;
+    link: string;
   }[];
   resetPasswordAccess: boolean;
   status: "Active" | "Inactive" | "Suspended" | "Blocked";

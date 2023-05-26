@@ -22,6 +22,7 @@ const connect = async () => {
       ? `mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DATABASE}?retryWrites=true&w=majority`
       : `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DATABASE}`;
 
+    mongoose.set("strictQuery", false);
     const conn = await mongoose.connect(MONGO_URI, MONGOOSE_OPTIONS);
     logger.info(
       NAMESPACE,

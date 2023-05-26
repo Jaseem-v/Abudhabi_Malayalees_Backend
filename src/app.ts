@@ -5,7 +5,7 @@ import cors from "cors";
 /* Custom Imported Modules */
 import { config, db } from "./config";
 import { logMiddleware, errorHandler } from "./middlewares";
-import { v1Routers } from "./routers";
+import { v1Routers, resourceRouter } from "./routers";
 
 /* Config Variables */
 const app = express();
@@ -56,6 +56,7 @@ app.get("/api-docs", (req: Request, res: Response) => {
 });
 
 /* Routes */
+app.use("/resource", resourceRouter);
 app.use("/api/v1", v1Routers);
 
 /* 404 Route */

@@ -8,6 +8,7 @@ import * as jobControllers from "./jobs/jobControllers";
 import * as advertisementControllers from "./advertisements/advertisementControllers";
 import * as newsControllers from "./news/newsControllers";
 import * as galleryControllers from "./gallerys/galleryControllers";
+import * as resourceControllers from "./resources/resourceControllers";
 
 export {
   adminControllers,
@@ -20,4 +21,5 @@ export {
   advertisementControllers,
   newsControllers,
   galleryControllers,
+  resourceControllers,
 };

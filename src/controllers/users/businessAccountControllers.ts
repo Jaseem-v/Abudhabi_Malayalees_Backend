@@ -3,6 +3,7 @@ import { businessAccountHelpers } from "../../helpers";
 
 import { config } from "../../config";
 import { ApiParams } from "../../types";
+import { deleteS3File } from "../../functions/s3";
 
 const { NODE_ENV, SERVER_ACCESS_TOKEN_KEY, SERVER_ACCESS_TOKEN_EXPIRE } =
   config.SERVER;
@@ -92,7 +93,7 @@ export const businessAccountLogin: ApiParams = (req, res, next) => {
     .businessAccountLogin(username, email, phone, password)
     .then((resp: any) => {
       res.cookie(SERVER_ACCESS_TOKEN_KEY, resp.token, {
-        secure: NODE_ENV.toLocaleLowerCase() === "production",
+        secure: NODE_ENV.toLocaleLowerCase() === "personalAccountion",
         httpOnly: true,
         expires: new Date(
           new Date().getTime() + parseInt(SERVER_ACCESS_TOKEN_EXPIRE)
@@ -122,13 +123,11 @@ export const addBusinessAccount: ApiParams = (req, res, next) => {
   businessAccountHelpers
     .addBusinessAccount(req.body)
     .then((resp: any) => {
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: resp.message,
-          businessAccount: resp.businessAccount,
-        });
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        businessAccount: resp.businessAccount,
+      });
     })
     .catch((error: any) => {
       return next(
@@ -178,6 +177,131 @@ export const updateBusinessAccountProfile: ApiParams = (req, res, next) => {
     })
     .catch((error: any) => {
       return next(new ErrorResponse(error.message, 402, error.code));
+    });
+};
+
+/**
+ * to change a businessAccount profile picture
+ * METHOD : PATCH
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const changeBusinessAccountProfileImage: ApiParams = (req, res, next) => {
+  businessAccountHelpers
+    .changeBusinessAccountProfileImage(req.client!.id, req.file)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.businessAccount,
+      });
+    })
+    .catch((error: any) => {
+      if (req.file) {
+        deleteS3File(req.file.key);
+      }
+      return next(new ErrorResponse(error.message, 402, error.code));
+    });
+};
+
+/**
+ * To remove a businessAccount profile picture
+ * METHOD : PATCH
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const removeBusinessAccountProfileImage: ApiParams = (req, res, next) => {
+  businessAccountHelpers
+    .removeBusinessAccountProfileImage(req.client!.id)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.businessAccount,
+      });
+    })
+    .catch((error: any) => {
+      return next(new ErrorResponse(error.message, 402, error.code));
+    });
+};
+
+/**
+ * Add a new personalAccount image
+ * METHOD : PATCH
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const addGalleryImage: ApiParams = (req, res, next) => {
+  businessAccountHelpers
+    .addGalleryImage(req.client!.id, req.file)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.businessAccount,
+      });
+    })
+    .catch((error: any) => {
+      if (req.file) {
+        deleteS3File(req.file.key);
+      }
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
+ * Remove a personalAccount image
+ * METHOD : PATCH
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const removeGalleryImage: ApiParams = (req, res, next) => {
+  businessAccountHelpers
+    .removeGalleryImage(req.client!.id, req.params.gid)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.businessAccount,
+      });
+    })
+    .catch((error: any) => {
+      if (req.file) {
+        deleteS3File(req.file.key);
+      }
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
+ * Remove all image from a personalAccount
+ * METHOD : PATCH
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const removeAllGalleryImages: ApiParams = (req, res, next) => {
+  businessAccountHelpers
+    .removeAllGalleryImages(req.client!.id)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.businessAccount,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
     });
 };
 

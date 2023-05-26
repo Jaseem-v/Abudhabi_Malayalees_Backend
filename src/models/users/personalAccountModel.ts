@@ -50,6 +50,26 @@ const personalAccountSchema = new mongoose.Schema<IPersonalAccountDocument>(
         link: String,
       },
     ],
+    gallerys: [
+      {
+        key: {
+          type: String,
+          required: true,
+        },
+        mimetype: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    profilePicture: {
+      key: {
+        type: String,
+      },
+      mimetype: {
+        type: String,
+      },
+    },
     resetPasswordAccess: {
       type: Boolean,
       default: false,

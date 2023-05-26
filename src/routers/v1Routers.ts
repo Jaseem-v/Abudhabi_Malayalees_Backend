@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import adminRouters from "./admins/adminRouters";
 import categoryRouters from "./categorys/categoryRouters";
-import userRouters from "./users/userRouters";
+// import userRouters from "./users/userRouters";
 import businessAccountRouters from "./users/businessAccountRouters";
 import personalAccountRouters from "./users/personalAccountRouters";
 

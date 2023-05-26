@@ -66,8 +66,12 @@ const businessAccountSchema = new mongoose.Schema<IBusinessAccountDocument>(
         link: String,
       },
     ],
-    images: [
+    gallerys: [
       {
+        _id: {
+          type: String,
+          required: true,
+        },
         key: {
           type: String,
           required: true,
@@ -78,6 +82,16 @@ const businessAccountSchema = new mongoose.Schema<IBusinessAccountDocument>(
         },
       },
     ],
+    profilePicture: {
+      key: {
+        type: String,
+        required: true,
+      },
+      mimetype: {
+        type: String,
+        required: true,
+      },
+    },
     contactDetails: {
       fname: {
         type: String,

@@ -11,9 +11,14 @@ export interface IRequest extends Request {
   query: {
     [name: string]: string;
   };
+  file?: any;
 }
 
 export interface IImage {
   key: string;
   mimetype: string;
+}
+
+export interface IImages extends IImage {
+  _id: string;
 }

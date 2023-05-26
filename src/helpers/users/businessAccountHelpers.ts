@@ -183,8 +183,6 @@ export const addBusinessAccount = (data: any) => {
         !state ||
         !city ||
         !address ||
-        !services ||
-        !socialMediaLinks ||
         !contactDetails ||
         !contactDetails.fname ||
         !contactDetails.lname ||
@@ -192,7 +190,7 @@ export const addBusinessAccount = (data: any) => {
         !contactDetails.phone
       )
         throw new ThrowError(
-          `Please Provide name, username, phone, email, password, category, website, location, state, city, address and contactDetails (fname, lname, email, phone)`,
+          `Please Provide name, username, phone, email, password, category, website, location, state, city, services, address, socialMediaLinks and contactDetails (fname, lname, email, phone)`,
           400
         );
 
@@ -223,8 +221,10 @@ export const addBusinessAccount = (data: any) => {
         state,
         city,
         address,
-        services,
+        services: services ?? [],
         about,
+        profilePicture: null,
+        gallerys: [],
         socialMediaLinks,
         contactDetails: {
           fname: contactDetails.fname,
@@ -239,7 +239,7 @@ export const addBusinessAccount = (data: any) => {
       const nbusinessAccount = await businessAccount.save();
 
       resolve({
-        message: "Account created successfully",
+        message: "Business Account created successfully",
         businessAccount: nbusinessAccount,
       });
     } catch (error: any) {
@@ -457,6 +457,236 @@ export const updateBusinessAccountProfile = (
       return reject({
         message: error.message || error.msg,
         statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * to change a businessAccount profile pic
+ * @param {String} businessAccountId
+ * @param {Object} image
+ * @returns businessAccount
+ */
+export const changeBusinessAccountProfileImage = (
+  businessAccountId: string,
+  image: any
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!businessAccountId || !isValidObjectId(businessAccountId) || !image) {
+        return reject({
+          message: "Provide valid businessAccount id and image",
+          statusCode: 400,
+        });
+      }
+
+      const businessAccount = await BusinessAccount.findById(businessAccountId);
+
+      if (!businessAccount) {
+        return reject({
+          message: "Business Account not found",
+          statusCode: 404,
+        });
+      }
+
+      businessAccount.profilePicture = {
+        key: image.key.split("/").slice(-1)[0],
+        mimetype: image.mimetype,
+      };
+
+      const nbusinessAccount = await businessAccount.save();
+
+      resolve({
+        message: "Business Account profile picture changed successfully",
+        businessAccount: nbusinessAccount,
+      });
+    } catch (error: any) {
+      reject({
+        message: error.message || error.msg,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * to remove a businessAccount profile pic
+ * @param {String} businessAccountId
+ * @param {Object} image
+ * @returns businessAccount
+ */
+export const removeBusinessAccountProfileImage = (
+  businessAccountId: string
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!businessAccountId || !isValidObjectId(businessAccountId)) {
+        return reject({
+          message: "Provide valid businessAccount id",
+          statusCode: 400,
+        });
+      }
+
+      const businessAccount = await BusinessAccount.findById(businessAccountId);
+
+      if (!businessAccount) {
+        return reject({
+          message: "Business Account not found",
+          statusCode: 404,
+        });
+      }
+
+      businessAccount.profilePicture = null;
+
+      const nbusinessAccount = await businessAccount.save();
+
+      resolve({
+        message: "Business Account profile picture removed successfully",
+        businessAccount: nbusinessAccount,
+      });
+    } catch (error: any) {
+      reject({
+        message: error.message || error.msg,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * Add a new businessAccount image
+ * @param {String} businessAccountId
+ * @param {Object} image
+ * @returns businessAccount
+ */
+export const addGalleryImage = (businessAccountId: string, image: any) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!businessAccountId || !isValidObjectId(businessAccountId) || !image) {
+        return reject({
+          message: "Provide valid businessAccount id and image",
+          statusCode: 400,
+        });
+      }
+
+      const businessAccount = await BusinessAccount.findById(businessAccountId);
+
+      if (!businessAccount) {
+        return reject({
+          message: "Business Account not found",
+          statusCode: 404,
+        });
+      }
+
+      businessAccount.gallerys.push({
+        _id: new mongoose.Types.ObjectId().toString(),
+        key: image.key.split("/").slice(-1)[0],
+        mimetype: image.mimetype,
+      });
+
+      const nbusinessAccount = await businessAccount.save();
+
+      resolve({
+        message: "Business Account gallery added successfully",
+        businessAccount: nbusinessAccount,
+      });
+    } catch (error: any) {
+      reject({
+        message: error.message || error.msg,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * Remove a businessAccount image
+ * @param {String} businessAccountId
+ * @param {String} galleryId
+ * @returns businessAccount
+ */
+export const removeGalleryImage = (
+  businessAccountId: string,
+  galleryId: string
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (
+        !businessAccountId ||
+        !isValidObjectId(businessAccountId) ||
+        !galleryId ||
+        !isValidObjectId(galleryId)
+      ) {
+        return reject({
+          message: "Provide valid businessAccount id and gallery id ",
+          statusCode: 400,
+        });
+      }
+
+      const businessAccount = await BusinessAccount.findById(businessAccountId);
+
+      if (!businessAccount) {
+        return reject({
+          message: "Business Account not found",
+          statusCode: 404,
+        });
+      }
+      businessAccount.gallerys = businessAccount.gallerys.filter(
+        (gallery) => gallery._id.toString() != galleryId.toString()
+      );
+
+      const nbusinessAccount = await businessAccount.save();
+
+      resolve({
+        message: "Business Account gallery removed successfully",
+        businessAccount: nbusinessAccount,
+      });
+    } catch (error: any) {
+      reject({
+        message: error.message || error.msg,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * Remove all image from a businessAccount
+ * @param {String} businessAccountId
+ * @returns businessAccount
+ */
+export const removeAllGalleryImages = (businessAccountId: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!businessAccountId || !isValidObjectId(businessAccountId)) {
+        return reject({
+          message: "Provide valid businessAccount id",
+          statusCode: 400,
+        });
+      }
+
+      const businessAccount = await BusinessAccount.findById(businessAccountId);
+
+      if (!businessAccount) {
+        return reject({
+          message: "Business Account not found",
+          statusCode: 404,
+        });
+      }
+
+      businessAccount.gallerys = [];
+
+      const nbusinessAccount = await businessAccount.save();
+
+      resolve({
+        message: "Business Account gallery images removed successfully",
+        businessAccount: nbusinessAccount,
+      });
+    } catch (error: any) {
+      reject({
+        message: error.message || error.msg,
         code: error.code || error.name,
       });
     }
