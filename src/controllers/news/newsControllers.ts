@@ -1,4 +1,5 @@
 import { ErrorResponse } from "../../classes";
+import { deleteS3File } from "../../functions/s3";
 import { newsHelpers } from "../../helpers";
 
 import { ApiParams } from "../../types";
@@ -70,6 +71,9 @@ export const addNews: ApiParams = (req, res, next) => {
       });
     })
     .catch((error: any) => {
+      if (req.file) {
+        deleteS3File(req.file.key);
+      }
       return next(
         new ErrorResponse(error.message, error.statusCode, error.code)
       );
@@ -95,6 +99,9 @@ export const editNews: ApiParams = (req, res, next) => {
       });
     })
     .catch((error: any) => {
+      if (req.file) {
+        deleteS3File(req.file.key);
+      }
       return next(new ErrorResponse(error.message, 402, error.code));
     });
 };

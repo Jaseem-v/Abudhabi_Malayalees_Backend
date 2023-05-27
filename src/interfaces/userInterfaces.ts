@@ -3,29 +3,49 @@ import { IImage, IImages } from "./default";
 
 export interface IBusinessAccount {
   name: string;
-  fname: string;
-  lname: string;
   username: string;
   phone: string;
   email: string;
   password?: string;
   category: string | Document["_id"];
-  website: string;
-  location: string;
-  state: string;
-  city: string;
-  address: string;
+  website?: string;
+  location?: string;
   about?: string;
-  services?: string[];
+  services: string[];
   gallerys: IImages[];
   profilePicture: IImage | null;
   locationType?: string;
-  numberOfEmployees?: string;
-  socialMediaLinks?: {
+  socialMediaLinks: {
     title: string;
     link: string;
   }[];
+  numberOfEmployees: number;
   yearEstablished?: string;
+  addressDetails: {
+    streetNumber?: string;
+    state: string;
+    city: string;
+    address: string;
+    place?: string;
+    pincode: string;
+    landmark?: string;
+  };
+  contactDetails: {
+    fname: string;
+    lname: string;
+    phone: string;
+    email?: string;
+    isAddressVisible?: boolean;
+    addressDetails: {
+      streetNumber?: string;
+      state?: string;
+      city?: string;
+      address?: string;
+      place?: string;
+      pincode?: string;
+      landmark?: string;
+    };
+  };
   resetPasswordAccess: boolean;
   status: "Active" | "Inactive" | "Suspended" | "Blocked";
   lastSync: string | Date;

@@ -15,14 +15,6 @@ const businessAccountSchema = new mongoose.Schema<IBusinessAccountDocument>(
       type: String,
       required: true,
     },
-    fname: {
-      type: String,
-      required: true,
-    },
-    lname: {
-      type: String,
-      required: true,
-    },
     username: {
       type: String,
       required: true,
@@ -50,19 +42,9 @@ const businessAccountSchema = new mongoose.Schema<IBusinessAccountDocument>(
     },
     website: {
       type: String,
-      required: true,
     },
     location: {
       type: String,
-      required: true,
-    },
-    city: {
-      type: String,
-      required: true,
-    },
-    address: {
-      type: String,
-      required: true,
     },
     about: {
       type: String,
@@ -74,6 +56,98 @@ const businessAccountSchema = new mongoose.Schema<IBusinessAccountDocument>(
         link: String,
       },
     ],
+    locationType: {
+      type: String,
+    },
+    numberOfEmployees: {
+      type: Number,
+    },
+    yearEstablished: {
+      type: String,
+    },
+    services: [
+      {
+        type: String,
+      },
+    ],
+    addressDetails: {
+      streetNumber: {
+        type: String,
+      },
+      state: {
+        type: String,
+        required: true,
+      },
+      city: {
+        type: String,
+        required: true,
+      },
+      address: {
+        type: String,
+        required: true,
+      },
+      pincode: {
+        type: String,
+        required: true,
+      },
+      place: {
+        type: String,
+      },
+      landmark: {
+        type: String,
+      },
+    },
+    contactDetails: {
+      fname: {
+        type: String,
+        required: true,
+      },
+      lname: {
+        type: String,
+        required: true,
+      },
+      email: {
+        type: String,
+      },
+      phone: {
+        type: String,
+      },
+      isAddressVisible: {
+        type: Boolean,
+        default: false,
+      },
+      addressDetails: {
+        streetNumber: {
+          type: String,
+        },
+        state: {
+          type: String,
+        },
+        city: {
+          type: String,
+        },
+        address: {
+          type: String,
+        },
+        pincode: {
+          type: String,
+        },
+        place: {
+          type: String,
+        },
+        landmark: {
+          type: String,
+        },
+      },
+    },
+    profilePicture: {
+      key: {
+        type: String,
+      },
+      mimetype: {
+        type: String,
+      },
+    },
     gallerys: [
       {
         _id: {
@@ -90,16 +164,6 @@ const businessAccountSchema = new mongoose.Schema<IBusinessAccountDocument>(
         },
       },
     ],
-    profilePicture: {
-      key: {
-        type: String,
-        required: true,
-      },
-      mimetype: {
-        type: String,
-        required: true,
-      },
-    },
     resetPasswordAccess: {
       type: Boolean,
       default: false,

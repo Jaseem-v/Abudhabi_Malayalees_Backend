@@ -155,8 +155,6 @@ export const addBusinessAccount = (data: any) => {
     try {
       const {
         name,
-        fname,
-        lname,
         username,
         phone,
         email,
@@ -164,31 +162,35 @@ export const addBusinessAccount = (data: any) => {
         category,
         website,
         location,
-        state,
-        city,
-        address,
         about,
         socialMediaLinks,
+        locationType,
+        numberOfEmployees,
+        yearEstablished,
         services,
+        addressDetails,
+        contactDetails,
       } = data;
 
       if (
         !name ||
-        !fname ||
-        !lname ||
         !username ||
         !phone ||
         !email ||
         !password ||
         !category ||
-        !website ||
-        !location ||
-        !state ||
-        !city ||
-        !address
+        !addressDetails ||
+        !addressDetails.state ||
+        !addressDetails.city ||
+        !addressDetails.address ||
+        !addressDetails.pincode ||
+        !contactDetails ||
+        !contactDetails.fname ||
+        !contactDetails.lname ||
+        !contactDetails.phone
       )
         throw new ThrowError(
-          `Please Provide name, fname, lname, username, phone, email, password, category, website, location, state, city, services, address and socialMediaLinks`,
+          `Please Provide name, username, phone, email, password, category, website, location, services, address, socialMediaLinks, addressDetails (streetNumber, state, city, address, place, pincode and landmark) and contactDetails (fname, lname, email, phone, isAddressVisible, addressDetails (streetNumber, state, city, address, place, pincode and landmark))`,
           400
         );
 
@@ -196,7 +198,13 @@ export const addBusinessAccount = (data: any) => {
         throw new ThrowError("Invalid Username", 404);
 
       const businessAccountExists = await BusinessAccount.findOne({
-        $or: [{ email }, { phone }, { username }],
+        $or: [
+          { email },
+          { phone },
+          { username },
+          { "contactDetails.email": contactDetails.email },
+          // { "contactDetails.phone": contactDetails.phone },
+        ],
       });
 
       if (businessAccountExists)
@@ -204,8 +212,6 @@ export const addBusinessAccount = (data: any) => {
 
       const businessAccount = await new BusinessAccount({
         name,
-        fname,
-        lname,
         username,
         phone,
         email,
@@ -213,14 +219,39 @@ export const addBusinessAccount = (data: any) => {
         category,
         website,
         location,
-        state,
-        city,
-        address,
         services: services ?? [],
         about,
+        socialMediaLinks,
+        locationType,
+        numberOfEmployees,
+        yearEstablished,
+        addressDetails: {
+          streetNumber: addressDetails.streetNumber,
+          state: addressDetails.state,
+          city: addressDetails.city,
+          address: addressDetails.address,
+          place: addressDetails.place,
+          pincode: addressDetails.pincode,
+          landmark: addressDetails.landmark,
+        },
+        contactDetails: {
+          fname: contactDetails.fname,
+          lname: contactDetails.lname,
+          email: contactDetails.email,
+          phone: contactDetails.phone,
+          isAddressVisible: contactDetails.isAddressVisible,
+          addressDetails: {
+            streetNumber: contactDetails.addressDetails.streetNumber,
+            state: contactDetails.addressDetails.state,
+            city: contactDetails.addressDetails.city,
+            address: contactDetails.addressDetails.address,
+            place: contactDetails.addressDetails.place,
+            pincode: contactDetails.addressDetails.pincode,
+            landmark: contactDetails.addressDetails.landmark,
+          },
+        },
         profilePicture: null,
         gallerys: [],
-        socialMediaLinks,
         lastSync: new Date(),
         lastUsed: new Date(),
       });
@@ -232,6 +263,7 @@ export const addBusinessAccount = (data: any) => {
         businessAccount: nbusinessAccount,
       });
     } catch (error: any) {
+      console.log(error);
       return reject({
         message: error.message || error.msg,
         statusCode: error.statusCode,
@@ -264,8 +296,6 @@ export const editBusinessAccount = (
 
       const {
         name,
-        fname,
-        lname,
         username,
         phone,
         email,
@@ -273,11 +303,10 @@ export const editBusinessAccount = (
         category,
         website,
         location,
-        state,
         services,
         socialMediaLinks,
-        city,
-        address,
+        addressDetails,
+        contactDetails,
       } = data;
 
       if (username && !username.includes(BUSINESS_ACCOUNT_USERNAME_STARTS_WITH))
@@ -319,20 +348,30 @@ export const editBusinessAccount = (
           );
       }
 
+      // New contact details phone is already exist from anothers
+      // if (
+      //   contactDetails && contactDetails.phone &&
+      //   businessAccount.contactDetails.phone != contactDetails.phone
+      // ) {
+      //   const businessAccountExists = await BusinessAccount.findOne({
+      //     "contactDetails.phone": contactDetails.phone,
+      //   });
+      //   if (businessAccountExists)
+      //     throw new ThrowError(
+      //       "contactDetail's phone already exist for other businessAccount",
+      //       400
+      //     );
+      // }
+
       // Update a values in db
       businessAccount.name = name || businessAccount.name;
-      businessAccount.fname = fname || businessAccount.fname;
-      businessAccount.lname = lname || businessAccount.lname;
       businessAccount.username = username || businessAccount.username;
       businessAccount.email = email || businessAccount.email;
       businessAccount.phone = phone || businessAccount.phone;
       businessAccount.website = website || businessAccount.website;
       businessAccount.location = location || businessAccount.location;
-      businessAccount.state = state || businessAccount.state;
-      businessAccount.city = city || businessAccount.city;
       businessAccount.socialMediaLinks =
         socialMediaLinks || businessAccount.socialMediaLinks;
-      businessAccount.address = address || businessAccount.address;
       businessAccount.services = services || businessAccount.services;
 
       if (category && isValidObjectId(category)) {
@@ -340,6 +379,79 @@ export const editBusinessAccount = (
       }
       if (password) {
         businessAccount.password = password;
+      }
+
+      if (addressDetails) {
+        if (addressDetails.streetNumber) {
+          businessAccount.addressDetails.streetNumber =
+            addressDetails.streetNumber;
+        }
+        if (addressDetails.state) {
+          businessAccount.addressDetails.state = addressDetails.state;
+        }
+        if (addressDetails.city) {
+          businessAccount.addressDetails.city = addressDetails.city;
+        }
+        if (addressDetails.address) {
+          businessAccount.addressDetails.address = addressDetails.address;
+        }
+        if (addressDetails.place) {
+          businessAccount.addressDetails.place = addressDetails.place;
+        }
+        if (addressDetails.pincode) {
+          businessAccount.addressDetails.pincode = addressDetails.pincode;
+        }
+        if (addressDetails.landmark) {
+          businessAccount.addressDetails.landmark = addressDetails.landmark;
+        }
+      }
+
+      if (contactDetails) {
+        if (contactDetails.fname) {
+          businessAccount.contactDetails.fname = contactDetails.fname;
+        }
+        if (contactDetails.lname) {
+          businessAccount.contactDetails.lname = contactDetails.lname;
+        }
+        if (contactDetails.email) {
+          businessAccount.contactDetails.email = contactDetails.email;
+        }
+        if (contactDetails.phone) {
+          businessAccount.contactDetails.phone = contactDetails.phone;
+        }
+        if (contactDetails.isAddressVisible) {
+          businessAccount.contactDetails.isAddressVisible = contactDetails.isAddressVisible;
+        }
+        if (contactDetails.addressDetails) {
+          if (contactDetails.addressDetails.streetNumber) {
+            businessAccount.contactDetails.addressDetails.streetNumber =
+              contactDetails.addressDetails.streetNumber;
+          }
+          if (contactDetails.addressDetails.state) {
+            businessAccount.contactDetails.addressDetails.state =
+              contactDetails.addressDetails.state;
+          }
+          if (contactDetails.addressDetails.city) {
+            businessAccount.contactDetails.addressDetails.city =
+              contactDetails.addressDetails.city;
+          }
+          if (contactDetails.addressDetails.address) {
+            businessAccount.contactDetails.addressDetails.address =
+              contactDetails.addressDetails.address;
+          }
+          if (contactDetails.addressDetails.place) {
+            businessAccount.contactDetails.addressDetails.place =
+              contactDetails.addressDetails.place;
+          }
+          if (contactDetails.addressDetails.pincode) {
+            businessAccount.contactDetails.addressDetails.pincode =
+              contactDetails.addressDetails.pincode;
+          }
+          if (contactDetails.addressDetails.landmark) {
+            businessAccount.contactDetails.addressDetails.landmark =
+              contactDetails.addressDetails.landmark;
+          }
+        }
       }
 
       const nbusinessAccount = await businessAccount.save();
@@ -380,28 +492,35 @@ export const updateBusinessAccountProfile = (
 
       const {
         name,
-        fname,
-        lname,
         category,
         website,
         location,
-        state,
-        city,
         about,
-        address,
         services,
         socialMediaLinks,
+        addressDetails,
+        contactDetails,
       } = data;
+
+      // New contact details phone is already exist from anothers
+      // if (
+      //   contactDetails && contactDetails.phone &&
+      //   businessAccount.contactDetails.phone != contactDetails.phone
+      // ) {
+      //   const businessAccountExists = await BusinessAccount.findOne({
+      //     "contactDetails.phone": contactDetails.phone,
+      //   });
+      //   if (businessAccountExists)
+      //     throw new ThrowError(
+      //       "contactDetail's phone already exist for other businessAccount",
+      //       400
+      //     );
+      // }
 
       // Update a values in db
       businessAccount.name = name || businessAccount.name;
-      businessAccount.fname = fname || businessAccount.fname;
-      businessAccount.lname = lname || businessAccount.lname;
       businessAccount.website = website || businessAccount.website;
       businessAccount.location = location || businessAccount.location;
-      businessAccount.state = state || businessAccount.state;
-      businessAccount.city = city || businessAccount.city;
-      businessAccount.address = address || businessAccount.address;
       businessAccount.about = about || businessAccount.about;
       businessAccount.services = services || businessAccount.services;
       businessAccount.socialMediaLinks =
@@ -409,6 +528,79 @@ export const updateBusinessAccountProfile = (
 
       if (category && isValidObjectId(category)) {
         businessAccount.category = category;
+      }
+
+      if (addressDetails) {
+        if (addressDetails.streetNumber) {
+          businessAccount.addressDetails.streetNumber =
+            addressDetails.streetNumber;
+        }
+        if (addressDetails.state) {
+          businessAccount.addressDetails.state = addressDetails.state;
+        }
+        if (addressDetails.city) {
+          businessAccount.addressDetails.city = addressDetails.city;
+        }
+        if (addressDetails.address) {
+          businessAccount.addressDetails.address = addressDetails.address;
+        }
+        if (addressDetails.place) {
+          businessAccount.addressDetails.place = addressDetails.place;
+        }
+        if (addressDetails.pincode) {
+          businessAccount.addressDetails.pincode = addressDetails.pincode;
+        }
+        if (addressDetails.landmark) {
+          businessAccount.addressDetails.landmark = addressDetails.landmark;
+        }
+      }
+
+      if (contactDetails) {
+        if (contactDetails.fname) {
+          businessAccount.contactDetails.fname = contactDetails.fname;
+        }
+        if (contactDetails.lname) {
+          businessAccount.contactDetails.lname = contactDetails.lname;
+        }
+        if (contactDetails.email) {
+          businessAccount.contactDetails.email = contactDetails.email;
+        }
+        if (contactDetails.phone) {
+          businessAccount.contactDetails.phone = contactDetails.phone;
+        }
+        if (contactDetails.isAddressVisible) {
+          businessAccount.contactDetails.isAddressVisible = contactDetails.isAddressVisible;
+        }
+        if (contactDetails.addressDetails) {
+          if (contactDetails.addressDetails.streetNumber) {
+            businessAccount.contactDetails.addressDetails.streetNumber =
+              contactDetails.addressDetails.streetNumber;
+          }
+          if (contactDetails.addressDetails.state) {
+            businessAccount.contactDetails.addressDetails.state =
+              contactDetails.addressDetails.state;
+          }
+          if (contactDetails.addressDetails.city) {
+            businessAccount.contactDetails.addressDetails.city =
+              contactDetails.addressDetails.city;
+          }
+          if (contactDetails.addressDetails.address) {
+            businessAccount.contactDetails.addressDetails.address =
+              contactDetails.addressDetails.address;
+          }
+          if (contactDetails.addressDetails.place) {
+            businessAccount.contactDetails.addressDetails.place =
+              contactDetails.addressDetails.place;
+          }
+          if (contactDetails.addressDetails.pincode) {
+            businessAccount.contactDetails.addressDetails.pincode =
+              contactDetails.addressDetails.pincode;
+          }
+          if (contactDetails.addressDetails.landmark) {
+            businessAccount.contactDetails.addressDetails.landmark =
+              contactDetails.addressDetails.landmark;
+          }
+        }
       }
 
       const nbusinessAccount = await businessAccount.save();
