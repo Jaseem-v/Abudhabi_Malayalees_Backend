@@ -226,28 +226,28 @@ export const addBusinessAccount = (data: any) => {
         numberOfEmployees,
         yearEstablished,
         addressDetails: {
-          streetNumber: addressDetails.streetNumber,
-          state: addressDetails.state,
-          city: addressDetails.city,
-          address: addressDetails.address,
-          place: addressDetails.place,
-          pincode: addressDetails.pincode,
-          landmark: addressDetails.landmark,
+          streetNumber: addressDetails?.streetNumber,
+          state: addressDetails?.state,
+          city: addressDetails?.city,
+          address: addressDetails?.address,
+          place: addressDetails?.place,
+          pincode: addressDetails?.pincode,
+          landmark: addressDetails?.landmark,
         },
         contactDetails: {
-          fname: contactDetails.fname,
-          lname: contactDetails.lname,
-          email: contactDetails.email,
-          phone: contactDetails.phone,
+          fname: contactDetails?.fname,
+          lname: contactDetails?.lname,
+          email: contactDetails?.email,
+          phone: contactDetails?.phone,
           isAddressVisible: contactDetails.isAddressVisible,
           addressDetails: {
-            streetNumber: contactDetails.addressDetails.streetNumber,
-            state: contactDetails.addressDetails.state,
-            city: contactDetails.addressDetails.city,
-            address: contactDetails.addressDetails.address,
-            place: contactDetails.addressDetails.place,
-            pincode: contactDetails.addressDetails.pincode,
-            landmark: contactDetails.addressDetails.landmark,
+            streetNumber: contactDetails.addressDetails?.streetNumber,
+            state: contactDetails.addressDetails?.state,
+            city: contactDetails.addressDetails?.city,
+            address: contactDetails.addressDetails?.address,
+            place: contactDetails.addressDetails?.place,
+            pincode: contactDetails.addressDetails?.pincode,
+            landmark: contactDetails.addressDetails?.landmark,
           },
         },
         profilePicture: null,
@@ -503,19 +503,19 @@ export const updateBusinessAccountProfile = (
       } = data;
 
       // New contact details phone is already exist from anothers
-      // if (
-      //   contactDetails && contactDetails.phone &&
-      //   businessAccount.contactDetails.phone != contactDetails.phone
-      // ) {
-      //   const businessAccountExists = await BusinessAccount.findOne({
-      //     "contactDetails.phone": contactDetails.phone,
-      //   });
-      //   if (businessAccountExists)
-      //     throw new ThrowError(
-      //       "contactDetail's phone already exist for other businessAccount",
-      //       400
-      //     );
-      // }
+      if (
+        contactDetails && contactDetails.phone &&
+        businessAccount.contactDetails.phone != contactDetails.phone
+      ) {
+        const businessAccountExists = await BusinessAccount.findOne({
+          "contactDetails.phone": contactDetails.phone,
+        });
+        if (businessAccountExists)
+          throw new ThrowError(
+            "contactDetail's phone already exist for other businessAccount",
+            400
+          );
+      }
 
       // Update a values in db
       businessAccount.name = name || businessAccount.name;
