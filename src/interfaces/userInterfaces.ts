@@ -3,6 +3,8 @@ import { IImage, IImages } from "./default";
 
 export interface IBusinessAccount {
   name: string;
+  fname: string;
+  lname: string;
   username: string;
   phone: string;
   email: string;
@@ -24,12 +26,6 @@ export interface IBusinessAccount {
     link: string;
   }[];
   yearEstablished?: string;
-  contactDetails: {
-    fname: string;
-    lname: string;
-    email: string;
-    phone: string;
-  };
   resetPasswordAccess: boolean;
   status: "Active" | "Inactive" | "Suspended" | "Blocked";
   lastSync: string | Date;

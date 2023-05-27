@@ -15,6 +15,14 @@ const businessAccountSchema = new mongoose.Schema<IBusinessAccountDocument>(
       type: String,
       required: true,
     },
+    fname: {
+      type: String,
+      required: true,
+    },
+    lname: {
+      type: String,
+      required: true,
+    },
     username: {
       type: String,
       required: true,
@@ -88,25 +96,6 @@ const businessAccountSchema = new mongoose.Schema<IBusinessAccountDocument>(
         required: true,
       },
       mimetype: {
-        type: String,
-        required: true,
-      },
-    },
-    contactDetails: {
-      fname: {
-        type: String,
-        required: true,
-      },
-      lname: {
-        type: String,
-        required: true,
-      },
-      email: {
-        type: String,
-        required: true,
-        unique: true,
-      },
-      phone: {
         type: String,
         required: true,
       },

@@ -155,6 +155,8 @@ export const addBusinessAccount = (data: any) => {
     try {
       const {
         name,
+        fname,
+        lname,
         username,
         phone,
         email,
@@ -168,11 +170,12 @@ export const addBusinessAccount = (data: any) => {
         about,
         socialMediaLinks,
         services,
-        contactDetails,
       } = data;
 
       if (
         !name ||
+        !fname ||
+        !lname ||
         !username ||
         !phone ||
         !email ||
@@ -182,15 +185,10 @@ export const addBusinessAccount = (data: any) => {
         !location ||
         !state ||
         !city ||
-        !address ||
-        !contactDetails ||
-        !contactDetails.fname ||
-        !contactDetails.lname ||
-        !contactDetails.email ||
-        !contactDetails.phone
+        !address
       )
         throw new ThrowError(
-          `Please Provide name, username, phone, email, password, category, website, location, state, city, services, address, socialMediaLinks and contactDetails (fname, lname, email, phone)`,
+          `Please Provide name, fname, lname, username, phone, email, password, category, website, location, state, city, services, address and socialMediaLinks`,
           400
         );
 
@@ -198,12 +196,7 @@ export const addBusinessAccount = (data: any) => {
         throw new ThrowError("Invalid Username", 404);
 
       const businessAccountExists = await BusinessAccount.findOne({
-        $or: [
-          { email },
-          { phone },
-          { username },
-          { "contactDetails.email": contactDetails.email },
-        ],
+        $or: [{ email }, { phone }, { username }],
       });
 
       if (businessAccountExists)
@@ -211,6 +204,8 @@ export const addBusinessAccount = (data: any) => {
 
       const businessAccount = await new BusinessAccount({
         name,
+        fname,
+        lname,
         username,
         phone,
         email,
@@ -226,12 +221,6 @@ export const addBusinessAccount = (data: any) => {
         profilePicture: null,
         gallerys: [],
         socialMediaLinks,
-        contactDetails: {
-          fname: contactDetails.fname,
-          lname: contactDetails.lname,
-          email: contactDetails.email,
-          phone: contactDetails.phone,
-        },
         lastSync: new Date(),
         lastUsed: new Date(),
       });
@@ -243,7 +232,6 @@ export const addBusinessAccount = (data: any) => {
         businessAccount: nbusinessAccount,
       });
     } catch (error: any) {
-      console.log(error);
       return reject({
         message: error.message || error.msg,
         statusCode: error.statusCode,
@@ -276,6 +264,8 @@ export const editBusinessAccount = (
 
       const {
         name,
+        fname,
+        lname,
         username,
         phone,
         email,
@@ -288,7 +278,6 @@ export const editBusinessAccount = (
         socialMediaLinks,
         city,
         address,
-        contactDetails,
       } = data;
 
       if (username && !username.includes(BUSINESS_ACCOUNT_USERNAME_STARTS_WITH))
@@ -332,6 +321,8 @@ export const editBusinessAccount = (
 
       // Update a values in db
       businessAccount.name = name || businessAccount.name;
+      businessAccount.fname = fname || businessAccount.fname;
+      businessAccount.lname = lname || businessAccount.lname;
       businessAccount.username = username || businessAccount.username;
       businessAccount.email = email || businessAccount.email;
       businessAccount.phone = phone || businessAccount.phone;
@@ -349,21 +340,6 @@ export const editBusinessAccount = (
       }
       if (password) {
         businessAccount.password = password;
-      }
-
-      if (contactDetails) {
-        if (contactDetails.fname) {
-          businessAccount.contactDetails.fname = contactDetails.fname;
-        }
-        if (contactDetails.lname) {
-          businessAccount.contactDetails.lname = contactDetails.lname;
-        }
-        if (contactDetails.email) {
-          businessAccount.contactDetails.email = contactDetails.email;
-        }
-        if (contactDetails.phone) {
-          businessAccount.contactDetails.phone = contactDetails.phone;
-        }
       }
 
       const nbusinessAccount = await businessAccount.save();
@@ -404,6 +380,8 @@ export const updateBusinessAccountProfile = (
 
       const {
         name,
+        fname,
+        lname,
         category,
         website,
         location,
@@ -412,12 +390,13 @@ export const updateBusinessAccountProfile = (
         about,
         address,
         services,
-        contactDetails,
         socialMediaLinks,
       } = data;
 
       // Update a values in db
       businessAccount.name = name || businessAccount.name;
+      businessAccount.fname = fname || businessAccount.fname;
+      businessAccount.lname = lname || businessAccount.lname;
       businessAccount.website = website || businessAccount.website;
       businessAccount.location = location || businessAccount.location;
       businessAccount.state = state || businessAccount.state;
@@ -430,21 +409,6 @@ export const updateBusinessAccountProfile = (
 
       if (category && isValidObjectId(category)) {
         businessAccount.category = category;
-      }
-
-      if (contactDetails) {
-        if (contactDetails.fname) {
-          businessAccount.contactDetails.fname = contactDetails.fname;
-        }
-        if (contactDetails.lname) {
-          businessAccount.contactDetails.lname = contactDetails.lname;
-        }
-        if (contactDetails.email) {
-          businessAccount.contactDetails.email = contactDetails.email;
-        }
-        if (contactDetails.phone) {
-          businessAccount.contactDetails.phone = contactDetails.phone;
-        }
       }
 
       const nbusinessAccount = await businessAccount.save();
