@@ -2,7 +2,6 @@ import { Router } from "express";
 import { config } from "../../config";
 import { businessAccountControllers } from "../../controllers";
 import {
-  adminAccess,
   businessAccountAccess,
   superAdminAccess,
 } from "../../middlewares";

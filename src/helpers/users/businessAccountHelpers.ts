@@ -94,10 +94,10 @@ export const businessAccountLogin = (
   return new Promise(async (resolve, reject) => {
     try {
       if ((!username && !email && !phone) || !password)
-        throw new ThrowError("Provide email and password", 400);
+        throw new ThrowError("Provide username or email or phone and password", 400);
 
       const businessAccount = await BusinessAccount.findOne(
-        { $or: [{ email }, { email }, { phone }] },
+        { $or: [{ username }, { email }, { phone }] },
         { password: 1, name: 1, role: 1, status: 1, lastSync: 1 }
       );
 
