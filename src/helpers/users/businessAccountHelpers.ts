@@ -239,7 +239,7 @@ export const addBusinessAccount = (data: any) => {
           lname: contactDetails?.lname,
           email: contactDetails?.email,
           phone: contactDetails?.phone,
-          isAddressVisible: contactDetails.isAddressVisible,
+          isAddressVisible: contactDetails?.isAddressVisible,
           addressDetails: {
             streetNumber: contactDetails.addressDetails?.streetNumber,
             state: contactDetails.addressDetails?.state,

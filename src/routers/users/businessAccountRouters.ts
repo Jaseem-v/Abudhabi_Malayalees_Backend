@@ -48,8 +48,8 @@ router.route("/login").patch(businessAccountLogin);
 router.route("/signup").post(addBusinessAccount);
 router.route("/forget-password").patch(forgotBusinessAccountPassword);
 router.route("/reset-password").patch(resetBusinessAccountPassword);
-router.route("/profile").get(adminAccess, getBusinessAccountProfile);
-router.route("/profile").patch(adminAccess, updateBusinessAccountProfile);
+router.route("/profile").get(businessAccountAccess, getBusinessAccountProfile);
+router.route("/profile").patch(businessAccountAccess, updateBusinessAccountProfile);
 router
   .route("/change-profile-picture")
   .patch(
@@ -75,16 +75,16 @@ router
   .patch(checkBusinessAccountUsernameAvailability);
 router
   .route("/change-password")
-  .patch(adminAccess, changeBusinessAccountPassword);
+  .patch(businessAccountAccess, changeBusinessAccountPassword);
 router.route("/delete/all").delete(superAdminAccess, deleteAllBusinessAccount);
 router
   .route("/change-status/:baid")
   .patch(superAdminAccess, changeBusinessAccountStatus);
-router.route("/change-phone").patch(adminAccess, changeBusinessAccountPhone);
-router.route("/change-email").patch(adminAccess, changeBusinessAccountEmail);
+router.route("/change-phone").patch(businessAccountAccess, changeBusinessAccountPhone);
+router.route("/change-email").patch(businessAccountAccess, changeBusinessAccountEmail);
 router
   .route("/change-username")
-  .patch(adminAccess, changeBusinessAccountUsername);
+  .patch(businessAccountAccess, changeBusinessAccountUsername);
 router
   .route("/remove-gallery/:gid")
   .delete(businessAccountAccess, removeGalleryImage);
