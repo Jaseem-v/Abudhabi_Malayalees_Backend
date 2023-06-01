@@ -5,6 +5,7 @@ import { s3Upload } from "../../functions/multer";
 import { config } from "../../config";
 const {
   getGallerys,
+  getGallerysForCustomer,
   getGallery,
   addGallery,
   editGallery,
@@ -27,6 +28,7 @@ router
     s3Upload(AWS_S3_GALLERY_RESOURCES, "single", "image"),
     addGallery
   );
+router.route("/customer").get(getGallerysForCustomer);
 router.route("/delete/all").delete(superAdminAccess, deleteAllGallery);
 router
   .route("/change-visibility/:cid")

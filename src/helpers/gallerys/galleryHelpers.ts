@@ -15,9 +15,37 @@ export const getGallerys = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? {}
+        : { isDeleted: false };
       const gallerys = await Gallery.find({ ...query }).sort({
+        createdAt: -1,
+      });
+
+      resolve({
+        message: "Gallerys Fetched",
+        gallerys,
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To get all gallerys
+ * @returns {Gallerys} gallerys
+ */
+export const getGallerysForCustomer = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const gallerys = await Gallery.find({
+        visibility: "Show",
+        isDeleted: false,
+      }).sort({
         createdAt: -1,
       });
 
@@ -47,8 +75,8 @@ export const getGallery = (galleryId: string, role?: IRoles) => {
         throw new ThrowError("Provide vaild gallery id", 404);
 
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? {}
+        : { isDeleted: false };
       const gallery = await Gallery.findOne({ _id: galleryId, ...query });
 
       if (!gallery) {
@@ -76,19 +104,20 @@ export const getGallery = (galleryId: string, role?: IRoles) => {
 export const addGallery = (data: any) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { name, image, visibility } = data;
-      if (!name || !image)
-        throw new ThrowError("Please Provide name, image and visibility", 400);
+      const { image, visibility } = data;
+      if (!image)
+        throw new ThrowError("Please Provide image and visibility", 400);
 
-      const galleryExists = await Gallery.findOne({
-        name: name,
-      });
-
-      if (galleryExists)
-        throw new ThrowError("Gallery name already exist!", 401);
+      const lastCode = await Gallery.find({}, { code: 1, _id: 0 })
+        .limit(1)
+        .sort({ createdAt: -1 });
+      data.code =
+        lastCode.length === 1
+          ? "GLY" + (parseInt(lastCode[0].code.slice(3)) + 1)
+          : "GLY100";
 
       const gallery = await new Gallery({
-        name,
+        code: data.code,
         image: {
           key: image.key.split("/").slice(-1)[0],
           mimetype: image.mimetype,

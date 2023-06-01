@@ -15,9 +15,37 @@ export const getNews = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? {}
+        : { isDeleted: false };
       const news = await News.find({ ...query }).sort({
+        createdAt: -1,
+      });
+
+      resolve({
+        message: "News Fetched",
+        news,
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To get all news for customer
+ * @returns {News} news
+ */
+export const getNewsForCustomer = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const news = await News.find({
+        isDeleted: false,
+        visibility: "Show",
+      }).sort({
         createdAt: -1,
       });
 
@@ -47,8 +75,8 @@ export const getSingleNews = (newsId: string, role?: IRoles) => {
         throw new ThrowError("Provide vaild news id", 404);
 
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? {}
+        : { isDeleted: false };
       const news = await News.findOne({ _id: newsId, ...query });
 
       if (!news) {
@@ -85,6 +113,7 @@ export const addNews = (data: any) => {
 
       const newsExists = await News.findOne({
         title: title,
+        isDeleted: false,
       });
 
       if (newsExists) throw new ThrowError("News title already exist!", 401);
@@ -92,6 +121,7 @@ export const addNews = (data: any) => {
       const lastCode = await News.find({}, { code: 1, _id: 0 })
         .limit(1)
         .sort({ createdAt: -1 });
+
       const code =
         lastCode.length === 1
           ? "NEWS" + (parseInt(lastCode[0].code.slice(4)) + 1)

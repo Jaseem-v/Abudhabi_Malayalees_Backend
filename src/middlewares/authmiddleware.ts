@@ -1,6 +1,6 @@
 import { ErrorResponse } from "../classes";
 import { verifyToken } from "../utils";
-import { personalAccountHelpers, businessAccountHelpers,  userHelpers } from "../helpers";
+import { personalAccountHelpers, businessAccountHelpers,  userHelpers, adminHelpers } from "../helpers";
 import { config } from "../config";
 import { ApiParams } from "../types";
 
@@ -30,15 +30,15 @@ export const superAdminAccess: ApiParams = async (req, res, next) => {
     const decoded = (await verifyToken(authorizationToken, "AccessToken"))
       .payload;
     if (decoded && ["SuperAdmin", "Developer"].includes(decoded.role ?? "")) {
-      // const admin = await (
-      //   await adminHelpers.checkAdminStatus(decoded.id, ["Active"])
-      // ).admin;
-      // req.client = {
-      //   id: admin.id,
-      //   name: admin.name,
-      //   status: admin.status,
-      //   role: admin.role,
-      // };
+      const admin = await (
+        await adminHelpers.checkAdminStatus(decoded.id, ["Active"])
+      ).admin;
+      req.client = {
+        id: admin.id,
+        name: admin.name,
+        status: admin.status,
+        role: admin.role,
+      };
       return next();
     } else {
       return next(new ErrorResponse("Unathenticated", 403));
@@ -74,15 +74,15 @@ export const adminAccess: ApiParams = async (req, res, next) => {
       decoded &&
       ["SuperAdmin", "Developer", "Admin"].includes(decoded.role ?? "")
     ) {
-      // const admin = await (
-      //   await adminHelpers.checkAdminStatus(decoded.id, ["Active"])
-      // ).admin;
-      // req.client = {
-      //   id: admin.id,
-      //   name: admin.name,
-      //   status: admin.status,
-      //   role: admin.role,
-      // };
+      const admin = await (
+        await adminHelpers.checkAdminStatus(decoded.id, ["Active"])
+      ).admin;
+      req.client = {
+        id: admin.id,
+        name: admin.name,
+        status: admin.status,
+        role: admin.role,
+      };
       return next();
     } else {
       return next(new ErrorResponse("Unathenticated", 403));

@@ -1,10 +1,12 @@
 import { Router } from "express";
 import { advertisementControllers } from "../../controllers";
-import { superAdminAccess } from "../../middlewares";
+import { adminAccess, superAdminAccess } from "../../middlewares";
 import { s3Upload } from "../../functions/multer";
 import { config } from "../../config";
 const {
   getAdvertisements,
+  getAdvertisementsByRealEstate,
+  getAdvertisementsByUserCar,
   getAdvertisement,
   addAdvertisement,
   editAdvertisement,
@@ -28,6 +30,11 @@ router
     s3Upload(AWS_S3_ADZ_RESOURCES, "single", "image"),
     addAdvertisement
   );
+
+router.route("/used-car").get(adminAccess, getAdvertisementsByUserCar);
+router.route("/used-car/customer").get(getAdvertisementsByUserCar);
+router.route("/real-estate").get(adminAccess, getAdvertisementsByRealEstate);
+router.route("/real-estate/customer").get(getAdvertisementsByRealEstate);
 router.route("/delete/all").delete(superAdminAccess, deleteAllAdvertisement);
 router
   .route("/change-status/:aid")

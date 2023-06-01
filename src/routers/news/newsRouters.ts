@@ -5,6 +5,7 @@ import { config } from "../../config";
 import { s3Upload } from "../../functions/multer";
 const {
   getNews,
+  getNewsForCustomer,
   getSingleNews,
   addNews,
   editNews,
@@ -28,6 +29,7 @@ router
     addNews
   );
 router.route("/delete/all").delete(superAdminAccess, deleteAllNews);
+router.route("/customer").get(getNewsForCustomer);
 router
   .route("/change-visibility/:nid")
   .patch(superAdminAccess, changeNewsVisibility);

@@ -342,7 +342,7 @@ export const sentLoginCredentials = (adminId: string) => {
  * @returns {Admin} admin
  */
 export const checkAdminStatus = (adminId: string, status: string[]) => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<{message: string; admin: any}>(async (resolve, reject) => {
     try {
       if (!adminId || !isValidObjectId(adminId) || status.length <= 0)
         throw new ThrowError("Provide vaild admin id and status", 400);

@@ -3,6 +3,7 @@ import { config } from "../../config/index";
 import { Advertisement } from "../../models";
 import { ThrowError } from "../../classes";
 import { IRoles } from "../../types/default";
+import { IAdvertisement } from "../../interfaces";
 
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;
@@ -15,9 +16,40 @@ export const getAdvertisements = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? { }
+        : { isDeleted: false };
       const advertisements = await Advertisement.find({ ...query }).sort({
+        createdAt: -1,
+      });
+
+      resolve({
+        message: "Advertisements Fetched",
+        advertisements,
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To get all advertisements by type
+ * @returns {Advertisements} advertisements
+ */
+export const getAdvertisementsByType = (
+  type: IAdvertisement["type"],
+  role?: IRoles
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
+        ? {  }
+        : { status: "APPROVED", isDeleted: false };
+      const advertisements = await Advertisement.find({ ...query, type }).sort({
         createdAt: -1,
       });
 
@@ -47,8 +79,8 @@ export const getAdvertisement = (advertisementId: string, role?: IRoles) => {
         throw new ThrowError("Provide vaild advertisement id", 404);
 
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? {  }
+        : { isDeleted: false };
       const advertisement = await Advertisement.findOne({
         _id: advertisementId,
         ...query,
@@ -88,12 +120,20 @@ export const addAdvertisement = (data: any) => {
         !visibility
       )
         throw new ThrowError(
-          "Please Provide  desc, type('REAL_ESTATE', 'USED_CAR') and visibility",
+          "Please Provide image, desc, type('REAL_ESTATE', 'USED_CAR') and visibility",
           400
         );
 
+      const lastCode = await Advertisement.find({}, { code: 1, _id: 0 })
+        .limit(1)
+        .sort({ createdAt: -1 });
+      data.code =
+        lastCode.length === 1
+          ? "ADZ" + (parseInt(lastCode[0].code.slice(3)) + 1)
+          : "ADZ100";
+
       const advertisement = await new Advertisement({
-        code: "",
+        code: data.code,
         desc,
         image: {
           key: image.key.split("/").slice(-1)[0],
@@ -185,7 +225,7 @@ export const changeAdvertisementStatus = (
       if (
         !advertisementId ||
         !isValidObjectId(advertisementId) ||
-        status ||
+        !status ||
         !["APPROVE", "REJECT"].includes(status)
       ) {
         return reject({
@@ -377,11 +417,11 @@ export const pDeleteAdvertisement = (advertisementId: string) => {
       if (NODE_ENV === "development") {
         await advertisement.deleteOne();
         return resolve({
-          message: `${advertisement.code} category was deleted`,
+          message: `${advertisement.code} advertisement was deleted`,
         });
       }
       throw new ThrowError(
-        `Not able to delete category in ${NODE_ENV} mode`,
+        `Not able to delete advertisement in ${NODE_ENV} mode`,
         401
       );
     } catch (error: any) {

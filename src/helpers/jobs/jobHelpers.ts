@@ -82,9 +82,15 @@ export const addJob = (data: any) => {
           "Please Provide  desc, categoryId and visibility",
           400
         );
-
+      const lastCode = await Job.find({}, { code: 1, _id: 0 })
+        .limit(1)
+        .sort({ createdAt: -1 });
+      data.code =
+        lastCode.length === 1
+          ? "JOB" + (parseInt(lastCode[0].code.slice(3)) + 1)
+          : "JOB100";
       const job = await new Job({
-        code: "",
+        code: data.code,
         desc,
         category: categoryId,
         status: "PENDING",
@@ -191,7 +197,7 @@ export const changeJobStatus = (
         job.statusLog.rejectedBy = clientId;
       }
 
-      const njob = await job.save(); 
+      const njob = await job.save();
 
       resolve({
         message: `${njob.code}'s status changed to ${njob.status}`,

@@ -29,6 +29,56 @@ export const getAdvertisements: ApiParams = (req, res, next) => {
 };
 
 /**
+ * Get all advertisements by real estate
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getAdvertisementsByRealEstate: ApiParams = (req, res, next) => {
+  console.log(req.client);
+  
+  advertisementHelpers
+    .getAdvertisementsByType("REAL_ESTATE", req.client!.role)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.advertisements,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
+ * Get all advertisements by used car
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getAdvertisementsByUserCar: ApiParams = (req, res, next) => {
+  advertisementHelpers
+    .getAdvertisementsByType("USED_CAR", req.client!.role)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.advertisements,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
  * Get a particular advertisement
  * METHOD : GET
  * @param {*} req

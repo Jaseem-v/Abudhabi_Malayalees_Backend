@@ -28,6 +28,30 @@ export const getNews: ApiParams = (req, res, next) => {
     });
 };
 
+/*
+ * Get all news for customer
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getNewsForCustomer: ApiParams = (req, res, next) => {
+  newsHelpers
+    .getNewsForCustomer()
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.news,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
 /**
  * Get a particular news
  * METHOD : GET

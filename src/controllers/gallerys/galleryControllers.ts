@@ -29,6 +29,30 @@ export const getGallerys: ApiParams = (req, res, next) => {
 };
 
 /**
+ * Get all gallerys for customer
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getGallerysForCustomer: ApiParams = (req, res, next) => {
+  galleryHelpers
+    .getGallerysForCustomer()
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.gallerys,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
  * Get a particular gallery
  * METHOD : GET
  * @param {*} req
