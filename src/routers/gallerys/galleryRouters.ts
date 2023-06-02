@@ -22,9 +22,9 @@ const { AWS_S3_GALLERY_RESOURCES } = config.AWS_S3;
 
 router
   .route("/")
-  .get(superAdminAccess, getGallerys)
+  .get(adminAccess, getGallerys)
   .post(
-    superAdminAccess,
+    adminAccess,
     s3Upload(AWS_S3_GALLERY_RESOURCES, "single", "image"),
     addGallery
   );
@@ -32,14 +32,14 @@ router.route("/customer").get(getGallerysForCustomer);
 router.route("/delete/all").delete(superAdminAccess, deleteAllGallery);
 router
   .route("/change-visibility/:cid")
-  .patch(superAdminAccess, changeGalleryVisibility);
-router.route("/delete/:cid").delete(superAdminAccess, pDeleteGallery);
+  .patch(adminAccess, changeGalleryVisibility);
+router.route("/delete/:cid").delete(adminAccess, pDeleteGallery);
 router.route("/restore/:cid").put(superAdminAccess, restoreGallery);
 router
   .route("/:cid")
-  .get(superAdminAccess, getGallery)
+  .get(adminAccess, getGallery)
   .patch(
-    superAdminAccess,
+    adminAccess,
     s3Upload(AWS_S3_GALLERY_RESOURCES, "single", "image"),
     editGallery
   )

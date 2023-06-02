@@ -29,6 +29,30 @@ export const getCategories: ApiParams = (req, res, next) => {
 };
 
 /**
+ * Get all categorys for customer
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getCategoriesForCustomer: ApiParams = (req, res, next) => {
+  categoryHelpers
+    .getCategoriesForCustomer()
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.categorys,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
  * Get a particular category
  * METHOD : GET
  * @param {*} req

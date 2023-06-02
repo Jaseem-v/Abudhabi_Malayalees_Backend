@@ -2,6 +2,7 @@ import { Router } from "express";
 import { config } from "../../config";
 import { businessAccountControllers } from "../../controllers";
 import {
+  adminAccess,
   businessAccountAccess,
   superAdminAccess,
 } from "../../middlewares";
@@ -41,8 +42,8 @@ const router = Router();
 
 router
   .route("/")
-  .get(superAdminAccess, getBusinessAccounts)
-  .post(superAdminAccess, addBusinessAccount);
+  .get(adminAccess, getBusinessAccounts)
+  .post(adminAccess, addBusinessAccount);
 router.route("/login").patch(businessAccountLogin);
 router.route("/signup").post(addBusinessAccount);
 router.route("/forget-password").patch(forgotBusinessAccountPassword);
@@ -78,7 +79,7 @@ router
 router.route("/delete/all").delete(superAdminAccess, deleteAllBusinessAccount);
 router
   .route("/change-status/:baid")
-  .patch(superAdminAccess, changeBusinessAccountStatus);
+  .patch(adminAccess, changeBusinessAccountStatus);
 router.route("/change-phone").patch(businessAccountAccess, changeBusinessAccountPhone);
 router.route("/change-email").patch(businessAccountAccess, changeBusinessAccountEmail);
 router
@@ -87,12 +88,12 @@ router
 router
   .route("/remove-gallery/:gid")
   .delete(businessAccountAccess, removeGalleryImage);
-router.route("/delete/:baid").delete(superAdminAccess, pDeleteBusinessAccount);
+router.route("/delete/:baid").delete(adminAccess, pDeleteBusinessAccount);
 router.route("/restore/:baid").put(superAdminAccess, restoreBusinessAccount);
 router
   .route("/:baid")
-  .get(superAdminAccess, getBusinessAccount)
-  .patch(superAdminAccess, editBusinessAccount)
+  .get(adminAccess, getBusinessAccount)
+  .patch(adminAccess, editBusinessAccount)
   .delete(superAdminAccess, deleteBusinessAccount);
 
 export default router;

@@ -15,6 +15,14 @@ const eventSchema = new mongoose.Schema<IEvent>(
       required: true,
     },
     date: {
+      type: String,
+      required: true,
+    },
+    time: {
+      type: String,
+      required: true,
+    },
+    eventAt: {
       type: Date,
       required: true,
     },

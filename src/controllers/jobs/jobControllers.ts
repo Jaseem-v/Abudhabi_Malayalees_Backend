@@ -28,6 +28,30 @@ export const getJobs: ApiParams = (req, res, next) => {
 };
 
 /**
+ * Get all jobs for customer
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getJobsForCustomer: ApiParams = (req, res, next) => {
+  jobHelpers
+    .getJobsForCustomer()
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.jobs,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
  * Get a particular job
  * METHOD : GET
  * @param {*} req

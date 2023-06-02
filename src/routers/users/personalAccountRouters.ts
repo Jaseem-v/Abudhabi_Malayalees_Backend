@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { config } from "../../config";
 import { personalAccountControllers } from "../../controllers";
-import { superAdminAccess, personalAccountAccess } from "../../middlewares";
+import { superAdminAccess, personalAccountAccess, adminAccess } from "../../middlewares";
 import { s3Upload } from "../../functions";
 const {
   getPersonalAccounts,
@@ -38,8 +38,8 @@ const router = Router();
 
 router
   .route("/")
-  .get(superAdminAccess, getPersonalAccounts)
-  .post(superAdminAccess, addPersonalAccount);
+  .get(adminAccess, getPersonalAccounts)
+  .post(adminAccess, addPersonalAccount);
 router.route("/login").patch(personalAccountLogin);
 router.route("/signup").post(addPersonalAccount);
 router.route("/forget-password").patch(forgotPersonalAccountPassword);
@@ -77,7 +77,7 @@ router
 router.route("/delete/all").delete(superAdminAccess, deleteAllPersonalAccount);
 router
   .route("/change-status/:paid")
-  .patch(superAdminAccess, changePersonalAccountStatus);
+  .patch(adminAccess, changePersonalAccountStatus);
 router
   .route("/change-phone")
   .patch(personalAccountAccess, changePersonalAccountPhone);
@@ -90,12 +90,12 @@ router
 router
   .route("/remove-gallery/:gid")
   .delete(personalAccountAccess, removeGalleryImage);
-router.route("/delete/:paid").delete(superAdminAccess, pDeletePersonalAccount);
+router.route("/delete/:paid").delete(adminAccess, pDeletePersonalAccount);
 router.route("/restore/:paid").put(superAdminAccess, restorePersonalAccount);
 router
   .route("/:paid")
-  .get(superAdminAccess, getPersonalAccount)
-  .patch(superAdminAccess, editPersonalAccount)
+  .get(adminAccess, getPersonalAccount)
+  .patch(adminAccess, editPersonalAccount)
   .delete(superAdminAccess, deletePersonalAccount);
 
 export default router;

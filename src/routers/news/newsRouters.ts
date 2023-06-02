@@ -22,9 +22,9 @@ const {AWS_S3_NEWS_RESOURCES} = config.AWS_S3;
 
 router
   .route("/")
-  .get(superAdminAccess, getNews)
+  .get(adminAccess, getNews)
   .post(
-    superAdminAccess,
+    adminAccess,
     s3Upload(AWS_S3_NEWS_RESOURCES, "single", "image"),
     addNews
   );
@@ -32,14 +32,14 @@ router.route("/delete/all").delete(superAdminAccess, deleteAllNews);
 router.route("/customer").get(getNewsForCustomer);
 router
   .route("/change-visibility/:nid")
-  .patch(superAdminAccess, changeNewsVisibility);
-router.route("/delete/:nid").delete(superAdminAccess, pDeleteNews);
+  .patch(adminAccess, changeNewsVisibility);
+router.route("/delete/:nid").delete(adminAccess, pDeleteNews);
 router.route("/restore/:nid").put(superAdminAccess, restoreNews);
 router
   .route("/:nid")
-  .get(superAdminAccess, getSingleNews)
+  .get(adminAccess, getSingleNews)
   .patch(
-    superAdminAccess,
+    adminAccess,
     s3Upload(AWS_S3_NEWS_RESOURCES, "single", "image"),
     editNews
   )

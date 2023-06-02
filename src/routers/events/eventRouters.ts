@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { eventControllers } from "../../controllers";
-import { superAdminAccess } from "../../middlewares";
+import { adminAccess, superAdminAccess } from "../../middlewares";
 const {
   getEvents,
+  getEventsForCustomer,
   getEvent,
   addEvent,
   editEvent,
@@ -15,15 +16,16 @@ const {
 
 const router = Router();
 
-router.route("/").get(superAdminAccess, getEvents).post(addEvent);
+router.route("/").get(adminAccess, getEvents).post(adminAccess, addEvent);
+router.route("/customer").get(getEventsForCustomer);
 router.route("/delete/all").delete(superAdminAccess, deleteAllEvent);
-router.route("/change-visibility/:eid").patch(superAdminAccess, changeEventVisibility);
-router.route("/delete/:eid").delete(superAdminAccess, pDeleteEvent);
+router.route("/change-visibility/:eid").patch(adminAccess, changeEventVisibility);
+router.route("/delete/:eid").delete(adminAccess, pDeleteEvent);
 router.route("/restore/:eid").put(superAdminAccess, restoreEvent);
 router
   .route("/:eid")
-  .get(superAdminAccess, getEvent)
-  .patch(superAdminAccess, editEvent)
+  .get(adminAccess, getEvent)
+  .patch(adminAccess, editEvent)
   .delete(superAdminAccess, deleteEvent);
 
 export default router;

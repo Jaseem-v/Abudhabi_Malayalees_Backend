@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { jobControllers } from "../../controllers";
-import { superAdminAccess } from "../../middlewares";
+import { adminAccess, superAdminAccess } from "../../middlewares";
 const {
   getJobs,
+  getJobsForCustomer,
   getJob,
   addJob,
   editJob,
@@ -16,16 +17,17 @@ const {
 
 const router = Router();
 
-router.route("/").get(superAdminAccess, getJobs).post(addJob);
+router.route("/").get(adminAccess, getJobs).post(adminAccess, addJob);
+router.route("/customer").get(getJobsForCustomer);
 router.route("/delete/all").delete(superAdminAccess, deleteAllJob);
-router.route("/change-status/:jid").patch(superAdminAccess, changeJobStatus);
-router.route("/change-visibility/:jid").patch(superAdminAccess, changeJobVisibility);
-router.route("/delete/:jid").delete(superAdminAccess, pDeleteJob);
+router.route("/change-status/:jid").patch(adminAccess, changeJobStatus);
+router.route("/change-visibility/:jid").patch(adminAccess, changeJobVisibility);
+router.route("/delete/:jid").delete(adminAccess, pDeleteJob);
 router.route("/restore/:jid").put(superAdminAccess, restoreJob);
 router
   .route("/:jid")
-  .get(superAdminAccess, getJob)
-  .patch(superAdminAccess, editJob)
+  .get(adminAccess, getJob)
+  .patch(adminAccess, editJob)
   .delete(superAdminAccess, deleteJob);
 
 export default router;

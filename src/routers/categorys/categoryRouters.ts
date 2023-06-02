@@ -5,6 +5,7 @@ import { config } from "../../config";
 import { s3Upload } from "../../functions/multer";
 const {
   getCategories,
+  getCategoriesForCustomer,
   getCategory,
   addCategory,
   editCategory,
@@ -22,26 +23,25 @@ const { AWS_S3_CATEGORY_RESOURCES } = config.AWS_S3;
 
 router
   .route("/")
-  .get(superAdminAccess, getCategories)
+  .get(adminAccess, getCategories)
   .post(
-    superAdminAccess,
+    adminAccess,
     s3Upload(AWS_S3_CATEGORY_RESOURCES, "single", "image"),
     addCategory
   );
+router.route("/customer").get(getCategoriesForCustomer);
 router.route("/delete/all").delete(superAdminAccess, deleteAllCategory);
-router
-  .route("/change-status/:cid")
-  .patch(superAdminAccess, changeCategoryStatus);
+router.route("/change-status/:cid").patch(adminAccess, changeCategoryStatus);
 router
   .route("/change-visibility/:cid")
-  .patch(superAdminAccess, changeCategoryVisibility);
-router.route("/delete/:cid").delete(superAdminAccess, pDeleteCategory);
+  .patch(adminAccess, changeCategoryVisibility);
+router.route("/delete/:cid").delete(adminAccess, pDeleteCategory);
 router.route("/restore/:cid").put(superAdminAccess, restoreCategory);
 router
   .route("/:cid")
-  .get(superAdminAccess, getCategory)
+  .get(adminAccess, getCategory)
   .patch(
-    superAdminAccess,
+    adminAccess,
     s3Upload(AWS_S3_CATEGORY_RESOURCES, "single", "image"),
     editCategory
   )

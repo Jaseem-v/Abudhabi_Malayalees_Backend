@@ -28,6 +28,30 @@ export const getEvents: ApiParams = (req, res, next) => {
 };
 
 /**
+ * Get all events for customer
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getEventsForCustomer: ApiParams = (req, res, next) => {
+  eventHelpers
+    .getEventsForCustomer()
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.events,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
  * Get a particular event
  * METHOD : GET
  * @param {*} req

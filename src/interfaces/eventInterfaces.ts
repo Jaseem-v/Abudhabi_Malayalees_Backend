@@ -1,9 +1,9 @@
-import { IImage } from "./default";
-
 export interface IEvent {
   title: string;
   desc: string;
-  date: Date;
+  date: string;
+  time: string;
+  eventAt: Date;
   visibility: "Show" | "Hide";
   isDeleted: boolean;
   deletedAt?: string | Date;

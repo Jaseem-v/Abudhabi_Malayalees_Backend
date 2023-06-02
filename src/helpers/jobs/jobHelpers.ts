@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { config } from "../../config/index";
-import { Job } from "../../models";
+import { Category, Job } from "../../models";
 import { ThrowError } from "../../classes";
 import { IRoles } from "../../types/default";
 
@@ -15,11 +15,48 @@ export const getJobs = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
-      const jobs = await Job.find({ ...query }).sort({
-        createdAt: -1,
+        ? {}
+        : { isDeleted: false };
+      const jobs = await Job.find({ ...query })
+        .sort({
+          createdAt: -1,
+        })
+        .populate("category", "name image status visibility");
+
+      resolve({
+        message: "Jobs Fetched",
+        jobs,
       });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To get all jobs for customer
+ * @returns {Jobs} jobs
+ */
+export const getJobsForCustomer = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const jobs = await Job.find({
+        status: "APPROVED",
+        visibility: "Show",
+        isDeleted: false,
+      })
+        .sort({
+          createdAt: -1,
+        })
+        .populate({
+          path: "category",
+          select: "name image status visibility",
+          match: { visibility: "Show" },
+        });
 
       resolve({
         message: "Jobs Fetched",
@@ -47,9 +84,12 @@ export const getJob = (jobId: string, role?: IRoles) => {
         throw new ThrowError("Provide vaild job id", 404);
 
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
-      const job = await Job.findOne({ _id: jobId, ...query });
+        ? {}
+        : { isDeleted: false };
+      const job = await Job.findOne({ _id: jobId, ...query }).populate(
+        "category",
+        "name image status visibility"
+      );
 
       if (!job) {
         return reject({
@@ -79,9 +119,15 @@ export const addJob = (data: any) => {
       const { desc, categoryId, visibility } = data;
       if (!desc || !categoryId || !isValidObjectId(categoryId) || !visibility)
         throw new ThrowError(
-          "Please Provide  desc, categoryId and visibility",
+          "Please Provide desc, categoryId and visibility",
           400
         );
+
+      const category = await Category.findById(categoryId);
+
+      if (!category || category.type != "JOB")
+        throw new ThrowError("Please Provide valid job category", 400);
+
       const lastCode = await Job.find({}, { code: 1, _id: 0 })
         .limit(1)
         .sort({ createdAt: -1 });
@@ -89,15 +135,18 @@ export const addJob = (data: any) => {
         lastCode.length === 1
           ? "JOB" + (parseInt(lastCode[0].code.slice(3)) + 1)
           : "JOB100";
+
       const job = await new Job({
         code: data.code,
         desc,
         category: categoryId,
         status: "PENDING",
-        visibility: "Show",
+        visibility: visibility || "Show",
       });
 
-      const njob = await job.save();
+      const njob = await (
+        await job.save()
+      ).populate("category", "name image status visibility");
 
       resolve({
         message: "Job created successfully",
@@ -135,7 +184,9 @@ export const editJob = (jobId: string, data: any, client: any) => {
       job.desc = desc || job.desc;
       job.visibility = visibility || job.visibility;
 
-      const njob = await job.save();
+      const njob = await (
+        await job.save()
+      ).populate("category", "name image status visibility");
 
       resolve({ message: "Job edited successfully", job: njob });
     } catch (error: any) {
@@ -163,7 +214,7 @@ export const changeJobStatus = (
       if (
         !jobId ||
         !isValidObjectId(jobId) ||
-        status ||
+        !status ||
         !["APPROVE", "REJECT"].includes(status)
       ) {
         return reject({
@@ -197,7 +248,9 @@ export const changeJobStatus = (
         job.statusLog.rejectedBy = clientId;
       }
 
-      const njob = await job.save();
+      const njob = await (
+        await job.save()
+      ).populate("category", "name image status visibility");
 
       resolve({
         message: `${njob.code}'s status changed to ${njob.status}`,
@@ -233,7 +286,9 @@ export const changeJobVisibility = (jobId: string) => {
 
       job.visibility = job.visibility === "Show" ? "Hide" : "Show";
 
-      const njob = await job.save();
+      const njob = await (
+        await job.save()
+      ).populate("category", "name image status visibility");
 
       resolve({
         message: `${njob.code}'s visibility changed to ${njob.visibility}`,
@@ -312,7 +367,9 @@ export const restoreJob = (jobId: string) => {
       job.isDeleted = false;
       job.deletedAt = undefined;
 
-      const njob = await job.save();
+      const njob = await (
+        await job.save()
+      ).populate("category", "name image status visibility");
 
       resolve({
         message: `${njob.code} job was restored`,
@@ -353,13 +410,10 @@ export const pDeleteJob = (jobId: string) => {
       if (NODE_ENV === "development") {
         await job.deleteOne();
         return resolve({
-          message: `${job.code} category was deleted`,
+          message: `${job.code} job was deleted`,
         });
       }
-      throw new ThrowError(
-        `Not able to delete category in ${NODE_ENV} mode`,
-        401
-      );
+      throw new ThrowError(`Not able to delete job in ${NODE_ENV} mode`, 401);
     } catch (error: any) {
       reject({
         message: error.message || error.msg,

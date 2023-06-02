@@ -15,9 +15,37 @@ export const getCategories = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? {}
+        : { isDeleted: false };
       const categorys = await Category.find({ ...query }).sort({
+        createdAt: -1,
+      });
+
+      resolve({
+        message: "Categories Fetched",
+        categorys,
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To get all categorys for customer
+ * @returns {Categories} categorys
+ */
+export const getCategoriesForCustomer = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const categorys = await Category.find({
+        visibility: "Show",
+        isDeleted: false,
+      }).sort({
         createdAt: -1,
       });
 
@@ -47,8 +75,8 @@ export const getCategory = (categoryId: string, role?: IRoles) => {
         throw new ThrowError("Provide vaild category id", 404);
 
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? {}
+        : { isDeleted: false };
       const category = await Category.findOne({ _id: categoryId, ...query });
 
       if (!category) {

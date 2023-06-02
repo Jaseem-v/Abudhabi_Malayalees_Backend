@@ -15,9 +15,37 @@ export const getEvents = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? {}
+        : { isDeleted: false };
       const events = await Event.find({ ...query }).sort({
+        createdAt: -1,
+      });
+
+      resolve({
+        message: "Events Fetched",
+        events,
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To get all events for customer
+ * @returns {Events} events
+ */
+export const getEventsForCustomer = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const events = await Event.find({
+        visibility: "Show",
+        isDeleted: false,
+      }).sort({
         createdAt: -1,
       });
 
@@ -47,8 +75,8 @@ export const getEvent = (eventId: string, role?: IRoles) => {
         throw new ThrowError("Provide vaild event id", 404);
 
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? {}
+        : { isDeleted: false };
       const event = await Event.findOne({ _id: eventId, ...query });
 
       if (!event) {
@@ -89,11 +117,16 @@ export const addEvent = (data: any) => {
 
       if (eventExists) throw new ThrowError("Event title already exist!", 401);
 
+      const [day, month, year] = date.split("-");
+      const [hours, minutes] = time.split(":");
+
       const event = await new Event({
         title,
         desc,
-        date: new Date(),
-        visibility: "Show",
+        date,
+        time,
+        eventAt: new Date(year, month - 1, day, hours, minutes),
+        visibility: visibility || "Show",
       });
 
       const nevent = await event.save();
@@ -128,7 +161,7 @@ export const editEvent = (eventId: string, data: any, client: any) => {
 
       if (!event) throw new ThrowError("Event not found", 404);
 
-      const { title, desc, date, visibility } = data;
+      const { title, desc, date, time, visibility } = data;
 
       // New title is already exist from another event then
       if (title && event.title != title) {
@@ -142,8 +175,16 @@ export const editEvent = (eventId: string, data: any, client: any) => {
       // Update a values in db
       event.title = title || event.title;
       event.desc = desc || event.desc;
-      event.date = date || event.date;
       event.visibility = visibility || event.visibility;
+
+      if (date && time) {
+        const [day, month, year] = date.split("-");
+        const [hours, minutes] = time.split(":");
+
+        event.date = date;
+        event.time = time;
+        event.eventAt = new Date(year, month - 1, day, hours, minutes);
+      }
 
       const nevent = await event.save();
 
@@ -298,11 +339,11 @@ export const pDeleteEvent = (eventId: string) => {
       if (NODE_ENV === "development") {
         await event.deleteOne();
         return resolve({
-          message: `${event.title} category was deleted`,
+          message: `${event.title} event was deleted`,
         });
       }
       throw new ThrowError(
-        `Not able to delete category in ${NODE_ENV} mode`,
+        `Not able to delete event in ${NODE_ENV} mode`,
         401
       );
     } catch (error: any) {
