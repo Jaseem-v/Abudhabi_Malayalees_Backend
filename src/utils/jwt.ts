@@ -5,9 +5,11 @@ import { IRoles } from "../types";
 
 const {
   JWT_ACCESS_TOKEN_SECRET,
-  JWT_RESET_TOKEN_SECRET,
   JWT_ACCESS_TOKEN_EXPIRE,
+  JWT_RESET_TOKEN_SECRET,
   JWT_RESET_TOKEN_EXPIRE,
+  JWT_VERIFICATION_TOKEN_SECRET,
+  JWT_VERIFICATION_TOKEN_EXPIRE,
   JWT_TOKEN_ISSUER,
 } = config.JWT;
 
@@ -16,11 +18,13 @@ interface IJwtPayload extends JwtPayload {
   role?: IRoles;
 }
 
+type IJWT_Type = "AccessToken" | "VerifyToken" | "ResetToken";
+
 export const generateToken = (meta: {
-  id: string |  Document["id"];
+  id: string | Document["id"];
   name: string;
   role: IRoles;
-  type: "AccessToken" | "ResetToken";
+  type: IJWT_Type;
   subject?: string;
 }) => {
   return new Promise<string>(async (resolve, reject) => {
@@ -28,16 +32,20 @@ export const generateToken = (meta: {
       const { id, name, role, type, subject } = meta;
       const token = await jwt.sign(
         { id, role },
-        type === "ResetToken"
-          ? JWT_RESET_TOKEN_SECRET
-          : JWT_ACCESS_TOKEN_SECRET,
+        type === "AccessToken"
+          ? JWT_ACCESS_TOKEN_SECRET
+          : type === "VerifyToken"
+          ? JWT_VERIFICATION_TOKEN_SECRET
+          : JWT_RESET_TOKEN_SECRET,
         {
           audience: name,
           issuer: JWT_TOKEN_ISSUER,
           expiresIn:
-            type === "ResetToken"
-              ? JWT_RESET_TOKEN_EXPIRE
-              : JWT_ACCESS_TOKEN_EXPIRE,
+            type === "AccessToken"
+              ? JWT_ACCESS_TOKEN_EXPIRE
+              : type === "VerifyToken"
+              ? JWT_VERIFICATION_TOKEN_EXPIRE
+              : JWT_RESET_TOKEN_EXPIRE,
           subject: subject ?? "Generate Token",
         }
       );
@@ -51,17 +59,16 @@ export const generateToken = (meta: {
   });
 };
 
-export const verifyToken = (
-  token: string,
-  type: "AccessToken" | "ResetToken"
-) => {
+export const verifyToken = (token: string, type: IJWT_Type) => {
   return new Promise<IJwtPayload>(async (resolve, reject) => {
     try {
       const decoded: IJwtPayload = await jwt.verify(
         token,
-        type === "ResetToken"
-          ? JWT_RESET_TOKEN_SECRET
-          : JWT_ACCESS_TOKEN_SECRET,
+        type === "AccessToken"
+          ? JWT_ACCESS_TOKEN_SECRET
+          : type === "VerifyToken"
+          ? JWT_VERIFICATION_TOKEN_SECRET
+          : JWT_RESET_TOKEN_SECRET,
         { complete: true }
       );
       resolve(decoded);

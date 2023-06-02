@@ -41,7 +41,7 @@ export const getPersonalAccounts: ApiParams = (req, res, next) => {
  */
 export const getPersonalAccount: ApiParams = (req, res, next) => {
   personalAccountHelpers
-    .getPersonalAccount(req.params.paid,req.client!.role)
+    .getPersonalAccount(req.params.paid, req.client!.role)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -121,16 +121,75 @@ export const personalAccountLogin: ApiParams = (req, res, next) => {
  */
 export const addPersonalAccount: ApiParams = (req, res, next) => {
   personalAccountHelpers
-    .addPersonalAccount(req.body)
+    .addPersonalAccount(
+      req.body,
+      ["SuperAdmin", "Admin", "Developer"].includes(req.client?.role ?? "")
+        ? req.client?.id.toString()
+        : undefined
+    )
     .then((resp: any) => {
       res
         .status(200)
-        .json({ success: true, message: resp.message, data: resp.personalAccount });
+        .json({
+          success: true,
+          message: resp.message,
+          data: resp.personalAccount,
+        });
     })
     .catch((error: any) => {
       return next(
         new ErrorResponse(error.message, error.statusCode, error.code)
       );
+    });
+};
+
+/**
+ * To send a reset link to email
+ * METHOD : PATCH
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const sendVerificationMailPersonalAccount: ApiParams = (
+  req,
+  res,
+  next
+) => {
+  personalAccountHelpers
+    .sendVerificationMailPersonalAccount(
+      req.body.email,
+      req.body.username,
+      ["SuperAdmin", "Admin", "Developer"].includes(req.client?.role ?? "")
+    )
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+      });
+    })
+    .catch((error: any) => {
+      return next(new ErrorResponse(error.message, 402, error.code));
+    });
+};
+
+/**
+ * To verify account using token
+ * METHOD : PATCH
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const verifyPersonalAccount: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .verifyPersonalAccount(req.body.token)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+      });
+    })
+    .catch((error: any) => {
+      return next(new ErrorResponse(error.message, 402, error.code));
     });
 };
 
@@ -178,7 +237,6 @@ export const updatePersonalAccountProfile: ApiParams = (req, res, next) => {
     });
 };
 
-
 /**
  * to change a personalAccount profile picture
  * METHOD : PATCH
@@ -186,7 +244,11 @@ export const updatePersonalAccountProfile: ApiParams = (req, res, next) => {
  * @param {*} res
  * @param {*} next
  */
-export const changePersonalAccountProfileImage: ApiParams = (req, res, next) => {
+export const changePersonalAccountProfileImage: ApiParams = (
+  req,
+  res,
+  next
+) => {
   personalAccountHelpers
     .changePersonalAccountProfileImage(req.client!.id, req.file)
     .then((resp: any) => {
@@ -211,7 +273,11 @@ export const changePersonalAccountProfileImage: ApiParams = (req, res, next) => 
  * @param {*} res
  * @param {*} next
  */
-export const removePersonalAccountProfileImage: ApiParams = (req, res, next) => {
+export const removePersonalAccountProfileImage: ApiParams = (
+  req,
+  res,
+  next
+) => {
   personalAccountHelpers
     .removePersonalAccountProfileImage(req.client!.id)
     .then((resp: any) => {

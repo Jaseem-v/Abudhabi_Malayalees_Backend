@@ -3,12 +3,15 @@ import { config } from "../../config";
 import { personalAccountControllers } from "../../controllers";
 import { superAdminAccess, personalAccountAccess, adminAccess } from "../../middlewares";
 import { s3Upload } from "../../functions";
+import { guestAccess } from "../../middlewares/authmiddleware";
 const {
   getPersonalAccounts,
   getPersonalAccount,
   getPersonalAccountProfile,
   personalAccountLogin,
   addPersonalAccount,
+  sendVerificationMailPersonalAccount,
+  verifyPersonalAccount,
   editPersonalAccount,
   updatePersonalAccountProfile,
   changePersonalAccountProfileImage,
@@ -42,6 +45,10 @@ router
   .post(adminAccess, addPersonalAccount);
 router.route("/login").patch(personalAccountLogin);
 router.route("/signup").post(addPersonalAccount);
+router
+  .route("/send-verification")
+  .patch(guestAccess, sendVerificationMailPersonalAccount);
+router.route("/verify-account").patch(verifyPersonalAccount);
 router.route("/forget-password").patch(forgotPersonalAccountPassword);
 router.route("/reset-password").patch(resetPersonalAccountPassword);
 router.route("/profile").get(personalAccountAccess, getPersonalAccountProfile);

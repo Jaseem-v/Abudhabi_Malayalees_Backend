@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { IPersonalAccount } from "../../interfaces";
 import { config } from "../../config/index";
 
-const { PERSONAL_ACCOUNTS } = config.MONGO_COLLECTIONS;
+const { PERSONAL_ACCOUNTS, ADMINS } = config.MONGO_COLLECTIONS;
 
 interface IPersonalAccountDocument extends IPersonalAccount {
   matchPassword(password: string): boolean;
@@ -38,6 +38,18 @@ const personalAccountSchema = new mongoose.Schema<IPersonalAccountDocument>(
       type: String,
       required: true,
       select: false,
+    },
+    isVerified: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    verifiedAt: {
+      type: Date,
+    },
+    verificationMailSentCount: {
+      type: Number,
+      default: 0,
     },
     about: {
       type: String,
@@ -89,6 +101,15 @@ const personalAccountSchema = new mongoose.Schema<IPersonalAccountDocument>(
       type: Date,
       required: true,
       default: Date.now(),
+    },
+    manual: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    createdBy: {
+      type: mongoose.Types.ObjectId,
+      ref: ADMINS,
     },
     isDeleted: {
       type: Boolean,

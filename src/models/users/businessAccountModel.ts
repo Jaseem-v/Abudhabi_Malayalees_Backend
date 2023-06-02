@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { IBusinessAccount } from "../../interfaces";
 import { config } from "../../config/index";
 
-const { BUSINESS_ACCOUNTS, CATEGORIES } = config.MONGO_COLLECTIONS;
+const { BUSINESS_ACCOUNTS, CATEGORIES, ADMINS } = config.MONGO_COLLECTIONS;
 
 interface IBusinessAccountDocument extends IBusinessAccount {
   matchPassword(password: string): boolean;
@@ -34,6 +34,18 @@ const businessAccountSchema = new mongoose.Schema<IBusinessAccountDocument>(
       type: String,
       required: true,
       select: false,
+    },
+    isVerified: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    verifiedAt: {
+      type: Date,
+    },
+    verificationMailSentCount: {
+      type: Number,
+      default: 0,
     },
     category: {
       type: mongoose.SchemaTypes.ObjectId,
@@ -183,6 +195,15 @@ const businessAccountSchema = new mongoose.Schema<IBusinessAccountDocument>(
       type: Date,
       required: true,
       default: Date.now(),
+    },
+    manual: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    createdBy: {
+      type: mongoose.Types.ObjectId,
+      ref: ADMINS,
     },
     isDeleted: {
       type: Boolean,

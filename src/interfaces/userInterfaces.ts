@@ -1,3 +1,4 @@
+import { IAdmin } from './adminInterfaces';
 import { Document } from "mongoose";
 import { IImage, IImages } from "./default";
 
@@ -11,6 +12,9 @@ export interface IBusinessAccount {
   website?: string;
   location?: string;
   about?: string;
+  isVerified: boolean;
+  verifiedAt: Date;
+  verificationMailSentCount: number;
   services: string[];
   gallerys: IImages[];
   profilePicture: IImage | null;
@@ -50,6 +54,8 @@ export interface IBusinessAccount {
   status: "Active" | "Inactive" | "Suspended" | "Blocked";
   lastSync: string | Date;
   lastUsed: string | Date;
+  manual: boolean;
+  createdBy?: string | IAdmin;
   isDeleted: boolean;
   deletedAt?: string | Date;
   createdAt: string | Date;
@@ -63,6 +69,9 @@ export interface IPersonalAccount {
   phone: string;
   email: string;
   password?: string;
+  isVerified: boolean;
+  verifiedAt: Date;
+  verificationMailSentCount: number;
   about: string;
   gallerys: IImages[];
   profilePicture: IImage | null;
@@ -74,6 +83,8 @@ export interface IPersonalAccount {
   status: "Active" | "Inactive" | "Suspended" | "Blocked";
   lastSync: string | Date;
   lastUsed: string | Date;
+  manual: boolean;
+  createdBy?: string | IAdmin;
   isDeleted: boolean;
   deletedAt?: string | Date;
   createdAt: string | Date;

@@ -7,12 +7,15 @@ import {
   superAdminAccess,
 } from "../../middlewares";
 import { s3Upload } from "../../functions/multer";
+import { guestAccess } from "../../middlewares/authmiddleware";
 const {
   getBusinessAccounts,
   getBusinessAccount,
   getBusinessAccountProfile,
   businessAccountLogin,
   addBusinessAccount,
+  sendVerificationMailBusinessAccount,
+  verifyBusinessAccount,
   editBusinessAccount,
   updateBusinessAccountProfile,
   changeBusinessAccountProfileImage,
@@ -48,8 +51,14 @@ router.route("/login").patch(businessAccountLogin);
 router.route("/signup").post(addBusinessAccount);
 router.route("/forget-password").patch(forgotBusinessAccountPassword);
 router.route("/reset-password").patch(resetBusinessAccountPassword);
+router
+  .route("/send-verification")
+  .patch(guestAccess, sendVerificationMailBusinessAccount);
+router.route("/verify-account").patch(verifyBusinessAccount);
 router.route("/profile").get(businessAccountAccess, getBusinessAccountProfile);
-router.route("/profile").patch(businessAccountAccess, updateBusinessAccountProfile);
+router
+  .route("/profile")
+  .patch(businessAccountAccess, updateBusinessAccountProfile);
 router
   .route("/change-profile-picture")
   .patch(
@@ -80,8 +89,12 @@ router.route("/delete/all").delete(superAdminAccess, deleteAllBusinessAccount);
 router
   .route("/change-status/:baid")
   .patch(adminAccess, changeBusinessAccountStatus);
-router.route("/change-phone").patch(businessAccountAccess, changeBusinessAccountPhone);
-router.route("/change-email").patch(businessAccountAccess, changeBusinessAccountEmail);
+router
+  .route("/change-phone")
+  .patch(businessAccountAccess, changeBusinessAccountPhone);
+router
+  .route("/change-email")
+  .patch(businessAccountAccess, changeBusinessAccountEmail);
 router
   .route("/change-username")
   .patch(businessAccountAccess, changeBusinessAccountUsername);

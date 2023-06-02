@@ -94,7 +94,10 @@ export const personalAccountLogin = (
   return new Promise(async (resolve, reject) => {
     try {
       if ((!username && !email && !phone) || !password)
-        throw new ThrowError("Provide username or email or phone and password", 400);
+        throw new ThrowError(
+          "Provide username or email or phone and password",
+          400
+        );
 
       const personalAccount = await PersonalAccount.findOne(
         { $or: [{ username }, { email }, { phone }] },
@@ -150,7 +153,7 @@ export const personalAccountLogin = (
  * @param {PersonalAccount} data
  * @returns personalAccount
  */
-export const addPersonalAccount = (data: any) => {
+export const addPersonalAccount = (data: any, adminId?: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       const {
@@ -192,9 +195,21 @@ export const addPersonalAccount = (data: any) => {
         password,
         lastSync: new Date(),
         lastUsed: new Date(),
+        manual: typeof adminId === "string",
+        createdBy: adminId,
       });
 
       const npersonalAccount = await personalAccount.save();
+
+      if (typeof adminId != "string") {
+        sendVerificationMailPersonalAccount(
+          personalAccount.email,
+          personalAccount.username,
+          false
+        )
+          .then()
+          .catch((error: any) => console.log(error.message));
+      }
 
       resolve({
         message: "Account created successfully",
@@ -202,6 +217,109 @@ export const addPersonalAccount = (data: any) => {
       });
     } catch (error: any) {
       return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+
+/**
+ * To send a reset link to email
+ * @param {String} email
+ * @param {String} username
+ * @param {Boolean} isAdmin
+ * @returns
+ */
+export const sendVerificationMailPersonalAccount = (
+  email: string,
+  username: string,
+  isAdmin: boolean
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!email && !username)
+        throw new ThrowError("Please Provide Email or Username", 400);
+
+      const personalAccount = await PersonalAccount.findOne({
+        $or: [{ email }, { username }],
+      });
+
+      if (personalAccount) {
+        if (
+          personalAccount.isVerified ||
+          (personalAccount.verificationMailSentCount >= 5 && !isAdmin)
+        ) {
+          throw new ThrowError(
+            personalAccount.isVerified
+              ? "Already verified"
+              : "Mail sent count exceed, contact customer care",
+            401
+          );
+        }
+
+        personalAccount.verificationMailSentCount += 1;
+        await personalAccount.save();
+
+        const token: string = await generateToken({
+          id: personalAccount._id.toString(),
+          name: personalAccount.fname + " " + personalAccount.lname,
+          role: "PersonalAccount",
+          type: "VerifyToken",
+        });
+
+        console.log(token);
+
+        // sendMail("ResetPassword", {
+        //   token,
+        //   name: personalAccount.name,
+        //   email: personalAccount.email,
+        // })
+        //   .then()
+        //   .catch();
+      }
+      resolve({
+        message:
+          "If your email exist, then the verification link will be sent to your email",
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To verify account using token
+ * @param {String} token
+ * @returns
+ */
+export const verifyPersonalAccount = (token: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!token) throw new ThrowError("Please Provide Token", 400);
+      const decoded = (await verifyToken(token, "VerifyToken")).payload;
+      if (decoded && decoded.id) {
+        const personalAccountFound = await PersonalAccount.findById(decoded.id);
+
+        if (personalAccountFound && !personalAccountFound.isVerified) {
+          personalAccountFound.isVerified = true;
+          personalAccountFound.verifiedAt = new Date();
+          await personalAccountFound.save();
+          return resolve({ message: "Personal Account verified Successfully" });
+        } else {
+          throw new ThrowError("Incorrect Credentials", 401);
+        }
+      } else {
+        throw new ThrowError("Incorrect Credentials", 401);
+      }
+    } catch (error: any) {
+      reject({
         message: error.message || error.msg,
         statusCode: error.statusCode,
         code: error.code || error.name,

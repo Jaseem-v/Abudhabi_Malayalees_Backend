@@ -4,6 +4,7 @@ import { BusinessAccount } from "../../models/index";
 import { generateToken, verifyToken } from "../../utils/index";
 import { ThrowError } from "../../classes/index";
 import { IRoles } from "../../types/default";
+import { IAdmin } from "../../interfaces";
 
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;
@@ -18,8 +19,8 @@ export const getBusinessAccounts = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? {}
+        : { isDeleted: false };
       const businessAccounts = await BusinessAccount.find({ ...query }).sort({
         createdAt: -1,
       });
@@ -53,8 +54,8 @@ export const getBusinessAccount = (
         throw new ThrowError("Provide vaild businessAccount id", 404);
 
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? {}
+        : { isDeleted: false };
       const businessAccount = await BusinessAccount.findOne({
         _id: businessAccountId,
         ...query,
@@ -94,7 +95,10 @@ export const businessAccountLogin = (
   return new Promise(async (resolve, reject) => {
     try {
       if ((!username && !email && !phone) || !password)
-        throw new ThrowError("Provide username or email or phone and password", 400);
+        throw new ThrowError(
+          "Provide username or email or phone and password",
+          400
+        );
 
       const businessAccount = await BusinessAccount.findOne(
         { $or: [{ username }, { email }, { phone }] },
@@ -150,7 +154,7 @@ export const businessAccountLogin = (
  * @param {BusinessAccount} data
  * @returns businessAccount
  */
-export const addBusinessAccount = (data: any) => {
+export const addBusinessAccount = (data: any, adminId?: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       const {
@@ -190,7 +194,7 @@ export const addBusinessAccount = (data: any) => {
         !contactDetails.phone
       )
         throw new ThrowError(
-          `Please Provide name, username, phone, email, password, category, website, location, services, address, socialMediaLinks, addressDetails (streetNumber, state, city, address, place, pincode and landmark) and contactDetails (fname, lname, email, phone, isAddressVisible, addressDetails (streetNumber, state, city, address, place, pincode and landmark))`,
+          `Please Provide name(*), username(*), phone(*), email(*), password(*), category(*), website, location, services, about, socialMediaLinks, addressDetails(streetNumber, state(*), city(*), address(*), place, pincode(*) and landmark) and contactDetails (fname(*), lname(*), email, phone(*), isAddressVisible, addressDetails (streetNumber, state, city, address, place, pincode and landmark))`,
           400
         );
 
@@ -216,6 +220,9 @@ export const addBusinessAccount = (data: any) => {
         phone,
         email,
         password,
+        isVerified: typeof adminId === "string",
+        verifiedAt: typeof adminId === "string" ? new Date() : null,
+        verificationMailSentCount: 0,
         category,
         website,
         location,
@@ -254,9 +261,21 @@ export const addBusinessAccount = (data: any) => {
         gallerys: [],
         lastSync: new Date(),
         lastUsed: new Date(),
+        manual: typeof adminId === "string",
+        createdBy: adminId,
       });
 
       const nbusinessAccount = await businessAccount.save();
+      
+      if (typeof adminId != "string") {
+        sendVerificationMailBusinessAccount(
+          businessAccount.email,
+          businessAccount.username,
+          false
+        )
+          .then()
+          .catch((error: any) => console.log(error.message));
+      }
 
       resolve({
         message: "Business Account created successfully",
@@ -265,6 +284,108 @@ export const addBusinessAccount = (data: any) => {
     } catch (error: any) {
       console.log(error);
       return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To send a reset link to email
+ * @param {String} email
+ * @param {String} username
+ * @param {Boolean} isAdmin
+ * @returns
+ */
+export const sendVerificationMailBusinessAccount = (
+  email: string,
+  username: string,
+  isAdmin: boolean
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!email && !username)
+        throw new ThrowError("Please Provide Email or Username", 400);
+
+      const businessAccount = await BusinessAccount.findOne({
+        $or: [{ email }, { username }],
+      });
+
+      if (businessAccount) {
+        if (
+          businessAccount.isVerified ||
+          (businessAccount.verificationMailSentCount >= 5 && !isAdmin)
+        ) {
+          throw new ThrowError(
+            businessAccount.isVerified
+              ? "Already verified"
+              : "Mail sent count exceed, contact customer care",
+            401
+          );
+        }
+
+        businessAccount.verificationMailSentCount += 1;
+        await businessAccount.save();
+
+        const token: string = await generateToken({
+          id: businessAccount._id.toString(),
+          name: businessAccount.name,
+          role: "BusinessAccount",
+          type: "VerifyToken",
+        });
+
+        console.log(token);
+
+        // sendMail("ResetPassword", {
+        //   token,
+        //   name: businessAccount.name,
+        //   email: businessAccount.email,
+        // })
+        //   .then()
+        //   .catch();
+      }
+      resolve({
+        message:
+          "If your email exist, then the verification link will be sent to your email",
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To verify account using token
+ * @param {String} token
+ * @returns
+ */
+export const verifyBusinessAccount = (token: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!token) throw new ThrowError("Please Provide Token", 400);
+      const decoded = (await verifyToken(token, "VerifyToken")).payload;
+      if (decoded && decoded.id) {
+        const businessAccountFound = await BusinessAccount.findById(decoded.id);
+
+        if (businessAccountFound && !businessAccountFound.isVerified) {
+          businessAccountFound.isVerified = true;
+          businessAccountFound.verifiedAt = new Date();
+          await businessAccountFound.save();
+          return resolve({ message: "Business Account verified Successfully" });
+        } else {
+          throw new ThrowError("Incorrect Credentials", 401);
+        }
+      } else {
+        throw new ThrowError("Incorrect Credentials", 401);
+      }
+    } catch (error: any) {
+      reject({
         message: error.message || error.msg,
         statusCode: error.statusCode,
         code: error.code || error.name,
@@ -420,7 +541,8 @@ export const editBusinessAccount = (
           businessAccount.contactDetails.phone = contactDetails.phone;
         }
         if (contactDetails.isAddressVisible) {
-          businessAccount.contactDetails.isAddressVisible = contactDetails.isAddressVisible;
+          businessAccount.contactDetails.isAddressVisible =
+            contactDetails.isAddressVisible;
         }
         if (contactDetails.addressDetails) {
           if (contactDetails.addressDetails.streetNumber) {
@@ -504,7 +626,8 @@ export const updateBusinessAccountProfile = (
 
       // New contact details phone is already exist from anothers
       if (
-        contactDetails && contactDetails.phone &&
+        contactDetails &&
+        contactDetails.phone &&
         businessAccount.contactDetails.phone != contactDetails.phone
       ) {
         const businessAccountExists = await BusinessAccount.findOne({
@@ -569,7 +692,8 @@ export const updateBusinessAccountProfile = (
           businessAccount.contactDetails.phone = contactDetails.phone;
         }
         if (contactDetails.isAddressVisible) {
-          businessAccount.contactDetails.isAddressVisible = contactDetails.isAddressVisible;
+          businessAccount.contactDetails.isAddressVisible =
+            contactDetails.isAddressVisible;
         }
         if (contactDetails.addressDetails) {
           if (contactDetails.addressDetails.streetNumber) {

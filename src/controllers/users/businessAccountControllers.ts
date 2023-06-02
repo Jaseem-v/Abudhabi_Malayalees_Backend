@@ -121,7 +121,12 @@ export const businessAccountLogin: ApiParams = (req, res, next) => {
  */
 export const addBusinessAccount: ApiParams = (req, res, next) => {
   businessAccountHelpers
-    .addBusinessAccount(req.body)
+    .addBusinessAccount(
+      req.body,
+      ["SuperAdmin", "Admin", "Developer"].includes(req.client?.role ?? "")
+        ? req.client?.id.toString()
+        : undefined
+    )
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -159,6 +164,56 @@ export const editBusinessAccount: ApiParams = (req, res, next) => {
 };
 
 /**
+ * To send a reset link to email
+ * METHOD : PATCH
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const sendVerificationMailBusinessAccount: ApiParams = (
+  req,
+  res,
+  next
+) => {
+  businessAccountHelpers
+    .sendVerificationMailBusinessAccount(
+      req.body.email,
+      req.body.username,
+      ["SuperAdmin", "Admin", "Developer"].includes(req.client?.role ?? "")
+    )
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+      });
+    })
+    .catch((error: any) => {
+      return next(new ErrorResponse(error.message, 402, error.code));
+    });
+};
+
+/**
+ * To verify account using token
+ * METHOD : PATCH
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const verifyBusinessAccount: ApiParams = (req, res, next) => {
+  businessAccountHelpers
+    .verifyBusinessAccount(req.body.token)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+      });
+    })
+    .catch((error: any) => {
+      return next(new ErrorResponse(error.message, 402, error.code));
+    });
+};
+
+/**
  * To edit a businessAccount profile
  * METHOD : PATCH
  * @param {*} req
@@ -187,7 +242,11 @@ export const updateBusinessAccountProfile: ApiParams = (req, res, next) => {
  * @param {*} res
  * @param {*} next
  */
-export const changeBusinessAccountProfileImage: ApiParams = (req, res, next) => {
+export const changeBusinessAccountProfileImage: ApiParams = (
+  req,
+  res,
+  next
+) => {
   businessAccountHelpers
     .changeBusinessAccountProfileImage(req.client!.id, req.file)
     .then((resp: any) => {
@@ -212,7 +271,11 @@ export const changeBusinessAccountProfileImage: ApiParams = (req, res, next) => 
  * @param {*} res
  * @param {*} next
  */
-export const removeBusinessAccountProfileImage: ApiParams = (req, res, next) => {
+export const removeBusinessAccountProfileImage: ApiParams = (
+  req,
+  res,
+  next
+) => {
   businessAccountHelpers
     .removeBusinessAccountProfileImage(req.client!.id)
     .then((resp: any) => {
