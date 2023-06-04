@@ -6,6 +6,7 @@ import {
   generateResetPasswdMailTemplate,
 } from "./generate";
 import { s3Upload } from "./multer";
+import { sendMail } from "./sendMail";
 
 export {
   generateCredentialsMailTemplate,
@@ -14,4 +15,5 @@ export {
   generateTagsFromSpecifications,
   generateResetPasswdMailTemplate,
   s3Upload,
+  sendMail,
 };

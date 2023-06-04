@@ -5,9 +5,13 @@ import { generateToken, verifyToken } from "../../utils/index";
 import { ThrowError } from "../../classes/index";
 import { IRoles } from "../../types/default";
 import { IAdmin } from "../../interfaces";
+import { sendMail } from "../../functions";
 
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;
+const { CLIENT_DOMAIN } = config.CLIENT;
+const { EMAILJS_VERIFICATION_TEMPLATE_ID, EMAILJS_RESET_TEMPLATE_ID } =
+  config.EMAILJS;
 
 const BUSINESS_ACCOUNT_USERNAME_STARTS_WITH = "ba-";
 
@@ -266,7 +270,7 @@ export const addBusinessAccount = (data: any, adminId?: string) => {
       });
 
       const nbusinessAccount = await businessAccount.save();
-      
+
       if (typeof adminId != "string") {
         sendVerificationMailBusinessAccount(
           businessAccount.email,
@@ -336,15 +340,18 @@ export const sendVerificationMailBusinessAccount = (
           type: "VerifyToken",
         });
 
-        console.log(token);
+        const VERIFY_URL = CLIENT_DOMAIN + "/business/verify/" + token;
 
-        // sendMail("ResetPassword", {
-        //   token,
-        //   name: businessAccount.name,
-        //   email: businessAccount.email,
-        // })
-        //   .then()
-        //   .catch();
+        sendMail({
+          templateId: EMAILJS_VERIFICATION_TEMPLATE_ID,
+          templateData: {
+            name: businessAccount.name,
+            email: businessAccount.email,
+            VERIFY_URL,
+          },
+        })
+          .then()
+          .catch();
       }
       resolve({
         message:
@@ -1364,13 +1371,18 @@ export const forgotBusinessAccountPassword = (email: string) => {
           type: "ResetToken",
         });
 
-        // await sendMail("ResetPassword", {
-        //   token,
-        //   name: businessAccount.name,
-        //   email: businessAccount.email,
-        // })
-        //   .then()
-        //   .catch();
+        const VERIFY_URL = CLIENT_DOMAIN + "/business/reset/" + token;
+
+        sendMail({
+          templateId: EMAILJS_RESET_TEMPLATE_ID,
+          templateData: {
+            name: businessAccount.name,
+            email: businessAccount.email,
+            VERIFY_URL,
+          },
+        })
+          .then()
+          .catch();
       }
       resolve({
         message:

@@ -7,6 +7,7 @@ const {
   AWS_S3_ADZ_RESOURCES,
   AWS_S3_CATEGORY_RESOURCES,
   AWS_S3_GALLERY_RESOURCES,
+  AWS_S3_EVENT_RESOURCES,
   AWS_S3_BUSINESS_ACCOUNT_GALLERY_RESOURCES,
   AWS_S3_BUSINESS_ACCOUNT_PROFILE_RESOURCES,
   AWS_S3_PERSONAL_ACCOUNT_GALLERY_RESOURCES,
@@ -72,6 +73,18 @@ export const getGalleryResourceByKey: ApiParams = async (req, res, next) => {
     const key = req.params.key;
 
     const image: any = await getS3File(key, AWS_S3_GALLERY_RESOURCES);
+
+    image.pipe(res);
+  } catch (error: any) {
+    return next(new ErrorResponse(error.message, error.statusCode, error.code));
+  }
+};
+
+export const getEventResourceByKey: ApiParams = async (req, res, next) => {
+  try {
+    const key = req.params.key;
+
+    const image: any = await getS3File(key, AWS_S3_EVENT_RESOURCES);
 
     image.pipe(res);
   } catch (error: any) {

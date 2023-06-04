@@ -51,9 +51,10 @@ const SERVER = {
 // Client Config
 const CLIENT_HOST = process.env.CLIENT_HOST || "0.0.0.0";
 const CLIENT_DOMAIN = process.env.CLIENT_DOMAIN || "localhost";
+const CLIENT_PORT = process.env.CLIENT_PORT || 3000;
 const CLIENT_ADMIN_HOST = process.env.CLIENT_ADMIN_HOST || "0.0.0.0";
 const CLIENT_ADMIN_DOMAIN = process.env.CLIENT_ADMIN_DOMAIN || "localhost";
-const CLIENT_PORT = process.env.CLIENT_PORT || 3000;
+const CLIENT_ADMIN_PORT = process.env.CLIENT_ADMIN_PORT || 4000;
 const CLIENT_DEV_HOSTS = [
   "http://localhost:3000",
   "http://localhost:3001",
@@ -64,9 +65,11 @@ const CLIENT_DEV_HOSTS = [
 const CLIENT = {
   CLIENT_HOST,
   CLIENT_DOMAIN,
+  CLIENT_PORT,
   CLIENT_ADMIN_HOST,
   CLIENT_ADMIN_DOMAIN,
-  CLIENT_PORT,
+  CLIENT_ADMIN_PORT,
+  CLIENT_DEV_HOSTS,
 };
 
 // Moongose config
@@ -125,14 +128,24 @@ const JWT = {
   JWT_TOKEN_ISSUER,
 };
 
-// Scheduler
-const BACKUP_STATUS = process.env.BACKUP_STATUS || "OFF";
-const BACKUP_CRON_EXPRESSION =
-  process.env.BACKUP_CRON_EXPRESSION || "0 0 * * *"; // Run at daily 12:00AM
+// Emailjs
+const EMAILJS_SERVICE_ID =
+  process.env.EMAILJS_SERVICE_ID || "EMAILJS_SERVICE_ID";
+const EMAILJS_PUBLIC_KEY =
+  process.env.EMAILJS_PUBLIC_KEY || "EMAILJS_PUBLIC_KEY";
+const EMAILJS_PRIVATE_KEY =
+  process.env.EMAILJS_PRIVATE_KEY || "EMAILJS_PRIVATE_KEY";
+const EMAILJS_VERIFICATION_TEMPLATE_ID =
+  process.env.EMAILJS_VERIFICATION_TEMPLATE_ID || "EMAILJS_VERIFICATION_TEMPLATE_ID";
+const EMAILJS_RESET_TEMPLATE_ID =
+  process.env.EMAILJS_RESET_TEMPLATE_ID || "EMAILJS_RESET_TEMPLATE_ID";
 
-const SCHEDULER = {
-  BACKUP_STATUS,
-  BACKUP_CRON_EXPRESSION,
+const EMAILJS = {
+  EMAILJS_SERVICE_ID,
+  EMAILJS_PUBLIC_KEY,
+  EMAILJS_PRIVATE_KEY,
+  EMAILJS_VERIFICATION_TEMPLATE_ID,
+  EMAILJS_RESET_TEMPLATE_ID
 };
 
 //* AWS Config */
@@ -160,8 +173,7 @@ const AWS_S3_PERSONAL_ACCOUNT_PROFILE_RESOURCES =
   "/personal-account/profile-pictures";
 const AWS_S3_ADZ_RESOURCES =
   process.env.AWS_S3_ADZ_RESOURCES || "/advertisements";
-const AWS_S3_EVENT_RESOURCES =
-  process.env.AWS_S3_EVENT_RESOURCES || "/events";
+const AWS_S3_EVENT_RESOURCES = process.env.AWS_S3_EVENT_RESOURCES || "/events";
 const AWS_S3_NEWS_RESOURCES = process.env.AWS_S3_NEWS_RESOURCES || "/news";
 
 const AWS_S3 = {
@@ -187,8 +199,8 @@ const config = {
   APP,
   JWT,
   MONGO_COLLECTIONS,
-  SCHEDULER,
   AWS_S3,
+  EMAILJS,
 };
 
 export default config;

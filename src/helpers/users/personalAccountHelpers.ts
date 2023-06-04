@@ -4,9 +4,13 @@ import { PersonalAccount } from "../../models/index";
 import { generateToken, verifyToken } from "../../utils/index";
 import { ThrowError } from "../../classes/index";
 import { IRoles } from "../../types/default";
+import { sendMail } from "../../functions";
 
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;
+const { CLIENT_DOMAIN } = config.CLIENT;
+const { EMAILJS_VERIFICATION_TEMPLATE_ID, EMAILJS_RESET_TEMPLATE_ID } =
+  config.EMAILJS;
 
 const PERSONAL_ACCOUNT_USERNAME_STARTS_WITH = "pa-";
 
@@ -225,7 +229,6 @@ export const addPersonalAccount = (data: any, adminId?: string) => {
   });
 };
 
-
 /**
  * To send a reset link to email
  * @param {String} email
@@ -270,15 +273,18 @@ export const sendVerificationMailPersonalAccount = (
           type: "VerifyToken",
         });
 
-        console.log(token);
+        const VERIFY_URL = CLIENT_DOMAIN + "/personal/verify/" + token;
 
-        // sendMail("ResetPassword", {
-        //   token,
-        //   name: personalAccount.name,
-        //   email: personalAccount.email,
-        // })
-        //   .then()
-        //   .catch();
+        sendMail({
+          templateId: EMAILJS_VERIFICATION_TEMPLATE_ID,
+          templateData: {
+            name: `${personalAccount.fname} ${personalAccount.lname}`,
+            email: personalAccount.email,
+            VERIFY_URL,
+          },
+        })
+          .then()
+          .catch();
       }
       resolve({
         message:
@@ -1105,13 +1111,18 @@ export const forgotPersonalAccountPassword = (email: string) => {
           type: "ResetToken",
         });
 
-        // await sendMail("ResetPassword", {
-        //   token,
-        //   name: personalAccount.fname + personalAccount.lname,
-        //   email: personalAccount.email,
-        // })
-        //   .then()
-        //   .catch();
+        const VERIFY_URL = CLIENT_DOMAIN + "/personal/reset/" + token;
+
+        sendMail({
+          templateId: EMAILJS_RESET_TEMPLATE_ID,
+          templateData: {
+            name: `${personalAccount.fname} ${personalAccount.lname}`,
+            email: personalAccount.email,
+            VERIFY_URL,
+          },
+        })
+          .then()
+          .catch();
       }
       resolve({
         message:

@@ -8,6 +8,7 @@ const {
   getCategoryResourceByKey,
   getAdvertisementResourceByKey,
   getGalleryResourceByKey,
+  getEventResourceByKey,
   getNewsResourceByKey,
   getBusinessAccountGalleryResourceByKey,
   getBusinessAccountProfilePictureResourceByKey,
@@ -19,6 +20,7 @@ router.route("/:key").get(getResourceByKey);
 router.route("/category/:key").get(getCategoryResourceByKey);
 router.route("/advertisement/:key").get(getAdvertisementResourceByKey);
 router.route("/gallery/:key").get(getGalleryResourceByKey);
+router.route("/event/:key").get(getEventResourceByKey);
 router.route("/news/:key").get(getNewsResourceByKey);
 router
   .route("/business-account-gallery/:key")
