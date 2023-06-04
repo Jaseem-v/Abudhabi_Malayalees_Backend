@@ -11,13 +11,10 @@ const { NODE_ENV } = config.SERVER;
  * To get all gallerys
  * @returns {Gallerys} gallerys
  */
-export const getGallerys = (role?: IRoles) => {
+export const getGallerys = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? {}
-        : { isDeleted: false };
-      const gallerys = await Gallery.find({ ...query }).sort({
+      const gallerys = await Gallery.find({}).sort({
         createdAt: -1,
       });
 
@@ -44,7 +41,6 @@ export const getGallerysForCustomer = () => {
     try {
       const gallerys = await Gallery.find({
         visibility: "Show",
-        isDeleted: false,
       }).sort({
         createdAt: -1,
       });
@@ -74,10 +70,7 @@ export const getGallery = (galleryId: string, role?: IRoles) => {
       if (!galleryId || !isValidObjectId(galleryId))
         throw new ThrowError("Provide vaild gallery id", 404);
 
-      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? {}
-        : { isDeleted: false };
-      const gallery = await Gallery.findOne({ _id: galleryId, ...query });
+      const gallery = await Gallery.findOne({ _id: galleryId });
 
       if (!gallery) {
         return reject({
@@ -220,7 +213,7 @@ export const changeGalleryVisibility = (galleryId: string) => {
 };
 
 /**
- * To delete a non deleted gallery temporarily
+ * To delete a gallery
  * @param {String} galleryId
  */
 export const deleteGallery = (galleryId: string) => {
@@ -231,105 +224,20 @@ export const deleteGallery = (galleryId: string) => {
 
       const gallery = await Gallery.findOne({
         _id: galleryId,
-        isDeleted: false,
+        isDeleted: true,
       });
 
-      if (!gallery) throw new ThrowError("Gallery not found", 404);
+      if (!gallery) {
+        return reject({
+          message: "Gallery not found",
+          statusCode: 404,
+        });
+      }
 
-      gallery.visibility = "Hide";
-      gallery.isDeleted = true;
-      gallery.deletedAt = new Date();
-
-      await gallery.save();
-
-      resolve({
+      await gallery.deleteOne();
+      return resolve({
         message: `${gallery.code} gallery was deleted`,
       });
-    } catch (error: any) {
-      reject({
-        message: error.message || error.msg,
-        statusCode: error.statusCode,
-        code: error.code || error.name,
-      });
-    }
-  });
-};
-
-/**
- * To restore a deleted gallery
- * @param {String} galleryId
- * @returns gallery
- */
-export const restoreGallery = (galleryId: string) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      if (!galleryId || !isValidObjectId(galleryId))
-        throw new ThrowError("Provide valid gallery id", 400);
-
-      const gallery = await Gallery.findOne({
-        _id: galleryId,
-        isDeleted: true,
-      });
-
-      if (!gallery) {
-        return reject({
-          message: "Gallery not found",
-          statusCode: 404,
-        });
-      }
-
-      gallery.visibility = "Show";
-      gallery.isDeleted = false;
-      gallery.deletedAt = undefined;
-
-      const ngallery = await gallery.save();
-
-      resolve({
-        message: `${ngallery.code} gallery was restored`,
-        gallery: ngallery,
-      });
-    } catch (error: any) {
-      reject({
-        message: error.message || error.msg,
-        statusCode: error.statusCode,
-        code: error.code || error.name,
-      });
-    }
-  });
-};
-
-/**
- * To delete a gallery permanently
- * @param {String} galleryId
- */
-export const pDeleteGallery = (galleryId: string) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      if (!galleryId || !isValidObjectId(galleryId))
-        throw new ThrowError("Provide valid gallery id", 400);
-
-      const gallery = await Gallery.findOne({
-        _id: galleryId,
-        isDeleted: true,
-      });
-
-      if (!gallery) {
-        return reject({
-          message: "Gallery not found",
-          statusCode: 404,
-        });
-      }
-
-      if (NODE_ENV === "development") {
-        await gallery.deleteOne();
-        return resolve({
-          message: `${gallery.code} gallery was deleted`,
-        });
-      }
-      throw new ThrowError(
-        `Not able to delete gallery in ${NODE_ENV} mode`,
-        401
-      );
     } catch (error: any) {
       reject({
         message: error.message || error.msg,
@@ -346,14 +254,8 @@ export const pDeleteGallery = (galleryId: string) => {
 export const deleteAllGallery = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (NODE_ENV === "development") {
-        await Gallery.deleteMany({});
-        return resolve({ message: "All gallery deleted" });
-      }
-      throw new ThrowError(
-        `Not able to delete all gallerys in ${NODE_ENV} mode`,
-        401
-      );
+      await Gallery.deleteMany({});
+      return resolve({ message: "All gallery deleted" });
     } catch (error: any) {
       reject({
         message: error.message || error.msg,

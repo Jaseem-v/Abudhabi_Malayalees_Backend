@@ -248,7 +248,12 @@ export const changeBusinessAccountProfileImage: ApiParams = (
   next
 ) => {
   businessAccountHelpers
-    .changeBusinessAccountProfileImage(req.client!.id, req.file)
+    .changeBusinessAccountProfileImage(
+      ["SuperAdmin", "Admin", "Developer"].includes(req.client?.role ?? "")
+        ? req.params.baid
+        : req.client!.id,
+      req.file
+    )
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -277,7 +282,11 @@ export const removeBusinessAccountProfileImage: ApiParams = (
   next
 ) => {
   businessAccountHelpers
-    .removeBusinessAccountProfileImage(req.client!.id)
+    .removeBusinessAccountProfileImage(
+      ["SuperAdmin", "Admin", "Developer"].includes(req.client?.role ?? "")
+        ? req.params.baid
+        : req.client!.id
+    )
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -299,7 +308,12 @@ export const removeBusinessAccountProfileImage: ApiParams = (
  */
 export const addGalleryImage: ApiParams = (req, res, next) => {
   businessAccountHelpers
-    .addGalleryImage(req.client!.id, req.file)
+    .addGalleryImage(
+      ["SuperAdmin", "Admin", "Developer"].includes(req.client?.role ?? "")
+        ? req.params.baid
+        : req.client!.id,
+      req.file
+    )
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -326,7 +340,12 @@ export const addGalleryImage: ApiParams = (req, res, next) => {
  */
 export const removeGalleryImage: ApiParams = (req, res, next) => {
   businessAccountHelpers
-    .removeGalleryImage(req.client!.id, req.params.gid)
+    .removeGalleryImage(
+      ["SuperAdmin", "Admin", "Developer"].includes(req.client?.role ?? "")
+        ? req.params.baid
+        : req.client!.id,
+      req.params.gid
+    )
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -353,7 +372,11 @@ export const removeGalleryImage: ApiParams = (req, res, next) => {
  */
 export const removeAllGalleryImages: ApiParams = (req, res, next) => {
   businessAccountHelpers
-    .removeAllGalleryImages(req.client!.id)
+    .removeAllGalleryImages(
+      ["SuperAdmin", "Admin", "Developer"].includes(req.client?.role ?? "")
+        ? req.params.baid
+        : req.client!.id
+    )
     .then((resp: any) => {
       res.status(200).json({
         success: true,

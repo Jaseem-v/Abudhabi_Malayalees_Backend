@@ -12,6 +12,7 @@ const {
   editAdvertisement,
   changeAdvertisementStatus,
   changeAdvertisementVisibility,
+  removeAdvertisementImage,
   deleteAdvertisement,
   restoreAdvertisement,
   pDeleteAdvertisement,
@@ -42,6 +43,7 @@ router
 router
   .route("/change-visibility/:aid")
   .patch(adminAccess, changeAdvertisementVisibility);
+router.route("/remove-image/:aid").delete(adminAccess, removeAdvertisementImage);
 router.route("/delete/:aid").delete(adminAccess, pDeleteAdvertisement);
 router.route("/restore/:aid").put(superAdminAccess, restoreAdvertisement);
 router

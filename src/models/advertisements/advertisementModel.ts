@@ -23,11 +23,9 @@ const advertisementSchema = new mongoose.Schema<IAdvertisement>(
     image: {
       key: {
         type: String,
-        required: true,
       },
       mimetype: {
         type: String,
-        required: true,
       },
     },
     status: {

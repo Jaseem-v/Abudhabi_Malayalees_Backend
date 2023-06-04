@@ -11,8 +11,6 @@ const {
   editGallery,
   changeGalleryVisibility,
   deleteGallery,
-  restoreGallery,
-  pDeleteGallery,
   deleteAllGallery,
 } = galleryControllers;
 
@@ -33,8 +31,6 @@ router.route("/delete/all").delete(superAdminAccess, deleteAllGallery);
 router
   .route("/change-visibility/:cid")
   .patch(adminAccess, changeGalleryVisibility);
-router.route("/delete/:cid").delete(adminAccess, pDeleteGallery);
-router.route("/restore/:cid").put(superAdminAccess, restoreGallery);
 router
   .route("/:cid")
   .get(adminAccess, getGallery)
@@ -43,6 +39,6 @@ router
     s3Upload(AWS_S3_GALLERY_RESOURCES, "single", "image"),
     editGallery
   )
-  .delete(superAdminAccess, deleteGallery);
+  .delete(adminAccess, deleteGallery);
 
 export default router;

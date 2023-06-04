@@ -90,6 +90,9 @@ router
   .route("/change-status/:baid")
   .patch(adminAccess, changeBusinessAccountStatus);
 router
+  .route("/remove-gallery/:gid")
+  .delete(businessAccountAccess, removeGalleryImage);
+router
   .route("/change-phone")
   .patch(businessAccountAccess, changeBusinessAccountPhone);
 router
@@ -98,9 +101,32 @@ router
 router
   .route("/change-username")
   .patch(businessAccountAccess, changeBusinessAccountUsername);
+
+// Admin
 router
-  .route("/remove-gallery/:gid")
-  .delete(businessAccountAccess, removeGalleryImage);
+  .route("/change-profile-picture/:baid")
+  .patch(
+    adminAccess,
+    s3Upload(AWS_S3_BUSINESS_ACCOUNT_PROFILE_RESOURCES, "single", "image"),
+    changeBusinessAccountProfileImage
+  );
+router
+  .route("/remove-profile-picture/:baid")
+  .delete(adminAccess, removeBusinessAccountProfileImage);
+router
+  .route("/add-gallery/:baid")
+  .patch(
+    adminAccess,
+    s3Upload(AWS_S3_BUSINESS_ACCOUNT_GALLERY_RESOURCES, "single", "image"),
+    addGalleryImage
+  );
+router
+  .route("/remove-all-gallerys/:baid")
+  .delete(adminAccess, removeAllGalleryImages);
+router
+  .route("/remove-gallery/:baid/:gid")
+  .delete(adminAccess, removeGalleryImage);
+
 router.route("/delete/:baid").delete(adminAccess, pDeleteBusinessAccount);
 router.route("/restore/:baid").put(superAdminAccess, restoreBusinessAccount);
 router

@@ -25,14 +25,6 @@ const gallerySchema = new mongoose.Schema<IGallery>(
       enum: ["Show", "Hide"],
       default: "Show",
     },
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
-    deletedAt: {
-      type: Date,
-      default: undefined,
-    },
   },
   {
     timestamps: true,

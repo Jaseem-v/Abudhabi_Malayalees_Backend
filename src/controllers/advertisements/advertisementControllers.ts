@@ -37,7 +37,7 @@ export const getAdvertisements: ApiParams = (req, res, next) => {
  */
 export const getAdvertisementsByRealEstate: ApiParams = (req, res, next) => {
   console.log(req.client);
-  
+
   advertisementHelpers
     .getAdvertisementsByType("REAL_ESTATE", req.client!.role)
     .then((resp: any) => {
@@ -191,6 +191,28 @@ export const changeAdvertisementVisibility: ApiParams = (req, res, next) => {
       res.status(200).json({
         success: true,
         message: resp.message,
+      });
+    })
+    .catch((error: any) => {
+      return next(new ErrorResponse(error.message, 402, error.code));
+    });
+};
+
+/**
+ * To remove a advertisement image
+ * METHOD : PATCH
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const removeAdvertisementImage: ApiParams = (req, res, next) => {
+  advertisementHelpers
+    .removeAdvertisementImage(req.params.aid)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.advertisement,
       });
     })
     .catch((error: any) => {

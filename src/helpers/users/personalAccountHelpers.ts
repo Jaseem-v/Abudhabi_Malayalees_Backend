@@ -188,7 +188,7 @@ export const addPersonalAccount = (data: any, adminId?: string) => {
         username,
         phone,
         email,
-        about,
+        about: about ?? "NO ABOUT",
         profilePicture: null,
         gallerys: [],
         socialMediaLinks,

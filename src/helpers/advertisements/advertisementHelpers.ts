@@ -135,14 +135,19 @@ export const addAdvertisement = (data: any) => {
       const advertisement = await new Advertisement({
         code: data.code,
         desc,
-        image: {
-          key: image.key.split("/").slice(-1)[0],
-          mimetype: image.mimetype,
-        },
         type: type,
+        image: null,
         status: "PENDING",
         visibility: "Show",
       });
+
+      if (image && image.key && image.mimetype) {
+        // Delete Image
+        advertisement.image = {
+          key: image.key.split("/").slice(-1)[0],
+          mimetype: image.mimetype,
+        };
+      }
 
       const nadvertisement = await advertisement.save();
 
@@ -307,6 +312,49 @@ export const changeAdvertisementVisibility = (advertisementId: string) => {
       return reject({
         message: error.message || error.msg,
         statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * to remove a advertisement image
+ * @param {String} advertisementId
+ * @returns advertisement
+ */
+export const removeAdvertisementImage = (
+  advertisementId: string
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!advertisementId || !isValidObjectId(advertisementId)) {
+        return reject({
+          message: "Provide valid advertisement id",
+          statusCode: 400,
+        });
+      }
+
+      const advertisement = await Advertisement.findById(advertisementId);
+
+      if (!advertisement) {
+        return reject({
+          message: "Advertisement not found",
+          statusCode: 404,
+        });
+      }
+
+      advertisement.image = null;
+
+      const nadvertisement = await advertisement.save();
+
+      resolve({
+        message: "Advertisement image removed successfully",
+        advertisement: nadvertisement,
+      });
+    } catch (error: any) {
+      reject({
+        message: error.message || error.msg,
         code: error.code || error.name,
       });
     }

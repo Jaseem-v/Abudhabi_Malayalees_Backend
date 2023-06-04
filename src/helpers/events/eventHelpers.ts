@@ -104,7 +104,7 @@ export const getEvent = (eventId: string, role?: IRoles) => {
 export const addEvent = (data: any) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { title, desc, date, time, visibility } = data;
+      const { title, desc, date, time, image, visibility } = data;
       if (!title || !desc || !date || !time || !visibility)
         throw new ThrowError(
           "Please Provide title, desc, date, time and visibility",
@@ -128,6 +128,14 @@ export const addEvent = (data: any) => {
         eventAt: new Date(year, month - 1, day, hours, minutes),
         visibility: visibility || "Show",
       });
+
+      if (image && image.key && image.mimetype) {
+        // Delete Image
+        event.image = {
+          key: image.key.split("/").slice(-1)[0],
+          mimetype: image.mimetype,
+        };
+      }
 
       const nevent = await event.save();
 
@@ -161,7 +169,7 @@ export const editEvent = (eventId: string, data: any, client: any) => {
 
       if (!event) throw new ThrowError("Event not found", 404);
 
-      const { title, desc, date, time, visibility } = data;
+      const { title, desc, date, time, image, visibility } = data;
 
       // New title is already exist from another event then
       if (title && event.title != title) {
@@ -184,6 +192,14 @@ export const editEvent = (eventId: string, data: any, client: any) => {
         event.date = date;
         event.time = time;
         event.eventAt = new Date(year, month - 1, day, hours, minutes);
+      }
+
+      if (image && image.key && image.mimetype) {
+        // Delete Image
+        event.image = {
+          key: image.key.split("/").slice(-1)[0],
+          mimetype: image.mimetype,
+        };
       }
 
       const nevent = await event.save();
@@ -229,6 +245,49 @@ export const changeEventVisibility = (eventId: string) => {
       return reject({
         message: error.message || error.msg,
         statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * to remove a event image
+ * @param {String} eventId
+ * @returns event
+ */
+export const removeEventImage = (
+  eventId: string
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!eventId || !isValidObjectId(eventId)) {
+        return reject({
+          message: "Provide valid event id",
+          statusCode: 400,
+        });
+      }
+
+      const event = await Event.findById(eventId);
+
+      if (!event) {
+        return reject({
+          message: "Event not found",
+          statusCode: 404,
+        });
+      }
+
+      event.image = null;
+
+      const nevent = await event.save();
+
+      resolve({
+        message: "Event image removed successfully",
+        event: nevent,
+      });
+    } catch (error: any) {
+      reject({
+        message: error.message || error.msg,
         code: error.code || error.name,
       });
     }

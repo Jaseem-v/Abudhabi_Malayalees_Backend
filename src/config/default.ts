@@ -160,6 +160,8 @@ const AWS_S3_PERSONAL_ACCOUNT_PROFILE_RESOURCES =
   "/personal-account/profile-pictures";
 const AWS_S3_ADZ_RESOURCES =
   process.env.AWS_S3_ADZ_RESOURCES || "/advertisements";
+const AWS_S3_EVENT_RESOURCES =
+  process.env.AWS_S3_EVENT_RESOURCES || "/events";
 const AWS_S3_NEWS_RESOURCES = process.env.AWS_S3_NEWS_RESOURCES || "/news";
 
 const AWS_S3 = {
@@ -174,6 +176,7 @@ const AWS_S3 = {
   AWS_S3_PERSONAL_ACCOUNT_GALLERY_RESOURCES,
   AWS_S3_PERSONAL_ACCOUNT_PROFILE_RESOURCES,
   AWS_S3_ADZ_RESOURCES,
+  AWS_S3_EVENT_RESOURCES,
   AWS_S3_NEWS_RESOURCES,
 };
 

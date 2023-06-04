@@ -1,4 +1,5 @@
 import { ErrorResponse } from "../../classes";
+import { deleteS3File } from "../../functions/s3";
 import { eventHelpers } from "../../helpers";
 
 import { ApiParams } from "../../types";
@@ -83,6 +84,7 @@ export const getEvent: ApiParams = (req, res, next) => {
  * @param {*} next
  */
 export const addEvent: ApiParams = (req, res, next) => {
+  req.body.image = req.file;
   eventHelpers
     .addEvent(req.body)
     .then((resp: any) => {
@@ -93,6 +95,9 @@ export const addEvent: ApiParams = (req, res, next) => {
       });
     })
     .catch((error: any) => {
+      if (req.file) {
+        deleteS3File(req.file.key);
+      }
       return next(
         new ErrorResponse(error.message, error.statusCode, error.code)
       );
@@ -107,6 +112,7 @@ export const addEvent: ApiParams = (req, res, next) => {
  * @param {*} next
  */
 export const editEvent: ApiParams = (req, res, next) => {
+  req.body.image = req.file;
   eventHelpers
     .editEvent(req.params.eid, req.body, req.client)
     .then((resp: any) => {
@@ -117,6 +123,9 @@ export const editEvent: ApiParams = (req, res, next) => {
       });
     })
     .catch((error: any) => {
+      if (req.file) {
+        deleteS3File(req.file.key);
+      }
       return next(new ErrorResponse(error.message, 402, error.code));
     });
 };
@@ -135,6 +144,32 @@ export const changeEventVisibility: ApiParams = (req, res, next) => {
       res.status(200).json({
         success: true,
         message: resp.message,
+      });
+    })
+    .catch((error: any) => {
+      return next(new ErrorResponse(error.message, 402, error.code));
+    });
+};
+
+/**
+ * To remove a event image
+ * METHOD : PATCH
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const removeEventImage: ApiParams = (
+  req,
+  res,
+  next
+) => {
+  eventHelpers
+    .removeEventImage(req.params.eid)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.event,
       });
     })
     .catch((error: any) => {

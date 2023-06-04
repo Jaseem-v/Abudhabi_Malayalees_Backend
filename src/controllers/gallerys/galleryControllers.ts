@@ -13,7 +13,7 @@ import { ApiParams } from "../../types";
  */
 export const getGallerys: ApiParams = (req, res, next) => {
   galleryHelpers
-    .getGallerys(req.client!.role)
+    .getGallerys()
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -175,54 +175,7 @@ export const deleteGallery: ApiParams = (req, res, next) => {
 };
 
 /**
- * To restore a deleted gallery
- * METHOD : PUT
- * @param {*} req
- * @param {*} res
- * @param {*} next
- */
-export const restoreGallery: ApiParams = (req, res, next) => {
-  galleryHelpers
-    .restoreGallery(req.params.cid)
-    .then((resp: any) => {
-      res.status(200).json({
-        success: true,
-        message: resp.message,
-        data: resp.gallery,
-      });
-    })
-    .catch((error: any) => {
-      return next(
-        new ErrorResponse(error.message, error.statusCode, error.code)
-      );
-    });
-};
-
-/**
- * To delete a gallery permanently
- * METHOD : DELETE
- * @param {*} req
- * @param {*} res
- * @param {*} next
- */
-export const pDeleteGallery: ApiParams = (req, res, next) => {
-  galleryHelpers
-    .pDeleteGallery(req.params.cid)
-    .then((resp: any) => {
-      res.status(200).json({
-        success: true,
-        message: resp.message,
-      });
-    })
-    .catch((error: any) => {
-      return next(
-        new ErrorResponse(error.message, error.statusCode, error.code)
-      );
-    });
-};
-
-/**
- * To delete all gallery in development mode
+ * To delete all gallery
  * METHOD : DELETE
  * @param {*} req
  * @param {*} res

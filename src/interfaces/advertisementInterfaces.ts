@@ -4,7 +4,7 @@ import { IImage } from "./default";
 export interface IAdvertisement {
   code: string;
   desc: string;
-  image: IImage;
+  image: IImage | null;
   type: "REAL_ESTATE" | "USED_CAR";
   visibility: "Show" | "Hide";
   status: "PENDING" | "APPROVED" | "REJECTED";

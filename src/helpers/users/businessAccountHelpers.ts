@@ -191,10 +191,10 @@ export const addBusinessAccount = (data: any, adminId?: string) => {
         !contactDetails ||
         !contactDetails.fname ||
         !contactDetails.lname ||
-        !contactDetails.phone
+        !contactDetails.email
       )
         throw new ThrowError(
-          `Please Provide name(*), username(*), phone(*), email(*), password(*), category(*), website, location, services, about, socialMediaLinks, addressDetails(streetNumber, state(*), city(*), address(*), place, pincode(*) and landmark) and contactDetails (fname(*), lname(*), email, phone(*), isAddressVisible, addressDetails (streetNumber, state, city, address, place, pincode and landmark))`,
+          `Please Provide name(*), username(*), phone(*), email(*), password(*), category(*), website, location, services, about, socialMediaLinks, addressDetails(streetNumber, state(*), city(*), address(*), place, pincode(*) and landmark) and contactDetails (fname(*), lname(*), email(*), phone, isAddressVisible, addressDetails (streetNumber, state, city, address, place, pincode and landmark))`,
           400
         );
 
@@ -794,7 +794,6 @@ export const changeBusinessAccountProfileImage = (
 /**
  * to remove a businessAccount profile pic
  * @param {String} businessAccountId
- * @param {Object} image
  * @returns businessAccount
  */
 export const removeBusinessAccountProfileImage = (

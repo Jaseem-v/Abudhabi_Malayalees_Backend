@@ -22,6 +22,14 @@ const eventSchema = new mongoose.Schema<IEvent>(
       type: String,
       required: true,
     },
+    image: {
+      key: {
+        type: String,
+      },
+      mimetype: {
+        type: String,
+      },
+    },
     eventAt: {
       type: Date,
       required: true,
