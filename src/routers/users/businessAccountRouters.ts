@@ -47,6 +47,7 @@ router
   .route("/")
   .get(adminAccess, getBusinessAccounts)
   .post(adminAccess, addBusinessAccount);
+router.route("/all").get(guestAccess, getBusinessAccounts);
 router.route("/login").patch(businessAccountLogin);
 router.route("/signup").post(addBusinessAccount);
 router.route("/forget-password").patch(forgotBusinessAccountPassword);
