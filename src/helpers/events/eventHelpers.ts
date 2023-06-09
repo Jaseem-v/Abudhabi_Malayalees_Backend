@@ -385,7 +385,6 @@ export const pDeleteEvent = (eventId: string) => {
 
       const event = await Event.findOne({
         _id: eventId,
-        isDeleted: true,
       });
 
       if (!event) {
