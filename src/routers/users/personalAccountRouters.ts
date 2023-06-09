@@ -47,6 +47,7 @@ router
   .route("/")
   .get(adminAccess, getPersonalAccounts)
   .post(adminAccess, addPersonalAccount);
+router.route("/all").get(guestAccess, getPersonalAccounts);
 router.route("/login").patch(personalAccountLogin);
 router.route("/signup").post(addPersonalAccount);
 router
