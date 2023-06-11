@@ -222,10 +222,7 @@ export const deleteGallery = (galleryId: string) => {
       if (!galleryId || !isValidObjectId(galleryId))
         throw new ThrowError("Provide valid gallery id", 400);
 
-      const gallery = await Gallery.findOne({
-        _id: galleryId,
-        isDeleted: true,
-      });
+      const gallery = await Gallery.findById(galleryId);
 
       if (!gallery) {
         return reject({
@@ -249,7 +246,7 @@ export const deleteGallery = (galleryId: string) => {
 };
 
 /**
- * To delete all gallery in development mode
+ * To delete all gallery
  */
 export const deleteAllGallery = () => {
   return new Promise(async (resolve, reject) => {

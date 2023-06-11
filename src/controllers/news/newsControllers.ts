@@ -13,7 +13,9 @@ import { ApiParams } from "../../types";
  */
 export const getNews: ApiParams = (req, res, next) => {
   newsHelpers
-    .getNews(req.client!.role)
+    .getNews(
+      // req.client!.role
+      )
     .then((resp: any) => {
       res.status(200).json({
         success: true,

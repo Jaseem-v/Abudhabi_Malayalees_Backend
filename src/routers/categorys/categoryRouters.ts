@@ -5,7 +5,8 @@ import { config } from "../../config";
 import { s3Upload } from "../../functions/multer";
 const {
   getCategories,
-  getCategoriesForCustomer,
+  getCategorysByBusiness,
+  getCategorysByJob,
   getCategory,
   addCategory,
   editCategory,
@@ -29,7 +30,10 @@ router
     s3Upload(AWS_S3_CATEGORY_RESOURCES, "single", "image"),
     addCategory
   );
-router.route("/customer").get(getCategoriesForCustomer);
+router.route("/job").get(adminAccess, getCategorysByJob);
+router.route("/job/customer").get(getCategorysByJob);
+router.route("/business").get(adminAccess, getCategorysByBusiness);
+router.route("/business/customer").get(getCategorysByBusiness);
 router.route("/delete/all").delete(superAdminAccess, deleteAllCategory);
 router.route("/change-status/:cid").patch(adminAccess, changeCategoryStatus);
 router

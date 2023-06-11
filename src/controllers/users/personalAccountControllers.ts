@@ -17,7 +17,9 @@ const { NODE_ENV, SERVER_ACCESS_TOKEN_KEY, SERVER_ACCESS_TOKEN_EXPIRE } =
  */
 export const getPersonalAccounts: ApiParams = (req, res, next) => {
   personalAccountHelpers
-    .getPersonalAccounts(req.client!.role)
+    .getPersonalAccounts(
+    // req.client!.role
+    )
     .then((resp: any) => {
       res.status(200).json({
         success: true,

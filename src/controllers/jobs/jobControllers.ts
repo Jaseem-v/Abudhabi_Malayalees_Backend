@@ -12,7 +12,9 @@ import { ApiParams } from "../../types";
  */
 export const getJobs: ApiParams = (req, res, next) => {
   jobHelpers
-    .getJobs(req.client!.role)
+    .getJobs(
+      // req.client!.role
+      )
     .then((resp: any) => {
       res.status(200).json({
         success: true,

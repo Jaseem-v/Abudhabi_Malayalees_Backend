@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 import { IAdvertisement } from "../../interfaces";
 import { config } from "../../config/index";
 
-const { ADVERTISEMENTS, ADMINS } = config.MONGO_COLLECTIONS;
+const { ADVERTISEMENTS, ADMINS, BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS } =
+  config.MONGO_COLLECTIONS;
 
 const advertisementSchema = new mongoose.Schema<IAdvertisement>(
   {
@@ -10,6 +11,16 @@ const advertisementSchema = new mongoose.Schema<IAdvertisement>(
       type: String,
       required: true,
       unique: true,
+    },
+    user: {
+      type: mongoose.SchemaTypes.ObjectId,
+      required: true,
+      refPath: "userRole",
+    },
+    userRole: {
+      type: String,
+      required: true,
+      enum: [BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS],
     },
     desc: {
       type: String,

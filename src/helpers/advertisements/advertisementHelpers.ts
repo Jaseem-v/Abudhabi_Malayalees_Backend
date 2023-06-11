@@ -7,6 +7,7 @@ import { IAdvertisement } from "../../interfaces";
 
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;
+const { BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS } = config.MONGO_COLLECTIONS;
 
 /**
  * To get all advertisements
@@ -16,11 +17,44 @@ export const getAdvertisements = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { }
+        ? {}
         : { isDeleted: false };
       const advertisements = await Advertisement.find({ ...query }).sort({
         createdAt: -1,
       });
+
+      resolve({
+        message: "Advertisements Fetched",
+        advertisements,
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To get all advertisements for customer
+ * @returns {Advertisements} advertisements
+ */
+export const getAdvertisementsForCustomer = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const advertisements = await Advertisement.find({
+        visibility: "Show",
+        status: "APPROVED",
+      })
+        .sort({
+          createdAt: -1,
+        })
+        .populate(
+          "user",
+          "fname lname name email phone username profilePicture"
+        );
 
       resolve({
         message: "Advertisements Fetched",
@@ -47,11 +81,20 @@ export const getAdvertisementsByType = (
   return new Promise(async (resolve, reject) => {
     try {
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? {  }
-        : { status: "APPROVED", isDeleted: false };
-      const advertisements = await Advertisement.find({ ...query, type }).sort({
-        createdAt: -1,
-      });
+        ? {}
+        : { status: "APPROVED", visibility: "Show" };
+      const advertisements = await Advertisement.find({
+        ...query,
+        type,
+        isDeleted: false,
+      })
+        .sort({
+          createdAt: -1,
+        })
+        .populate(
+          "user",
+          "fname lname name email phone username profilePicture"
+        );
 
       resolve({
         message: "Advertisements Fetched",
@@ -79,7 +122,7 @@ export const getAdvertisement = (advertisementId: string, role?: IRoles) => {
         throw new ThrowError("Provide vaild advertisement id", 404);
 
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? {  }
+        ? {}
         : { isDeleted: false };
       const advertisement = await Advertisement.findOne({
         _id: advertisementId,
@@ -108,11 +151,18 @@ export const getAdvertisement = (advertisementId: string, role?: IRoles) => {
  * @param {Advertisement} data
  * @returns advertisement
  */
-export const addAdvertisement = (data: any) => {
+export const addAdvertisement = (
+  userId: string,
+  userRole: IRoles,
+  data: any
+) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { desc, type, image, visibility } = data;
       if (
+        !userId ||
+        !userRole ||
+        !["BusinessAccount", "PersonalAccount"].includes(userRole) ||
         !desc ||
         !image ||
         !type ||
@@ -134,7 +184,12 @@ export const addAdvertisement = (data: any) => {
 
       const advertisement = await new Advertisement({
         code: data.code,
-        desc,
+        user: userId,
+        userRole:
+          userRole === "BusinessAccount"
+            ? BUSINESS_ACCOUNTS
+            : PERSONAL_ACCOUNTS,
+        desc: desc,
         type: type,
         image: null,
         status: "PENDING",
@@ -149,7 +204,10 @@ export const addAdvertisement = (data: any) => {
         };
       }
 
-      const nadvertisement = await advertisement.save();
+      const nadvertisement = await(await advertisement.save()).populate(
+        "user",
+        "fname lname name email phone username profilePicture"
+      );
 
       resolve({
         message: "Advertisement created successfully",
@@ -174,7 +232,6 @@ export const addAdvertisement = (data: any) => {
 export const editAdvertisement = (
   advertisementId: string,
   data: any,
-  client: any
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -323,9 +380,7 @@ export const changeAdvertisementVisibility = (advertisementId: string) => {
  * @param {String} advertisementId
  * @returns advertisement
  */
-export const removeAdvertisementImage = (
-  advertisementId: string
-) => {
+export const removeAdvertisementImage = (advertisementId: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!advertisementId || !isValidObjectId(advertisementId)) {

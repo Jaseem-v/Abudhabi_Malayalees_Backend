@@ -13,7 +13,9 @@ import { ApiParams } from "../../types";
  */
 export const getAdvertisements: ApiParams = (req, res, next) => {
   advertisementHelpers
-    .getAdvertisements(req.client!.role)
+    .getAdvertisements
+    // req.client!.role
+    ()
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -36,8 +38,6 @@ export const getAdvertisements: ApiParams = (req, res, next) => {
  * @param {*} next
  */
 export const getAdvertisementsByRealEstate: ApiParams = (req, res, next) => {
-  console.log(req.client);
-
   advertisementHelpers
     .getAdvertisementsByType("REAL_ESTATE", req.client!.role)
     .then((resp: any) => {
@@ -112,7 +112,19 @@ export const getAdvertisement: ApiParams = (req, res, next) => {
 export const addAdvertisement: ApiParams = (req, res, next) => {
   req.body.image = req.file;
   advertisementHelpers
-    .addAdvertisement(req.body)
+    .addAdvertisement(
+      ["SuperAdmin", "Admin", "Developer"].includes(req.client?.role ?? "")
+        ? req.params.uid.toString()
+        : req.client!.id,
+      ["SuperAdmin", "Admin", "Developer"].includes(req.client?.role ?? "")
+        ? req.params.role === "BusinessAccount"
+          ? "BusinessAccount"
+          : req.params.role === "PersonalAccount"
+          ? "PersonalAccount"
+          : "SuperAdmin"
+        : req.client!.role,
+      req.body
+    )
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -140,7 +152,7 @@ export const addAdvertisement: ApiParams = (req, res, next) => {
 export const editAdvertisement: ApiParams = (req, res, next) => {
   req.body.image = req.file;
   advertisementHelpers
-    .editAdvertisement(req.params.aid, req.body, req.client)
+    .editAdvertisement(req.params.aid, req.body)
     .then((resp: any) => {
       res.status(200).json({
         success: true,

@@ -13,7 +13,9 @@ import { ApiParams } from "../../types";
  */
 export const getEvents: ApiParams = (req, res, next) => {
   eventHelpers
-    .getEvents(req.client!.role)
+    .getEvents(
+      // req.client!.role
+      )
     .then((resp: any) => {
       res.status(200).json({
         success: true,

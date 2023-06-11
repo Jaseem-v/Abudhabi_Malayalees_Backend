@@ -3,6 +3,7 @@ import { config } from "../../config/index";
 import { Category } from "../../models";
 import { ThrowError } from "../../classes";
 import { IRoles } from "../../types/default";
+import { ICategory } from "../../interfaces";
 
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;
@@ -51,6 +52,40 @@ export const getCategoriesForCustomer = () => {
 
       resolve({
         message: "Categories Fetched",
+        categorys,
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To get all categorys by type
+ * @returns {Categorys} categorys
+ */
+export const getCategorysByType = (
+  type: ICategory["type"],
+  role?: IRoles
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
+        ? {}
+        : { visibility: "Show" };
+      const categorys = await Category.find({
+        ...query,
+        type,
+        isDeleted: false,
+      }).sort({
+        createdAt: -1,
+      });
+      resolve({
+        message: "Categorys Fetched",
         categorys,
       });
     } catch (error: any) {
@@ -113,6 +148,7 @@ export const addCategory = (data: any) => {
 
       const categoryExists = await Category.findOne({
         name: name,
+        isDeleted: false,
       });
 
       if (categoryExists)

@@ -13,7 +13,9 @@ import { ApiParams } from "../../types";
  */
 export const getCategories: ApiParams = (req, res, next) => {
   categoryHelpers
-    .getCategories(req.client!.role)
+    .getCategories(
+      // req.client!.role
+      )
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -29,15 +31,15 @@ export const getCategories: ApiParams = (req, res, next) => {
 };
 
 /**
- * Get all categorys for customer
+ * Get all categorys by job
  * METHOD : GET
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
-export const getCategoriesForCustomer: ApiParams = (req, res, next) => {
+export const getCategorysByJob: ApiParams = (req, res, next) => {
   categoryHelpers
-    .getCategoriesForCustomer()
+    .getCategorysByType("JOB", req.client!.role)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -51,6 +53,31 @@ export const getCategoriesForCustomer: ApiParams = (req, res, next) => {
       );
     });
 };
+
+/**
+ * Get all categorys by business
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getCategorysByBusiness: ApiParams = (req, res, next) => {
+  categoryHelpers
+    .getCategorysByType("BUSINESS", req.client!.role)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.categorys,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
 
 /**
  * Get a particular category

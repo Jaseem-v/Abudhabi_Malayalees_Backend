@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { advertisementControllers } from "../../controllers";
-import { adminAccess, superAdminAccess } from "../../middlewares";
+import {
+  adminAccess,
+  allRoleAccess,
+  superAdminAccess,
+  userAccess,
+} from "../../middlewares";
 import { s3Upload } from "../../functions/multer";
 import { config } from "../../config";
 const {
@@ -27,11 +32,10 @@ router
   .route("/")
   .get(adminAccess, getAdvertisements)
   .post(
-    adminAccess,
+    userAccess,
     s3Upload(AWS_S3_ADZ_RESOURCES, "single", "image"),
     addAdvertisement
   );
-
 router.route("/used-car").get(adminAccess, getAdvertisementsByUserCar);
 router.route("/used-car/customer").get(getAdvertisementsByUserCar);
 router.route("/real-estate").get(adminAccess, getAdvertisementsByRealEstate);
@@ -43,17 +47,26 @@ router
 router
   .route("/change-visibility/:aid")
   .patch(adminAccess, changeAdvertisementVisibility);
-router.route("/remove-image/:aid").delete(adminAccess, removeAdvertisementImage);
+router
+  .route("/remove-image/:aid")
+  .delete(adminAccess, removeAdvertisementImage);
 router.route("/delete/:aid").delete(adminAccess, pDeleteAdvertisement);
 router.route("/restore/:aid").put(superAdminAccess, restoreAdvertisement);
 router
   .route("/:aid")
   .get(adminAccess, getAdvertisement)
   .patch(
-    adminAccess,
+    allRoleAccess,
     s3Upload(AWS_S3_ADZ_RESOURCES, "single", "image"),
     editAdvertisement
   )
   .delete(superAdminAccess, deleteAdvertisement);
+router
+  .route("/:uid/:role")
+  .post(
+    adminAccess,
+    s3Upload(AWS_S3_ADZ_RESOURCES, "single", "image"),
+    addAdvertisement
+  );
 
 export default router;

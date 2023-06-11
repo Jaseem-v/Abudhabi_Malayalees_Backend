@@ -92,7 +92,6 @@ const MONGO = {
 /* Mongo Collections */
 const MONGO_COLLECTIONS = {
   ADMINS: "Admins",
-  USERS: "Users",
   BUSINESS_ACCOUNTS: "Business_Accounts",
   PERSONAL_ACCOUNTS: "Personal_Accounts",
   CATEGORIES: "Categories",

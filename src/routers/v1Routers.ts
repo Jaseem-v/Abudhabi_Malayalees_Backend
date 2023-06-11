@@ -7,7 +7,6 @@ import newsRouters from "./news/newsRouters";
 import galleryRouters from "./gallerys/galleryRouters";
 import eventRouters from "./events/eventRouters";
 import jobRouters from "./jobs/jobRouters";
-// import userRouters from "./users/userRouters";
 import businessAccountRouters from "./users/businessAccountRouters";
 import personalAccountRouters from "./users/personalAccountRouters";
 
@@ -20,7 +19,6 @@ router.use("/gallery", galleryRouters);
 router.use("/news", newsRouters);
 router.use("/event", eventRouters);
 router.use("/job", jobRouters);
-// router.use("/user", userRouters);
 router.use("/user/business", businessAccountRouters);
 router.use("/user/personal", personalAccountRouters);
 

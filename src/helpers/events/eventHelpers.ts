@@ -113,6 +113,7 @@ export const addEvent = (data: any) => {
 
       const eventExists = await Event.findOne({
         title: title,
+        isDeleted: false
       });
 
       if (eventExists) throw new ThrowError("Event title already exist!", 401);

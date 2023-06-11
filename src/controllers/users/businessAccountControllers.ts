@@ -17,7 +17,9 @@ const { NODE_ENV, SERVER_ACCESS_TOKEN_KEY, SERVER_ACCESS_TOKEN_EXPIRE } =
  */
 export const getBusinessAccounts: ApiParams = (req, res, next) => {
   businessAccountHelpers
-    .getBusinessAccounts(req.client!.role)
+    .getBusinessAccounts(
+      // req.client!.role
+      )
     .then((resp: any) => {
       res.status(200).json({
         success: true,
