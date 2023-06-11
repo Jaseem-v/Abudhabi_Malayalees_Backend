@@ -113,7 +113,7 @@ const JWT_RESET_TOKEN_EXPIRE = process.env.JWT_RESET_TOKEN_EXPIRE || "5m";
 const JWT_VERIFICATION_TOKEN_SECRET =
   process.env.JWT_VERIFICATION_TOKEN_SECRET || "secret";
 const JWT_VERIFICATION_TOKEN_EXPIRE =
-  process.env.JWT_VERIFICATION_TOKEN_EXPIRE || "5m";
+  process.env.JWT_VERIFICATION_TOKEN_EXPIRE || "1d";
 const JWT_TOKEN_ISSUER = process.env.JWT_TOKEN_ISSUER || "trentit.in";
 
 // JWT

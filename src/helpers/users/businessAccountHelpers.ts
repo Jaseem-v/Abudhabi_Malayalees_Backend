@@ -4,7 +4,6 @@ import { BusinessAccount } from "../../models/index";
 import { generateToken, verifyToken } from "../../utils/index";
 import { ThrowError } from "../../classes/index";
 import { IRoles } from "../../types/default";
-import { IAdmin } from "../../interfaces";
 import { sendMail } from "../../functions";
 
 const { isValidObjectId } = mongoose;
@@ -28,6 +27,36 @@ export const getBusinessAccounts = (role?: IRoles) => {
       const businessAccounts = await BusinessAccount.find({ ...query }).sort({
         createdAt: -1,
       });
+
+      resolve({
+        message: "BusinessAccounts Fetched",
+        businessAccounts,
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To get all verified businessAccounts
+ * @returns {BusinessAccounts} businessAccounts
+ */
+export const getVerifiedBusinessAccounts = (search: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const searchQuery =
+        search.trim().length > 0
+          ? { name: { $regex: search.toLowerCase, $options: "i" } }
+          : {};
+      const businessAccounts = await BusinessAccount.find({
+        isVerified: true,
+        ...searchQuery,
+      }).sort({ name: 1 });
 
       resolve({
         message: "BusinessAccounts Fetched",
@@ -106,7 +135,7 @@ export const businessAccountLogin = (
 
       const businessAccount = await BusinessAccount.findOne(
         { $or: [{ username }, { email }, { phone }] },
-        { password: 1, name: 1, role: 1, status: 1, lastSync: 1 }
+        { password: 1, name: 1, role: 1, status: 1, lastSync: 1, isVerified: 1 }
       );
 
       if (!businessAccount)
@@ -120,6 +149,8 @@ export const businessAccountLogin = (
         throw new ThrowError(`Account blocked! contact Customer Care`, 401);
 
       if (businessAccount && (await businessAccount.matchPassword(password))) {
+        if (!businessAccount.isVerified)
+          throw new ThrowError(`Verify your account`, 401);
         if (businessAccount.status === "Inactive")
           businessAccount.status = "Active";
         businessAccount.lastSync = new Date();

@@ -33,6 +33,30 @@ export const getBusinessAccounts: ApiParams = (req, res, next) => {
 };
 
 /**
+ * Get all active businessAccounts
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getVerifiedBusinessAccounts: ApiParams = (req, res, next) => {
+  businessAccountHelpers
+    .getVerifiedBusinessAccounts(req.query.search ?? "")
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.businessAccounts,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
  * Get a particular businessAccount
  * METHOD : GET
  * @param {*} req

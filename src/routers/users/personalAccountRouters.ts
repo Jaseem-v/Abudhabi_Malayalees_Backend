@@ -10,6 +10,7 @@ import { s3Upload } from "../../functions";
 import { guestAccess } from "../../middlewares/authmiddleware";
 const {
   getPersonalAccounts,
+  getVerifiedPersonalAccounts,
   getPersonalAccount,
   getPersonalAccountProfile,
   personalAccountLogin,
@@ -47,7 +48,7 @@ router
   .route("/")
   .get(adminAccess, getPersonalAccounts)
   .post(adminAccess, addPersonalAccount);
-router.route("/all").get(guestAccess, getPersonalAccounts);
+router.route("/verified").get(guestAccess, getVerifiedPersonalAccounts);
 router.route("/login").patch(personalAccountLogin);
 router.route("/signup").post(addPersonalAccount);
 router
@@ -111,7 +112,7 @@ router.route("/delete/:paid").delete(adminAccess, pDeletePersonalAccount);
 router.route("/restore/:paid").put(superAdminAccess, restorePersonalAccount);
 router
   .route("/:paid")
-  .get(adminAccess, getPersonalAccount)
+  .get(guestAccess, getPersonalAccount)
   .patch(adminAccess, editPersonalAccount)
   .delete(superAdminAccess, deletePersonalAccount);
 

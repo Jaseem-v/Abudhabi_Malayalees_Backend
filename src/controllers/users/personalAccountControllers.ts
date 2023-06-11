@@ -33,6 +33,30 @@ export const getPersonalAccounts: ApiParams = (req, res, next) => {
 };
 
 /**
+ * Get all active personalAccounts
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getVerifiedPersonalAccounts: ApiParams = (req, res, next) => {
+  personalAccountHelpers
+    .getVerifiedPersonalAccounts(req.query.search ?? "")
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.personalAccounts,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
  * Get a particular personalAccount
  * METHOD : GET
  * @param {*} req

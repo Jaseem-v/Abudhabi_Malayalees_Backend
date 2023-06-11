@@ -43,6 +43,39 @@ export const getPersonalAccounts = (role?: IRoles) => {
 };
 
 /**
+ * To get all verified personalAccounts
+ * @returns {PersonalAccounts} personalAccounts
+ */
+export const getVerifiedPersonalAccounts = (search: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log(search.trim().length);
+      
+      const searchQuery =
+        search.trim().length > 0
+          ? { fname: { $regex: search.toLowerCase(), $options: "i" } }
+          : {};
+          
+      const personalAccounts = await PersonalAccount.find({
+        isVerified: true,
+        ...searchQuery,
+      }).sort({ fname: 1 });
+
+      resolve({
+        message: "PersonalAccounts Fetched",
+        personalAccounts,
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
  * To get a particular personalAccount by id
  * @param {String} personalAccountId
  * @returns {PersonalAccount} personalAccount
@@ -105,7 +138,7 @@ export const personalAccountLogin = (
 
       const personalAccount = await PersonalAccount.findOne(
         { $or: [{ username }, { email }, { phone }] },
-        { password: 1, fname: 1, role: 1, status: 1, lastSync: 1 }
+        { password: 1, fname: 1, role: 1, status: 1, lastSync: 1, isVerified: 1 }
       );
 
       if (!personalAccount)
@@ -119,6 +152,8 @@ export const personalAccountLogin = (
         throw new ThrowError(`Account blocked! contact Customer Care`, 401);
 
       if (personalAccount && (await personalAccount.matchPassword(password))) {
+        if (!personalAccount.isVerified)
+          throw new ThrowError(`Verify your account`, 401);
         if (personalAccount.status === "Inactive")
           personalAccount.status = "Active";
         personalAccount.lastSync = new Date();

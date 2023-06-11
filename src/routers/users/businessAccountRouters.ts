@@ -10,6 +10,7 @@ import { s3Upload } from "../../functions/multer";
 import { guestAccess } from "../../middlewares/authmiddleware";
 const {
   getBusinessAccounts,
+  getVerifiedBusinessAccounts,
   getBusinessAccount,
   getBusinessAccountProfile,
   businessAccountLogin,
@@ -47,7 +48,7 @@ router
   .route("/")
   .get(adminAccess, getBusinessAccounts)
   .post(adminAccess, addBusinessAccount);
-router.route("/all").get(guestAccess, getBusinessAccounts);
+router.route("/verified").get(guestAccess, getVerifiedBusinessAccounts);
 router.route("/login").patch(businessAccountLogin);
 router.route("/signup").post(addBusinessAccount);
 router.route("/forget-password").patch(forgotBusinessAccountPassword);
@@ -132,7 +133,7 @@ router.route("/delete/:baid").delete(adminAccess, pDeleteBusinessAccount);
 router.route("/restore/:baid").put(superAdminAccess, restoreBusinessAccount);
 router
   .route("/:baid")
-  .get(adminAccess, getBusinessAccount)
+  .get(guestAccess, getBusinessAccount)
   .patch(adminAccess, editBusinessAccount)
   .delete(superAdminAccess, deleteBusinessAccount);
 
