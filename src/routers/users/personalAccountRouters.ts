@@ -62,52 +62,20 @@ router
   .route("/profile")
   .patch(personalAccountAccess, updatePersonalAccountProfile);
 router 
-
    .route("/change-profile-picture") 
+   .patch(
+personalAccountAccess,    s3Upload(AWS_S3_PERSONAL_ACCOUNT_PROFILE_RESOURCES, "single", "image"),    changePersonalAccountProfileImage); 
 
-   .patch( 
-
-     personalAccountAccess, 
-
-     s3Upload(AWS_S3_PERSONAL_ACCOUNT_PROFILE_RESOURCES, "single", "image"), 
-
-     changePersonalAccountProfileImage 
-
-   ); 
-
- router 
-
-.route("/remove-profile-picture") 
-
+ router .route("/remove-profile-picture") 
    .delete(personalAccountAccess, removePersonalAccountProfileImage); 
-
- router 
-
-   .route("/add-gallery") 
-
-   .patch( 
-
-     personalAccountAccess, 
-
-     s3Upload(AWS_S3_PERSONAL_ACCOUNT_GALLERY_RESOURCES, "single", "image"), 
-
-     addGalleryImage 
-
-   ); 
-
- router 
-
-   .route("/remove-all-gallerys") 
-
-   .delete(personalAccountAccess, removeAllGalleryImages); 
-
 router 
-
-   .route("/remove-gallery/:gid") 
-
-   .delete(personalAccountAccess, removeGalleryImage); 
-
- 
+   .route("/add-gallery") 
+   .patch( 
+     personalAccountAccess,    s3Upload(AWS_S3_PERSONAL_ACCOUNT_GALLERY_RESOURCES, "single", "image"), addGalleryImage); 
+router.route("/remove-all-gallerys") 
+   .delete(personalAccountAccess, removeAllGalleryImages); 
+router.route("/remove-gallery/:gid") 
+  .delete(personalAccountAccess, removeGalleryImage); 
 router
   .route("/check-username-availablility")
   .patch(checkPersonalAccountUsernameAvailability);
@@ -134,27 +102,26 @@ router
 router
   .route("/change-profile-picture/:paid")
   .patch(
-    personalAccountAccess,
+    adminAccess,
     s3Upload(AWS_S3_PERSONAL_ACCOUNT_PROFILE_RESOURCES, "single", "image"),
     changePersonalAccountProfileImage
   );
 router
   .route("/remove-profile-picture/:paid")
-  .delete(personalAccountAccess, removePersonalAccountProfileImage);
+  .delete(adminAccess, removePersonalAccountProfileImage);
 router
   .route("/add-gallery/:paid")
   .patch(
-    personalAccountAccess,
-    s3Upload(AWS_S3_PERSONAL_ACCOUNT_GALLERY_RESOURCES, "single", "image"),
+    adminAccess,
+   s3Upload(AWS_S3_PERSONAL_ACCOUNT_GALLERY_RESOURCES, "single", "image"),
     addGalleryImage
   );
 router
   .route("/remove-all-gallerys/:paid")
-  .delete(personalAccountAccess, removeAllGalleryImages);
+  .delete(adminAccess, removeAllGalleryImages);
 router
-  .route("/remove-gallery//:paid:gid")
-  .delete(personalAccountAccess, removeGalleryImage);
-
+  .route("/remove-gallery/:paid:gid")
+  .delete(adminAccess, removeGalleryImage);
 router.route("/delete/:paid").delete(adminAccess, pDeletePersonalAccount);
 router.route("/restore/:paid").put(superAdminAccess, restorePersonalAccount);
 router
