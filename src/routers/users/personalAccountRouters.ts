@@ -117,7 +117,7 @@ router
   .route("/remove-all-gallerys/:paid")
   .delete(adminAccess, removeAllGalleryImages);
 router
-  .route("/remove-gallery/:paid:gid")
+  .route("/remove-gallery/:paid/:gid")
   .delete(adminAccess, removeGalleryImage);
 router.route("/delete/:paid").delete(adminAccess, pDeletePersonalAccount);
 router.route("/restore/:paid").put(superAdminAccess, restorePersonalAccount);
