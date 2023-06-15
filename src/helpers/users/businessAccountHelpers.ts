@@ -467,6 +467,9 @@ export const editBusinessAccount = (
         socialMediaLinks,
         addressDetails,
         contactDetails,
+        locationType,
+        numberOfEmployees,
+        yearEstablished,
       } = data;
 
       if (username && !username.includes(BUSINESS_ACCOUNT_USERNAME_STARTS_WITH))
@@ -533,6 +536,9 @@ export const editBusinessAccount = (
       businessAccount.socialMediaLinks =
         socialMediaLinks || businessAccount.socialMediaLinks;
       businessAccount.services = services || businessAccount.services;
+      businessAccount.locationType = locationType || businessAccount.locationType;
+      businessAccount.numberOfEmployees = numberOfEmployees || businessAccount.numberOfEmployees;
+      businessAccount.yearEstablished = yearEstablished || businessAccount.yearEstablished;
 
       if (category && isValidObjectId(category)) {
         businessAccount.category = category;
@@ -661,6 +667,9 @@ export const updateBusinessAccountProfile = (
         socialMediaLinks,
         addressDetails,
         contactDetails,
+        locationType,
+        numberOfEmployees,
+        yearEstablished,
       } = data;
 
       // New contact details phone is already exist from anothers
@@ -685,6 +694,9 @@ export const updateBusinessAccountProfile = (
       businessAccount.location = location || businessAccount.location;
       businessAccount.about = about || businessAccount.about;
       businessAccount.services = services || businessAccount.services;
+      businessAccount.locationType = locationType || businessAccount.locationType;
+      businessAccount.numberOfEmployees = numberOfEmployees || businessAccount.numberOfEmployees;
+      businessAccount.yearEstablished = yearEstablished || businessAccount.yearEstablished;
       businessAccount.socialMediaLinks =
         socialMediaLinks || businessAccount.socialMediaLinks;
 
