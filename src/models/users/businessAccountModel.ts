@@ -112,11 +112,11 @@ const businessAccountSchema = new mongoose.Schema<IBusinessAccountDocument>(
     contactDetails: {
       fname: {
         type: String,
-        required: true,
+
       },
       lname: {
         type: String,
-        required: true,
+   
       },
       email: {
         type: String,
