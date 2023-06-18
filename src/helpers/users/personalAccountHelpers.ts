@@ -22,8 +22,8 @@ export const getPersonalAccounts = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? {}
+        : { isDeleted: false };
       const personalAccounts = await PersonalAccount.find({ ...query }).sort({
         createdAt: -1,
       });
@@ -57,7 +57,7 @@ export const getVerifiedPersonalAccounts = (search: string) => {
           : {};
           
       const personalAccounts = await PersonalAccount.find({
-        isVerified: true,
+        isVerified: true, isDeleted: false,
         ...searchQuery,
       }).sort({ fname: 1 });
 
@@ -90,8 +90,8 @@ export const getPersonalAccount = (
         throw new ThrowError("Provide vaild personalAccount id", 404);
 
       const query = ["SuperAdmin", "Developer"].includes(role ?? "")
-        ? { isDeleted: true }
-        : {};
+        ? { }
+        : { isDeleted: false };
       const personalAccount = await PersonalAccount.findOne({
         _id: personalAccountId,
         ...query,
@@ -137,7 +137,7 @@ export const personalAccountLogin = (
         );
 
       const personalAccount = await PersonalAccount.findOne(
-        { $or: [{ username }, { email }, { phone }] },
+        { $or: [{ username }, { email }, { phone }], isDeleted: false },
         { password: 1, fname: 1, role: 1, status: 1, lastSync: 1, isVerified: 1 }
       );
 
