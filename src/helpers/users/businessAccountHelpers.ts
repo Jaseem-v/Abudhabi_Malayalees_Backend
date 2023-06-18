@@ -241,7 +241,7 @@ export const addBusinessAccount = (data: any, adminId?: string) => {
           { email },
           { phone },
           { username },
-          { "contactDetails.email": contactDetails.email },
+          // { "contactDetails.email": contactDetails.email },
           // { "contactDetails.phone": contactDetails.phone },
         ],
         isDeleted: false
