@@ -222,11 +222,7 @@ export const addBusinessAccount = (data: any, adminId?: string) => {
         !addressDetails.state ||
         !addressDetails.city ||
         !addressDetails.address ||
-        !addressDetails.pincode
-
-
-    
-    
+        !addressDetails.pincode   
       )
         throw new ThrowError(
           `Please Provide name(*), username(*), phone(*), email(*), password(*), category(*), website, location, services, about, socialMediaLinks, addressDetails(streetNumber, state(*), city(*), address(*), place, pincode(*) and landmark) and contactDetails (fname, lname, email, phone, isAddressVisible, addressDetails (streetNumber, state, city, address, place, pincode and landmark))`,
