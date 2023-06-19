@@ -238,12 +238,8 @@ export const addPersonalAccount = (data: any, adminId?: string) => {
         lastUsed: new Date(),
         manual: typeof adminId === "string",
         isVerified: typeof adminId === "string",
-
         verifiedAt: typeof adminId === "string" ? new Date() : null,
-
         verificationMailSentCount: 0,
-
-        category,
         createdBy: adminId,
       });
 
