@@ -72,7 +72,7 @@ const businessAccountSchema = new mongoose.Schema<IBusinessAccountDocument>(
       type: String,
     },
     numberOfEmployees: {
-      type: Number,
+      type: String,
     },
     yearEstablished: {
       type: String,
