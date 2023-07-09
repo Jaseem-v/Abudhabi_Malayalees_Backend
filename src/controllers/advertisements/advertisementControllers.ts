@@ -1,8 +1,8 @@
-import { ErrorResponse } from "../../classes";
-import { deleteS3File } from "../../functions/s3";
-import { advertisementHelpers } from "../../helpers";
+import { ErrorResponse } from '../../classes';
+import { deleteS3File } from '../../functions/s3';
+import { advertisementHelpers } from '../../helpers';
 
-import { ApiParams } from "../../types";
+import { ApiParams } from '../../types';
 
 /**
  * Get all advertisements
@@ -39,7 +39,7 @@ export const getAdvertisements: ApiParams = (req, res, next) => {
  */
 export const getAdvertisementsByRealEstate: ApiParams = (req, res, next) => {
   advertisementHelpers
-    .getAdvertisementsByType("REAL_ESTATE", req.client!.role)
+    .getAdvertisementsByType('REAL_ESTATE', req.client!.role)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -63,7 +63,7 @@ export const getAdvertisementsByRealEstate: ApiParams = (req, res, next) => {
  */
 export const getAdvertisementsByUserCar: ApiParams = (req, res, next) => {
   advertisementHelpers
-    .getAdvertisementsByType("USED_CAR", req.client!.role)
+    .getAdvertisementsByType('USED_CAR', req.client!.role)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -112,19 +112,7 @@ export const getAdvertisement: ApiParams = (req, res, next) => {
 export const addAdvertisement: ApiParams = (req, res, next) => {
   req.body.image = req.file;
   advertisementHelpers
-    .addAdvertisement(
-      ["SuperAdmin", "Admin", "Developer"].includes(req.client?.role ?? "")
-        ? req.params.uid.toString()
-        : req.client!.id,
-      ["SuperAdmin", "Admin", "Developer"].includes(req.client?.role ?? "")
-        ? req.params.role === "BusinessAccount"
-          ? "BusinessAccount"
-          : req.params.role === "PersonalAccount"
-          ? "PersonalAccount"
-          : "SuperAdmin"
-        : req.client!.role,
-      req.body
-    )
+    .addAdvertisement(req.client!.id, req.client!.role, req.body)
     .then((resp: any) => {
       res.status(200).json({
         success: true,

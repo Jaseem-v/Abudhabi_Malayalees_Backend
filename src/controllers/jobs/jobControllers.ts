@@ -1,7 +1,7 @@
-import { ErrorResponse } from "../../classes";
-import { jobHelpers } from "../../helpers";
+import { ErrorResponse } from '../../classes';
+import { jobHelpers } from '../../helpers';
 
-import { ApiParams } from "../../types";
+import { ApiParams } from '../../types';
 
 /**
  * Get all jobs
@@ -12,9 +12,9 @@ import { ApiParams } from "../../types";
  */
 export const getJobs: ApiParams = (req, res, next) => {
   jobHelpers
-    .getJobs(
-      // req.client!.role
-      )
+    .getJobs
+    // req.client!.role
+    ()
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -86,7 +86,7 @@ export const getJob: ApiParams = (req, res, next) => {
  */
 export const addJob: ApiParams = (req, res, next) => {
   jobHelpers
-    .addJob(req.body)
+    .addJob(req.client!.id, req.client!.role, req.body)
     .then((resp: any) => {
       res.status(200).json({
         success: true,

@@ -1,11 +1,13 @@
-import mongoose from "mongoose";
-import { config } from "../../config/index";
-import { Category, Job } from "../../models";
-import { ThrowError } from "../../classes";
-import { IRoles } from "../../types/default";
+import mongoose from 'mongoose';
+import { config } from '../../config/index';
+import { Category, Job } from '../../models';
+import { ThrowError } from '../../classes';
+import { IRoles } from '../../types/default';
 
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;
+const { BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS, ADMINS } =
+  config.MONGO_COLLECTIONS;
 
 /**
  * To get all jobs
@@ -14,17 +16,17 @@ const { NODE_ENV } = config.SERVER;
 export const getJobs = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
+      const query = ['SuperAdmin', 'Developer'].includes(role ?? '')
         ? {}
         : { isDeleted: false };
       const jobs = await Job.find({ ...query })
         .sort({
           createdAt: -1,
         })
-        .populate("category", "name image status visibility");
+        .populate('category', 'name image status visibility');
 
       resolve({
-        message: "Jobs Fetched",
+        message: 'Jobs Fetched',
         jobs,
       });
     } catch (error: any) {
@@ -45,21 +47,21 @@ export const getJobsForCustomer = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const jobs = await Job.find({
-        status: "APPROVED",
-        visibility: "Show",
+        status: 'APPROVED',
+        visibility: 'Show',
         isDeleted: false,
       })
         .sort({
           createdAt: -1,
         })
         .populate({
-          path: "category",
-          select: "name image status visibility",
-          match: { visibility: "Show" },
+          path: 'category',
+          select: 'name image status visibility',
+          match: { visibility: 'Show' },
         });
 
       resolve({
-        message: "Jobs Fetched",
+        message: 'Jobs Fetched',
         jobs,
       });
     } catch (error: any) {
@@ -81,23 +83,23 @@ export const getJob = (jobId: string, role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!jobId || !isValidObjectId(jobId))
-        throw new ThrowError("Provide vaild job id", 404);
+        throw new ThrowError('Provide vaild job id', 404);
 
-      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
+      const query = ['SuperAdmin', 'Developer'].includes(role ?? '')
         ? {}
         : { isDeleted: false };
       const job = await Job.findOne({ _id: jobId, ...query }).populate(
-        "category",
-        "name image status visibility"
+        'category',
+        'name image status visibility'
       );
 
       if (!job) {
         return reject({
-          message: "Job not found",
+          message: 'Job not found',
           statusCode: 404,
         });
       }
-      resolve({ message: "Job fetched", job });
+      resolve({ message: 'Job fetched', job });
     } catch (error: any) {
       return reject({
         message: error.message || error.msg,
@@ -113,43 +115,64 @@ export const getJob = (jobId: string, role?: IRoles) => {
  * @param {Job} data
  * @returns job
  */
-export const addJob = (data: any) => {
+export const addJob = (clientId: string, clientRole: IRoles, data: any) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { desc, categoryId, visibility } = data;
-      if (!desc || !categoryId || !isValidObjectId(categoryId) || !visibility)
+      if (
+        !clientId ||
+        !clientRole ||
+        ![
+          'BusinessAccount',
+          'PersonalAccount',
+          'SuperAdmin',
+          'DeveloperAdmin',
+          'Admin',
+        ].includes(clientRole) ||
+        !desc ||
+        !categoryId ||
+        !isValidObjectId(categoryId) ||
+        !visibility
+      )
         throw new ThrowError(
-          "Please Provide desc, categoryId and visibility",
+          'Please Provide desc, categoryId and visibility',
           400
         );
 
       const category = await Category.findById(categoryId);
 
-      if (!category || category.type != "JOB")
-        throw new ThrowError("Please Provide valid job category", 400);
+      if (!category || category.type != 'JOB')
+        throw new ThrowError('Please Provide valid job category', 400);
 
       const lastCode = await Job.find({}, { code: 1, _id: 0 })
         .limit(1)
         .sort({ createdAt: -1 });
       data.code =
         lastCode.length === 1
-          ? "JOB" + (parseInt(lastCode[0].code.slice(3)) + 1)
-          : "JOB100";
+          ? 'JOB' + (parseInt(lastCode[0].code.slice(3)) + 1)
+          : 'JOB100';
 
       const job = await new Job({
         code: data.code,
+        createdBy: clientId,
+        createdByRole:
+          clientRole === 'BusinessAccount'
+            ? BUSINESS_ACCOUNTS
+            : clientRole === 'PersonalAccount'
+            ? PERSONAL_ACCOUNTS
+            : ADMINS,
         desc,
         category: categoryId,
-        status: "PENDING",
-        visibility: visibility || "Show",
+        status: 'PENDING',
+        visibility: visibility || 'Show',
       });
 
       const njob = await (
         await job.save()
-      ).populate("category", "name image status visibility");
+      ).populate('category', 'name image status visibility');
 
       resolve({
-        message: "Job created successfully",
+        message: 'Job created successfully',
         job: njob,
       });
     } catch (error: any) {
@@ -172,11 +195,11 @@ export const editJob = (jobId: string, data: any, client: any) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!jobId || !isValidObjectId(jobId))
-        throw new ThrowError("Provide vaild job id", 400);
+        throw new ThrowError('Provide vaild job id', 400);
 
       const job = await Job.findById(jobId);
 
-      if (!job) throw new ThrowError("Job not found", 404);
+      if (!job) throw new ThrowError('Job not found', 404);
 
       const { desc, visibility } = data;
 
@@ -186,9 +209,9 @@ export const editJob = (jobId: string, data: any, client: any) => {
 
       const njob = await (
         await job.save()
-      ).populate("category", "name image status visibility");
+      ).populate('category', 'name image status visibility');
 
-      resolve({ message: "Job edited successfully", job: njob });
+      resolve({ message: 'Job edited successfully', job: njob });
     } catch (error: any) {
       return reject({
         message: error.message || error.msg,
@@ -206,7 +229,7 @@ export const editJob = (jobId: string, data: any, client: any) => {
  */
 export const changeJobStatus = (
   jobId: string,
-  status: "APPROVE" | "REJECT",
+  status: 'APPROVE' | 'REJECT',
   clientId: string
 ) => {
   return new Promise(async (resolve, reject) => {
@@ -215,7 +238,7 @@ export const changeJobStatus = (
         !jobId ||
         !isValidObjectId(jobId) ||
         !status ||
-        !["APPROVE", "REJECT"].includes(status)
+        !['APPROVE', 'REJECT'].includes(status)
       ) {
         return reject({
           message: "Provide vaild job id and status ('APPROVE', 'REJECT')",
@@ -226,21 +249,21 @@ export const changeJobStatus = (
       const job = await Job.findById(jobId);
       if (
         !job ||
-        (job.status === "APPROVED" && status === "APPROVE") ||
-        (job.status === "REJECTED" && status === "REJECT")
+        (job.status === 'APPROVED' && status === 'APPROVE') ||
+        (job.status === 'REJECTED' && status === 'REJECT')
       )
         throw new ThrowError(
           !job
-            ? "Job not found"
-            : job.status === "APPROVED" && status === "APPROVE"
-            ? "Job already approved"
-            : "Job already rejected",
+            ? 'Job not found'
+            : job.status === 'APPROVED' && status === 'APPROVE'
+            ? 'Job already approved'
+            : 'Job already rejected',
           404
         );
 
-      job.status = status === "APPROVE" ? "APPROVED" : "REJECTED";
+      job.status = status === 'APPROVE' ? 'APPROVED' : 'REJECTED';
 
-      if (status === "APPROVE") {
+      if (status === 'APPROVE') {
         job.statusLog.approvedAt = new Date();
         job.statusLog.approvedBy = clientId;
       } else {
@@ -250,7 +273,7 @@ export const changeJobStatus = (
 
       const njob = await (
         await job.save()
-      ).populate("category", "name image status visibility");
+      ).populate('category', 'name image status visibility');
 
       resolve({
         message: `${njob.code}'s status changed to ${njob.status}`,
@@ -276,19 +299,19 @@ export const changeJobVisibility = (jobId: string) => {
     try {
       if (!jobId || !isValidObjectId(jobId)) {
         return reject({
-          message: "Provide vaild job id",
+          message: 'Provide vaild job id',
           statusCode: 404,
         });
       }
 
       const job = await Job.findById(jobId);
-      if (!job) throw new ThrowError("Job not found", 404);
+      if (!job) throw new ThrowError('Job not found', 404);
 
-      job.visibility = job.visibility === "Show" ? "Hide" : "Show";
+      job.visibility = job.visibility === 'Show' ? 'Hide' : 'Show';
 
       const njob = await (
         await job.save()
-      ).populate("category", "name image status visibility");
+      ).populate('category', 'name image status visibility');
 
       resolve({
         message: `${njob.code}'s visibility changed to ${njob.visibility}`,
@@ -312,16 +335,16 @@ export const deleteJob = (jobId: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!jobId || !isValidObjectId(jobId))
-        throw new ThrowError("Provide valid job id", 400);
+        throw new ThrowError('Provide valid job id', 400);
 
       const job = await Job.findOne({
         _id: jobId,
         isDeleted: false,
       });
 
-      if (!job) throw new ThrowError("Job not found", 404);
+      if (!job) throw new ThrowError('Job not found', 404);
 
-      job.visibility = "Show";
+      job.visibility = 'Show';
       job.isDeleted = true;
       job.deletedAt = new Date();
 
@@ -349,7 +372,7 @@ export const restoreJob = (jobId: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!jobId || !isValidObjectId(jobId))
-        throw new ThrowError("Provide valid job id", 400);
+        throw new ThrowError('Provide valid job id', 400);
 
       const job = await Job.findOne({
         _id: jobId,
@@ -358,18 +381,18 @@ export const restoreJob = (jobId: string) => {
 
       if (!job) {
         return reject({
-          message: "Job not found",
+          message: 'Job not found',
           statusCode: 404,
         });
       }
 
-      job.visibility = "Show";
+      job.visibility = 'Show';
       job.isDeleted = false;
       job.deletedAt = undefined;
 
       const njob = await (
         await job.save()
-      ).populate("category", "name image status visibility");
+      ).populate('category', 'name image status visibility');
 
       resolve({
         message: `${njob.code} job was restored`,
@@ -393,7 +416,7 @@ export const pDeleteJob = (jobId: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!jobId || !isValidObjectId(jobId))
-        throw new ThrowError("Provide valid job id", 400);
+        throw new ThrowError('Provide valid job id', 400);
 
       const job = await Job.findOne({
         _id: jobId,
@@ -402,12 +425,12 @@ export const pDeleteJob = (jobId: string) => {
 
       if (!job) {
         return reject({
-          message: "Job not found",
+          message: 'Job not found',
           statusCode: 404,
         });
       }
 
-      if (NODE_ENV === "development") {
+      if (NODE_ENV === 'development') {
         await job.deleteOne();
         return resolve({
           message: `${job.code} job was deleted`,
@@ -430,9 +453,9 @@ export const pDeleteJob = (jobId: string) => {
 export const deleteAllJob = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (NODE_ENV === "development") {
+      if (NODE_ENV === 'development') {
         await Job.deleteMany({});
-        return resolve({ message: "All job deleted" });
+        return resolve({ message: 'All job deleted' });
       }
       throw new ThrowError(
         `Not able to delete all jobs in ${NODE_ENV} mode`,

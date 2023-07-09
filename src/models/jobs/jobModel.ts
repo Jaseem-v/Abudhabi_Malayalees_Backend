@@ -1,8 +1,9 @@
-import mongoose from "mongoose";
-import { IJob } from "../../interfaces";
-import { config } from "../../config/index";
+import mongoose from 'mongoose';
+import { IJob } from '../../interfaces';
+import { config } from '../../config/index';
 
-const { JOBS, CATEGORIES, ADMINS } = config.MONGO_COLLECTIONS;
+const { JOBS, CATEGORIES, ADMINS, BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS } =
+  config.MONGO_COLLECTIONS;
 
 const jobSchema = new mongoose.Schema<IJob>(
   {
@@ -10,6 +11,16 @@ const jobSchema = new mongoose.Schema<IJob>(
       type: String,
       required: true,
       unique: true,
+    },
+    createdBY: {
+      type: mongoose.SchemaTypes.ObjectId,
+      required: true,
+      refPath: 'userRole',
+    },
+    createdBYRole: {
+      type: String,
+      required: true,
+      enum: [BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS, ADMINS],
     },
     desc: {
       type: String,
@@ -22,7 +33,7 @@ const jobSchema = new mongoose.Schema<IJob>(
     },
     status: {
       type: String,
-      enum: ["PENDING", "APPROVED", "REJECTED"],
+      enum: ['PENDING', 'APPROVED', 'REJECTED'],
       required: true,
     },
     statusLog: {
@@ -39,8 +50,8 @@ const jobSchema = new mongoose.Schema<IJob>(
     },
     visibility: {
       type: String,
-      enum: ["Show", "Hide"],
-      default: "Show",
+      enum: ['Show', 'Hide'],
+      default: 'Show',
     },
     isDeleted: {
       type: Boolean,

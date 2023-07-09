@@ -1,13 +1,14 @@
-import mongoose from "mongoose";
-import { config } from "../../config/index";
-import { Advertisement } from "../../models";
-import { ThrowError } from "../../classes";
-import { IRoles } from "../../types/default";
-import { IAdvertisement } from "../../interfaces";
+import mongoose from 'mongoose';
+import { config } from '../../config/index';
+import { Advertisement, Category } from '../../models';
+import { ThrowError } from '../../classes';
+import { IRoles } from '../../types/default';
+import { IAdvertisement } from '../../interfaces';
 
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;
-const { BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS } = config.MONGO_COLLECTIONS;
+const { BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS, ADMINS } =
+  config.MONGO_COLLECTIONS;
 
 /**
  * To get all advertisements
@@ -16,7 +17,7 @@ const { BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS } = config.MONGO_COLLECTIONS;
 export const getAdvertisements = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
+      const query = ['SuperAdmin', 'Developer'].includes(role ?? '')
         ? {}
         : { isDeleted: false };
       const advertisements = await Advertisement.find({ ...query }).sort({
@@ -24,7 +25,7 @@ export const getAdvertisements = (role?: IRoles) => {
       });
 
       resolve({
-        message: "Advertisements Fetched",
+        message: 'Advertisements Fetched',
         advertisements,
       });
     } catch (error: any) {
@@ -45,19 +46,20 @@ export const getAdvertisementsForCustomer = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const advertisements = await Advertisement.find({
-        visibility: "Show",
-        status: "APPROVED",
+        visibility: 'Show',
+        status: 'APPROVED',
       })
         .sort({
           createdAt: -1,
         })
         .populate(
-          "user",
-          "fname lname name email phone username profilePicture"
-        );
+          'createdBy',
+          'fname lname name email phone username profilePicture'
+        )
+        .populate('category', 'name image status visibility');
 
       resolve({
-        message: "Advertisements Fetched",
+        message: 'Advertisements Fetched',
         advertisements,
       });
     } catch (error: any) {
@@ -75,14 +77,14 @@ export const getAdvertisementsForCustomer = () => {
  * @returns {Advertisements} advertisements
  */
 export const getAdvertisementsByType = (
-  type: IAdvertisement["type"],
+  type: IAdvertisement['type'],
   role?: IRoles
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
+      const query = ['SuperAdmin', 'Developer'].includes(role ?? '')
         ? {}
-        : { status: "APPROVED", visibility: "Show" };
+        : { status: 'APPROVED', visibility: 'Show' };
       const advertisements = await Advertisement.find({
         ...query,
         type,
@@ -92,12 +94,13 @@ export const getAdvertisementsByType = (
           createdAt: -1,
         })
         .populate(
-          "user",
-          "fname lname name email phone username profilePicture"
-        );
+          'createdBy',
+          'fname lname name email phone username profilePicture'
+        )
+        .populate('category', 'name image status visibility');
 
       resolve({
-        message: "Advertisements Fetched",
+        message: 'Advertisements Fetched',
         advertisements,
       });
     } catch (error: any) {
@@ -119,23 +122,28 @@ export const getAdvertisement = (advertisementId: string, role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!advertisementId || !isValidObjectId(advertisementId))
-        throw new ThrowError("Provide vaild advertisement id", 404);
+        throw new ThrowError('Provide vaild advertisement id', 404);
 
-      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
+      const query = ['SuperAdmin', 'Developer'].includes(role ?? '')
         ? {}
         : { isDeleted: false };
       const advertisement = await Advertisement.findOne({
         _id: advertisementId,
         ...query,
-      });
+      })
+        .populate(
+          'createdBy',
+          'fname lname name email phone username profilePicture'
+        )
+        .populate('category', 'name image status visibility');
 
       if (!advertisement) {
         return reject({
-          message: "Advertisement not found",
+          message: 'Advertisement not found',
           statusCode: 404,
         });
       }
-      resolve({ message: "Advertisement fetched", advertisement });
+      resolve({ message: 'Advertisement fetched', advertisement });
     } catch (error: any) {
       return reject({
         message: error.message || error.msg,
@@ -152,65 +160,86 @@ export const getAdvertisement = (advertisementId: string, role?: IRoles) => {
  * @returns advertisement
  */
 export const addAdvertisement = (
-  userId: string,
-  userRole: IRoles,
+  clientId: string,
+  clientRole: IRoles,
   data: any
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { desc, type, image, visibility } = data;
+      const { categoryId, desc, type, image, visibility } = data;
       if (
-        !userId ||
-        !userRole ||
-        !["BusinessAccount", "PersonalAccount"].includes(userRole) ||
+        !clientId ||
+        !clientRole ||
+        ![
+          'BusinessAccount',
+          'PersonalAccount',
+          'SuperAdmin',
+          'DeveloperAdmin',
+          'Admin',
+        ].includes(clientRole) ||
         !desc ||
         !image ||
         !type ||
-        !["REAL_ESTATE", "USED_CAR"].includes(type) ||
+        !['REAL_ESTATE', 'USED_CAR', 'JOB'].includes(type) ||
+        (type === 'JOB' && !categoryId) ||
         !visibility
       )
         throw new ThrowError(
-          "Please Provide image, desc, type('REAL_ESTATE', 'USED_CAR') and visibility",
+          "Please Provide image, desc*, type('REAL_ESTATE', 'USED_CAR')*, category(type === 'JOB') and visibility",
           400
         );
+
+      if (type === 'JOB') {
+        const category = await Category.findById(categoryId);
+
+        if (!category || category.type != 'JOB')
+          throw new ThrowError('Please Provide valid job category', 400);
+      }
 
       const lastCode = await Advertisement.find({}, { code: 1, _id: 0 })
         .limit(1)
         .sort({ createdAt: -1 });
       data.code =
         lastCode.length === 1
-          ? "ADZ" + (parseInt(lastCode[0].code.slice(3)) + 1)
-          : "ADZ100";
+          ? 'ADZ' + (parseInt(lastCode[0].code.slice(3)) + 1)
+          : 'ADZ100';
 
       const advertisement = await new Advertisement({
         code: data.code,
-        user: userId,
-        userRole:
-          userRole === "BusinessAccount"
+        categoryId,
+        createdBy: clientId,
+        createdByRole:
+          clientRole === 'BusinessAccount'
             ? BUSINESS_ACCOUNTS
-            : PERSONAL_ACCOUNTS,
+            : clientRole === 'PersonalAccount'
+            ? PERSONAL_ACCOUNTS
+            : ADMINS,
         desc: desc,
         type: type,
         image: null,
-        status: "PENDING",
-        visibility: "Show",
+        status: 'PENDING',
+        visibility: 'Show',
       });
 
       if (image && image.key && image.mimetype) {
         // Delete Image
         advertisement.image = {
-          key: image.key.split("/").slice(-1)[0],
+          key: image.key.split('/').slice(-1)[0],
           mimetype: image.mimetype,
         };
       }
 
-      const nadvertisement = await(await advertisement.save()).populate(
-        "user",
-        "fname lname name email phone username profilePicture"
-      );
+      const nadvertisement = await (
+        await (
+          await advertisement.save()
+        ).populate(
+          'createdBy',
+          'fname lname name email phone username profilePicture'
+        )
+      ).populate('category', 'name image status visibility');
 
       resolve({
-        message: "Advertisement created successfully",
+        message: 'Advertisement created successfully',
         advertisement: nadvertisement,
       });
     } catch (error: any) {
@@ -229,18 +258,15 @@ export const addAdvertisement = (
  * @param {Advertisement} data
  * @returns
  */
-export const editAdvertisement = (
-  advertisementId: string,
-  data: any,
-) => {
+export const editAdvertisement = (advertisementId: string, data: any) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!advertisementId || !isValidObjectId(advertisementId))
-        throw new ThrowError("Provide vaild advertisement id", 400);
+        throw new ThrowError('Provide vaild advertisement id', 400);
 
       const advertisement = await Advertisement.findById(advertisementId);
 
-      if (!advertisement) throw new ThrowError("Advertisement not found", 404);
+      if (!advertisement) throw new ThrowError('Advertisement not found', 404);
 
       const { image, desc, visibility } = data;
 
@@ -251,15 +277,22 @@ export const editAdvertisement = (
       if (image && image.key && image.mimetype) {
         // Delete Image
         advertisement.image = {
-          key: image.key.split("/").slice(-1)[0],
+          key: image.key.split('/').slice(-1)[0],
           mimetype: image.mimetype,
         };
       }
 
-      const nadvertisement = await advertisement.save();
+      const nadvertisement = await (
+        await (
+          await advertisement.save()
+        ).populate(
+          'createdBy',
+          'fname lname name email phone username profilePicture'
+        )
+      ).populate('category', 'name image status visibility');
 
       resolve({
-        message: "Advertisement edited successfully",
+        message: 'Advertisement edited successfully',
         advertisement: nadvertisement,
       });
     } catch (error: any) {
@@ -279,7 +312,7 @@ export const editAdvertisement = (
  */
 export const changeAdvertisementStatus = (
   advertisementId: string,
-  status: "APPROVE" | "REJECT",
+  status: 'APPROVE' | 'REJECT',
   clientId: string
 ) => {
   return new Promise(async (resolve, reject) => {
@@ -288,7 +321,7 @@ export const changeAdvertisementStatus = (
         !advertisementId ||
         !isValidObjectId(advertisementId) ||
         !status ||
-        !["APPROVE", "REJECT"].includes(status)
+        !['APPROVE', 'REJECT'].includes(status)
       ) {
         return reject({
           message:
@@ -300,21 +333,21 @@ export const changeAdvertisementStatus = (
       const advertisement = await Advertisement.findById(advertisementId);
       if (
         !advertisement ||
-        (advertisement.status === "APPROVED" && status === "APPROVE") ||
-        (advertisement.status === "REJECTED" && status === "REJECT")
+        (advertisement.status === 'APPROVED' && status === 'APPROVE') ||
+        (advertisement.status === 'REJECTED' && status === 'REJECT')
       )
         throw new ThrowError(
           !advertisement
-            ? "Advertisement not found"
-            : advertisement.status === "APPROVED" && status === "APPROVE"
-            ? "Advertisement already approved"
-            : "Advertisement already rejected",
+            ? 'Advertisement not found'
+            : advertisement.status === 'APPROVED' && status === 'APPROVE'
+            ? 'Advertisement already approved'
+            : 'Advertisement already rejected',
           404
         );
 
-      advertisement.status = status === "APPROVE" ? "APPROVED" : "REJECTED";
+      advertisement.status = status === 'APPROVE' ? 'APPROVED' : 'REJECTED';
 
-      if (status === "APPROVE") {
+      if (status === 'APPROVE') {
         advertisement.statusLog.approvedAt = new Date();
         advertisement.statusLog.approvedBy = clientId;
       } else {
@@ -322,7 +355,14 @@ export const changeAdvertisementStatus = (
         advertisement.statusLog.rejectedBy = clientId;
       }
 
-      const nadvertisement = await advertisement.save();
+      const nadvertisement = await (
+        await (
+          await advertisement.save()
+        ).populate(
+          'createdBy',
+          'fname lname name email phone username profilePicture'
+        )
+      ).populate('category', 'name image status visibility');
 
       resolve({
         message: `${nadvertisement.code}'s status changed to ${nadvertisement.status}`,
@@ -348,18 +388,25 @@ export const changeAdvertisementVisibility = (advertisementId: string) => {
     try {
       if (!advertisementId || !isValidObjectId(advertisementId)) {
         return reject({
-          message: "Provide vaild advertisement id",
+          message: 'Provide vaild advertisement id',
           statusCode: 404,
         });
       }
 
       const advertisement = await Advertisement.findById(advertisementId);
-      if (!advertisement) throw new ThrowError("Advertisement not found", 404);
+      if (!advertisement) throw new ThrowError('Advertisement not found', 404);
 
       advertisement.visibility =
-        advertisement.visibility === "Show" ? "Hide" : "Show";
+        advertisement.visibility === 'Show' ? 'Hide' : 'Show';
 
-      const nadvertisement = await advertisement.save();
+      const nadvertisement = await (
+        await (
+          await advertisement.save()
+        ).populate(
+          'createdBy',
+          'fname lname name email phone username profilePicture'
+        )
+      ).populate('category', 'name image status visibility');
 
       resolve({
         message: `${nadvertisement.code}'s visibility changed to ${nadvertisement.visibility}`,
@@ -385,7 +432,7 @@ export const removeAdvertisementImage = (advertisementId: string) => {
     try {
       if (!advertisementId || !isValidObjectId(advertisementId)) {
         return reject({
-          message: "Provide valid advertisement id",
+          message: 'Provide valid advertisement id',
           statusCode: 400,
         });
       }
@@ -394,17 +441,24 @@ export const removeAdvertisementImage = (advertisementId: string) => {
 
       if (!advertisement) {
         return reject({
-          message: "Advertisement not found",
+          message: 'Advertisement not found',
           statusCode: 404,
         });
       }
 
       advertisement.image = null;
 
-      const nadvertisement = await advertisement.save();
+      const nadvertisement = await (
+        await (
+          await advertisement.save()
+        ).populate(
+          'createdBy',
+          'fname lname name email phone username profilePicture'
+        )
+      ).populate('category', 'name image status visibility');
 
       resolve({
-        message: "Advertisement image removed successfully",
+        message: 'Advertisement image removed successfully',
         advertisement: nadvertisement,
       });
     } catch (error: any) {
@@ -424,16 +478,16 @@ export const deleteAdvertisement = (advertisementId: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!advertisementId || !isValidObjectId(advertisementId))
-        throw new ThrowError("Provide valid advertisement id", 400);
+        throw new ThrowError('Provide valid advertisement id', 400);
 
       const advertisement = await Advertisement.findOne({
         _id: advertisementId,
         isDeleted: false,
       });
 
-      if (!advertisement) throw new ThrowError("Advertisement not found", 404);
+      if (!advertisement) throw new ThrowError('Advertisement not found', 404);
 
-      advertisement.visibility = "Show";
+      advertisement.visibility = 'Show';
       advertisement.isDeleted = true;
       advertisement.deletedAt = new Date();
 
@@ -461,7 +515,7 @@ export const restoreAdvertisement = (advertisementId: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!advertisementId || !isValidObjectId(advertisementId))
-        throw new ThrowError("Provide valid advertisement id", 400);
+        throw new ThrowError('Provide valid advertisement id', 400);
 
       const advertisement = await Advertisement.findOne({
         _id: advertisementId,
@@ -470,16 +524,23 @@ export const restoreAdvertisement = (advertisementId: string) => {
 
       if (!advertisement) {
         return reject({
-          message: "Advertisement not found",
+          message: 'Advertisement not found',
           statusCode: 404,
         });
       }
 
-      advertisement.visibility = "Show";
+      advertisement.visibility = 'Show';
       advertisement.isDeleted = false;
       advertisement.deletedAt = undefined;
 
-      const nadvertisement = await advertisement.save();
+      const nadvertisement = await (
+        await (
+          await advertisement.save()
+        ).populate(
+          'createdBy',
+          'fname lname name email phone username profilePicture'
+        )
+      ).populate('category', 'name image status visibility');
 
       resolve({
         message: `${nadvertisement.code} advertisement was restored`,
@@ -503,7 +564,7 @@ export const pDeleteAdvertisement = (advertisementId: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!advertisementId || !isValidObjectId(advertisementId))
-        throw new ThrowError("Provide valid advertisement id", 400);
+        throw new ThrowError('Provide valid advertisement id', 400);
 
       const advertisement = await Advertisement.findOne({
         _id: advertisementId,
@@ -512,12 +573,12 @@ export const pDeleteAdvertisement = (advertisementId: string) => {
 
       if (!advertisement) {
         return reject({
-          message: "Advertisement not found",
+          message: 'Advertisement not found',
           statusCode: 404,
         });
       }
 
-      if (NODE_ENV === "development") {
+      if (NODE_ENV === 'development') {
         await advertisement.deleteOne();
         return resolve({
           message: `${advertisement.code} advertisement was deleted`,
@@ -543,9 +604,9 @@ export const pDeleteAdvertisement = (advertisementId: string) => {
 export const deleteAllAdvertisement = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (NODE_ENV === "development") {
+      if (NODE_ENV === 'development') {
         await Advertisement.deleteMany({});
-        return resolve({ message: "All advertisement deleted" });
+        return resolve({ message: 'All advertisement deleted' });
       }
       throw new ThrowError(
         `Not able to delete all advertisements in ${NODE_ENV} mode`,

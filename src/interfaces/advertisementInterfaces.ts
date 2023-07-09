@@ -1,16 +1,18 @@
-import { IAdmin } from "./adminInterfaces";
-import { IImage } from "./default";
-import { IPersonalAccount, IBusinessAccount } from "./userInterfaces";
+import { IAdmin } from './adminInterfaces';
+import { ICategory } from './categoryInterfaces';
+import { IImage } from './default';
+import { IPersonalAccount, IBusinessAccount } from './userInterfaces';
 
 export interface IAdvertisement {
   code: string;
-  user: IPersonalAccount | IBusinessAccount | string;
-  userRole: string ;
+  createdBY: IPersonalAccount | IBusinessAccount | IAdmin | string;
+  createdBYRole: string;
+  category?: string | ICategory;
   desc: string;
   image: IImage | null;
-  type: "REAL_ESTATE" | "USED_CAR";
-  visibility: "Show" | "Hide";
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  type: 'REAL_ESTATE' | 'USED_CAR';
+  visibility: 'Show' | 'Hide';
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
   statusLog: {
     approvedAt: Date;
     approvedBy: string | IAdmin;

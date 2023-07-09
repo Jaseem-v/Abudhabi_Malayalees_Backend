@@ -1,9 +1,14 @@
-import mongoose from "mongoose";
-import { IAdvertisement } from "../../interfaces";
-import { config } from "../../config/index";
+import mongoose from 'mongoose';
+import { IAdvertisement } from '../../interfaces';
+import { config } from '../../config/index';
 
-const { ADVERTISEMENTS, ADMINS, BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS } =
-  config.MONGO_COLLECTIONS;
+const {
+  ADVERTISEMENTS,
+  ADMINS,
+  BUSINESS_ACCOUNTS,
+  PERSONAL_ACCOUNTS,
+  CATEGORIES,
+} = config.MONGO_COLLECTIONS;
 
 const advertisementSchema = new mongoose.Schema<IAdvertisement>(
   {
@@ -12,15 +17,20 @@ const advertisementSchema = new mongoose.Schema<IAdvertisement>(
       required: true,
       unique: true,
     },
-    user: {
+    createdBY: {
       type: mongoose.SchemaTypes.ObjectId,
       required: true,
-      refPath: "userRole",
+      refPath: 'createdBYRole',
     },
-    userRole: {
+    createdBYRole: {
       type: String,
       required: true,
-      enum: [BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS],
+      enum: [BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS, ADMINS],
+    },
+    category: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: CATEGORIES,
+      required: true,
     },
     desc: {
       type: String,
@@ -28,7 +38,7 @@ const advertisementSchema = new mongoose.Schema<IAdvertisement>(
     },
     type: {
       type: String,
-      enum: ["REAL_ESTATE", "USED_CAR"],
+      enum: ['REAL_ESTATE', 'USED_CAR'],
       required: true,
     },
     image: {
@@ -41,7 +51,7 @@ const advertisementSchema = new mongoose.Schema<IAdvertisement>(
     },
     status: {
       type: String,
-      enum: ["PENDING", "APPROVED", "REJECTED"],
+      enum: ['PENDING', 'APPROVED', 'REJECTED'],
       required: true,
     },
     statusLog: {
@@ -58,8 +68,8 @@ const advertisementSchema = new mongoose.Schema<IAdvertisement>(
     },
     visibility: {
       type: String,
-      enum: ["Show", "Hide"],
-      default: "Show",
+      enum: ['Show', 'Hide'],
+      default: 'Show',
     },
     isDeleted: {
       type: Boolean,

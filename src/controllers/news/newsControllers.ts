@@ -1,8 +1,8 @@
-import { ErrorResponse } from "../../classes";
-import { deleteS3File } from "../../functions/s3";
-import { newsHelpers } from "../../helpers";
+import { ErrorResponse } from '../../classes';
+import { deleteS3File } from '../../functions/s3';
+import { newsHelpers } from '../../helpers';
 
-import { ApiParams } from "../../types";
+import { ApiParams } from '../../types';
 
 /**
  * Get all news
@@ -13,9 +13,9 @@ import { ApiParams } from "../../types";
  */
 export const getNews: ApiParams = (req, res, next) => {
   newsHelpers
-    .getNews(
-      // req.client!.role
-      )
+    .getNews
+    // req.client!.role
+    ()
     .then((resp: any) => {
       res.status(200).json({
         success: true,
