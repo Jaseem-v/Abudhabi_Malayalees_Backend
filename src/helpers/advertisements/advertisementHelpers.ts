@@ -25,7 +25,7 @@ export const getAdvertisements = (role?: IRoles) => {
           createdAt: -1,
         })
         .populate(
-          'user',
+          'createdBy',
           'fname lname name email phone username profilePicture'
         )
         .populate('category', 'name image status visibility');
