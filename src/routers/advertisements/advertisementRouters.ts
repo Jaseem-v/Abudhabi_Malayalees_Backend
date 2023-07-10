@@ -11,6 +11,7 @@ const {
   getAdvertisements,
   getAdvertisementsByRealEstate,
   getAdvertisementsByUserCar,
+  getAdvertisementsByJob,
   getAdvertisement,
   addAdvertisement,
   editAdvertisement,
@@ -36,9 +37,15 @@ router
     addAdvertisement
   );
 router.route('/used-car').get(adminAccess, getAdvertisementsByUserCar);
-router.route('/used-car/customer').get(getAdvertisementsByUserCar);
+router
+  .route('/used-car/approved')
+  .get(allRoleAccess, getAdvertisementsByUserCar);
 router.route('/real-estate').get(adminAccess, getAdvertisementsByRealEstate);
-router.route('/real-estate/customer').get(getAdvertisementsByRealEstate);
+router
+  .route('/real-estate/approved')
+  .get(allRoleAccess, getAdvertisementsByRealEstate);
+router.route('/job').get(adminAccess, getAdvertisementsByJob);
+router.route('/job/approved').get(allRoleAccess, getAdvertisementsByJob);
 router.route('/delete/all').delete(superAdminAccess, deleteAllAdvertisement);
 router
   .route('/change-status/:aid')

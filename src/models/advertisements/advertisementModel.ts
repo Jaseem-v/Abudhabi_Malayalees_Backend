@@ -30,7 +30,6 @@ const advertisementSchema = new mongoose.Schema<IAdvertisement>(
     category: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: CATEGORIES,
-      required: true,
     },
     desc: {
       type: String,

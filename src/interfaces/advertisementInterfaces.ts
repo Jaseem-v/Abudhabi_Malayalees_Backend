@@ -10,7 +10,7 @@ export interface IAdvertisement {
   category?: string | ICategory;
   desc: string;
   image: IImage | null;
-  type: 'REAL_ESTATE' | 'USED_CAR';
+  type: 'REAL_ESTATE' | 'USED_CAR' | 'JOB';
   visibility: 'Show' | 'Hide';
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   statusLog: {

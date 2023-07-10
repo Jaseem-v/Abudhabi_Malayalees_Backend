@@ -79,6 +79,30 @@ export const getAdvertisementsByUserCar: ApiParams = (req, res, next) => {
 };
 
 /**
+ * Get all advertisements by job
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getAdvertisementsByJob: ApiParams = (req, res, next) => {
+  advertisementHelpers
+    .getAdvertisementsByType('JOB', req.client!.role)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.advertisements,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
  * Get a particular advertisement
  * METHOD : GET
  * @param {*} req

@@ -88,7 +88,9 @@ export const getAdvertisementsByType = (
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const query = ['SuperAdmin', 'Developer'].includes(role ?? '')
+      const query = ['SuperAdmin', 'DeveloperAdmin', 'Admin'].includes(
+        role ?? ''
+      )
         ? {}
         : { status: 'APPROVED', visibility: 'Show' };
       const advertisements = await Advertisement.find({
@@ -223,7 +225,9 @@ export const addAdvertisement = (
         desc: desc,
         type: type,
         image: null,
-        status: 'PENDING',
+        status: ['SuperAdmin', 'Admin', 'DeveloperAdmin'].includes(clientRole)
+          ? 'APPROVED'
+          : 'PENDING',
         visibility: 'Show',
       });
 

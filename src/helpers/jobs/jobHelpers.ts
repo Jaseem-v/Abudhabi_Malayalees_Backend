@@ -85,7 +85,9 @@ export const getJob = (jobId: string, role?: IRoles) => {
       if (!jobId || !isValidObjectId(jobId))
         throw new ThrowError('Provide vaild job id', 404);
 
-      const query = ['SuperAdmin', 'Developer'].includes(role ?? '')
+      const query = ['SuperAdmin', 'DeveloperAdmin', 'Admin'].includes(
+        role ?? ''
+      )
         ? {}
         : { isDeleted: false };
       const job = await Job.findOne({ _id: jobId, ...query }).populate(
@@ -163,7 +165,9 @@ export const addJob = (clientId: string, clientRole: IRoles, data: any) => {
             : ADMINS,
         desc,
         category: categoryId,
-        status: 'PENDING',
+        status: ['SuperAdmin', 'Admin', 'DeveloperAdmin'].includes(clientRole)
+          ? 'APPROVED'
+          : 'PENDING',
         visibility: visibility || 'Show',
       });
 
