@@ -20,7 +20,7 @@ const advertisementSchema = new mongoose.Schema<IAdvertisement>(
     createdBy: {
       type: mongoose.SchemaTypes.ObjectId,
       required: true,
-      refPath: 'createdBYRole',
+      refPath: 'createdByRole',
     },
     createdByRole: {
       type: String,
