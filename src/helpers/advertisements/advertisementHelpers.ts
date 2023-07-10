@@ -26,7 +26,7 @@ export const getAdvertisements = (role?: IRoles) => {
         })
         .populate(
           'createdBy',
-          'fname lname name email phone username profilePicture'
+          'fname lname name email phone role username profilePicture'
         )
         .populate('category', 'name image status visibility');
 
@@ -60,7 +60,7 @@ export const getAdvertisementsForCustomer = () => {
         })
         .populate(
           'createdBy',
-          'fname lname name email phone username profilePicture'
+          'fname lname name email phone role username profilePicture'
         )
         .populate('category', 'name image status visibility');
 
@@ -103,7 +103,7 @@ export const getAdvertisementsByType = (
         })
         .populate(
           'createdBy',
-          'fname lname name email phone username profilePicture'
+          'fname lname name email phone role username profilePicture'
         )
         .populate('category', 'name image status visibility');
 
@@ -141,7 +141,7 @@ export const getAdvertisement = (advertisementId: string, role?: IRoles) => {
       })
         .populate(
           'createdBy',
-          'fname lname name email phone username profilePicture'
+          'fname lname name email phone role username profilePicture'
         )
         .populate('category', 'name image status visibility');
 
@@ -193,7 +193,7 @@ export const addAdvertisement = (
         !visibility
       )
         throw new ThrowError(
-          "Please Provide image, desc*, type('REAL_ESTATE', 'USED_CAR')*, category(type === 'JOB') and visibility",
+          "Please Provide image, desc*, type('REAL_ESTATE', 'USED_CAR','JOB')*, categoryId(type === 'JOB') and visibility",
           400
         );
 
@@ -214,7 +214,7 @@ export const addAdvertisement = (
 
       const advertisement = await new Advertisement({
         code: data.code,
-        categoryId,
+        category: categoryId,
         createdBy: clientId,
         createdByRole:
           clientRole === 'BusinessAccount'
@@ -244,7 +244,7 @@ export const addAdvertisement = (
           await advertisement.save()
         ).populate(
           'createdBy',
-          'fname lname name email phone username profilePicture'
+          'fname lname name email phone role username profilePicture'
         )
       ).populate('category', 'name image status visibility');
 
@@ -297,7 +297,7 @@ export const editAdvertisement = (advertisementId: string, data: any) => {
           await advertisement.save()
         ).populate(
           'createdBy',
-          'fname lname name email phone username profilePicture'
+          'fname lname name email phone role username profilePicture'
         )
       ).populate('category', 'name image status visibility');
 
@@ -370,7 +370,7 @@ export const changeAdvertisementStatus = (
           await advertisement.save()
         ).populate(
           'createdBy',
-          'fname lname name email phone username profilePicture'
+          'fname lname name email phone role username profilePicture'
         )
       ).populate('category', 'name image status visibility');
 
@@ -414,7 +414,7 @@ export const changeAdvertisementVisibility = (advertisementId: string) => {
           await advertisement.save()
         ).populate(
           'createdBy',
-          'fname lname name email phone username profilePicture'
+          'fname lname name email phone role username profilePicture'
         )
       ).populate('category', 'name image status visibility');
 
@@ -463,7 +463,7 @@ export const removeAdvertisementImage = (advertisementId: string) => {
           await advertisement.save()
         ).populate(
           'createdBy',
-          'fname lname name email phone username profilePicture'
+          'fname lname name email phone role username profilePicture'
         )
       ).populate('category', 'name image status visibility');
 
@@ -548,7 +548,7 @@ export const restoreAdvertisement = (advertisementId: string) => {
           await advertisement.save()
         ).populate(
           'createdBy',
-          'fname lname name email phone username profilePicture'
+          'fname lname name email phone role username profilePicture'
         )
       ).populate('category', 'name image status visibility');
 
