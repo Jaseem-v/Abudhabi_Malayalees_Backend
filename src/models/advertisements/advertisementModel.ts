@@ -37,7 +37,7 @@ const advertisementSchema = new mongoose.Schema<IAdvertisement>(
     },
     type: {
       type: String,
-      enum: ['REAL_ESTATE', 'USED_CAR'],
+      enum: ['REAL_ESTATE', 'USED_CAR', 'JOB'],
       required: true,
     },
     image: {
