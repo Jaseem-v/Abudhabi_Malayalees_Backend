@@ -22,7 +22,10 @@ export const getAdvertisements = (role?: IRoles) => {
         : { isDeleted: false };
       const advertisements = await Advertisement.find({ ...query }).sort({
         createdAt: -1,
-      });
+      }).populate(
+          "user",
+          "fname lname name email phone username profilePicture"
+        );
 
       resolve({
         message: 'Advertisements Fetched',

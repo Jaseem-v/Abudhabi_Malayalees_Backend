@@ -23,7 +23,7 @@ export interface IBusinessAccount {
     title: string;
     link: string;
   }[];
-  numberOfEmployees: number;
+  numberOfEmployees?: string;
   yearEstablished?: string;
   addressDetails: {
     streetNumber?: string;
