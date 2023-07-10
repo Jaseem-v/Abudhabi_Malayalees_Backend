@@ -17,12 +17,12 @@ const advertisementSchema = new mongoose.Schema<IAdvertisement>(
       required: true,
       unique: true,
     },
-    createdBY: {
+    createdBy: {
       type: mongoose.SchemaTypes.ObjectId,
       required: true,
       refPath: 'createdBYRole',
     },
-    createdBYRole: {
+    createdByRole: {
       type: String,
       required: true,
       enum: [BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS, ADMINS],

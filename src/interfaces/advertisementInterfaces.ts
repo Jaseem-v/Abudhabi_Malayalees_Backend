@@ -5,8 +5,8 @@ import { IPersonalAccount, IBusinessAccount } from './userInterfaces';
 
 export interface IAdvertisement {
   code: string;
-  createdBY: IPersonalAccount | IBusinessAccount | IAdmin | string;
-  createdBYRole: string;
+  createdBy: IPersonalAccount | IBusinessAccount | IAdmin | string;
+  createdByRole: string;
   category?: string | ICategory;
   desc: string;
   image: IImage | null;
