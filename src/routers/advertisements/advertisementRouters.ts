@@ -7,6 +7,7 @@ import {
 } from '../../middlewares';
 import { s3Upload } from '../../functions/multer';
 import { config } from '../../config';
+import { guestAccess } from '../../middlewares/authmiddleware';
 const {
   getAdvertisements,
   getAdvertisementsByRealEstate,
@@ -37,15 +38,13 @@ router
     addAdvertisement
   );
 router.route('/used-car').get(adminAccess, getAdvertisementsByUserCar);
-router
-  .route('/used-car/approved')
-  .get(allRoleAccess, getAdvertisementsByUserCar);
+router.route('/used-car/approved').get(guestAccess, getAdvertisementsByUserCar);
 router.route('/real-estate').get(adminAccess, getAdvertisementsByRealEstate);
 router
   .route('/real-estate/approved')
-  .get(allRoleAccess, getAdvertisementsByRealEstate);
+  .get(guestAccess, getAdvertisementsByRealEstate);
 router.route('/job').get(adminAccess, getAdvertisementsByJob);
-router.route('/job/approved').get(allRoleAccess, getAdvertisementsByJob);
+router.route('/job/approved').get(guestAccess, getAdvertisementsByJob);
 router.route('/delete/all').delete(superAdminAccess, deleteAllAdvertisement);
 router
   .route('/change-status/:aid')
