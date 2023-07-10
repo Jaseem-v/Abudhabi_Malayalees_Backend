@@ -20,12 +20,15 @@ export const getAdvertisements = (role?: IRoles) => {
       const query = ['SuperAdmin', 'Developer'].includes(role ?? '')
         ? {}
         : { isDeleted: false };
-      const advertisements = await Advertisement.find({ ...query }).sort({
-        createdAt: -1,
-      }).populate(
-          "user",
-          "fname lname name email phone username profilePicture"
-        );
+      const advertisements = await Advertisement.find({ ...query })
+        .sort({
+          createdAt: -1,
+        })
+        .populate(
+          'user',
+          'fname lname name email phone username profilePicture'
+        )
+        .populate('category', 'name image status visibility');
 
       resolve({
         message: 'Advertisements Fetched',
