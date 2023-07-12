@@ -186,7 +186,6 @@ export const addAdvertisement = (
           'Admin',
         ].includes(clientRole) ||
         !desc ||
-        !image ||
         !type ||
         !['REAL_ESTATE', 'USED_CAR', 'JOB'].includes(type) ||
         (type === 'JOB' && !categoryId) ||
@@ -232,7 +231,6 @@ export const addAdvertisement = (
       });
 
       if (image && image.key && image.mimetype) {
-        // Delete Image
         advertisement.image = {
           key: image.key.split('/').slice(-1)[0],
           mimetype: image.mimetype,

@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
-import { config } from "../../config/index";
-import { Category } from "../../models";
-import { ThrowError } from "../../classes";
-import { IRoles } from "../../types/default";
-import { ICategory } from "../../interfaces";
+import mongoose from 'mongoose';
+import { config } from '../../config/index';
+import { Category } from '../../models';
+import { ThrowError } from '../../classes';
+import { IRoles } from '../../types/default';
+import { ICategory } from '../../interfaces';
 
 const { isValidObjectId } = mongoose;
 const { NODE_ENV } = config.SERVER;
@@ -15,7 +15,7 @@ const { NODE_ENV } = config.SERVER;
 export const getCategories = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
+      const query = ['SuperAdmin', 'Developer'].includes(role ?? '')
         ? {}
         : { isDeleted: false };
       const categorys = await Category.find({ ...query }).sort({
@@ -23,7 +23,7 @@ export const getCategories = (role?: IRoles) => {
       });
 
       resolve({
-        message: "Categories Fetched",
+        message: 'Categories Fetched',
         categorys,
       });
     } catch (error: any) {
@@ -44,14 +44,14 @@ export const getCategoriesForCustomer = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const categorys = await Category.find({
-        visibility: "Show",
+        visibility: 'Show',
         isDeleted: false,
       }).sort({
         createdAt: -1,
       });
 
       resolve({
-        message: "Categories Fetched",
+        message: 'Categories Fetched',
         categorys,
       });
     } catch (error: any) {
@@ -68,15 +68,12 @@ export const getCategoriesForCustomer = () => {
  * To get all categorys by type
  * @returns {Categorys} categorys
  */
-export const getCategorysByType = (
-  type: ICategory["type"],
-  role?: IRoles
-) => {
+export const getCategorysByType = (type: ICategory['type'], role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
+      const query = ['SuperAdmin', 'Developer'].includes(role ?? '')
         ? {}
-        : { visibility: "Show" };
+        : { visibility: 'Show' };
       const categorys = await Category.find({
         ...query,
         type,
@@ -85,7 +82,7 @@ export const getCategorysByType = (
         createdAt: -1,
       });
       resolve({
-        message: "Categorys Fetched",
+        message: 'Categorys Fetched',
         categorys,
       });
     } catch (error: any) {
@@ -107,20 +104,20 @@ export const getCategory = (categoryId: string, role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!categoryId || !isValidObjectId(categoryId))
-        throw new ThrowError("Provide vaild category id", 404);
+        throw new ThrowError('Provide vaild category id', 404);
 
-      const query = ["SuperAdmin", "Developer"].includes(role ?? "")
+      const query = ['SuperAdmin', 'Developer'].includes(role ?? '')
         ? {}
         : { isDeleted: false };
       const category = await Category.findOne({ _id: categoryId, ...query });
 
       if (!category) {
         return reject({
-          message: "Category not found",
+          message: 'Category not found',
           statusCode: 404,
         });
       }
-      resolve({ message: "Category fetched", category });
+      resolve({ message: 'Category fetched', category });
     } catch (error: any) {
       return reject({
         message: error.message || error.msg,
@@ -140,7 +137,7 @@ export const addCategory = (data: any) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { name, type, image, status, visibility } = data;
-      if (!name || !type || !["JOB", "BUSINESS"].includes(type) || !image)
+      if (!name || !type || !['JOB', 'BUSINESS'].includes(type))
         throw new ThrowError(
           "Please Provide name, type('JOB', 'BUSINESS') and image",
           400
@@ -152,23 +149,28 @@ export const addCategory = (data: any) => {
       });
 
       if (categoryExists)
-        throw new ThrowError("Category name already exist!", 401);
+        throw new ThrowError('Category name already exist!', 401);
 
       const category = await new Category({
         name,
         type,
-        image: {
-          key: image.key.split("/").slice(-1)[0],
-          mimetype: image.mimetype,
-        },
-        status: status || "Active",
-        visibility: visibility || "Show",
+        image: null,
+        status: status || 'Active',
+        visibility: visibility || 'Show',
       });
+
+      if (image && image.key && image.mimetype) {
+        // Delete Image
+        category.image = {
+          key: image.key.split('/').slice(-1)[0],
+          mimetype: image.mimetype,
+        };
+      }
 
       const ncategory = await category.save();
 
       resolve({
-        message: "Category created successfully",
+        message: 'Category created successfully',
         category: ncategory,
       });
     } catch (error: any) {
@@ -191,11 +193,11 @@ export const editCategory = (categoryId: string, data: any, client: any) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!categoryId || !isValidObjectId(categoryId))
-        throw new ThrowError("Provide vaild category id", 400);
+        throw new ThrowError('Provide vaild category id', 400);
 
       const category = await Category.findById(categoryId);
 
-      if (!category) throw new ThrowError("Category not found", 404);
+      if (!category) throw new ThrowError('Category not found', 404);
 
       const { name, image, status, visibility } = data;
 
@@ -205,7 +207,7 @@ export const editCategory = (categoryId: string, data: any, client: any) => {
           name,
         });
         if (categoryExists)
-          throw new ThrowError("Email already exist for other category", 400);
+          throw new ThrowError('Email already exist for other category', 400);
       }
 
       // Update a values in db
@@ -216,14 +218,14 @@ export const editCategory = (categoryId: string, data: any, client: any) => {
       if (image && image.key && image.mimetype) {
         // Delete Image
         category.image = {
-          key: image.key.split("/").slice(-1)[0],
+          key: image.key.split('/').slice(-1)[0],
           mimetype: image.mimetype,
         };
       }
 
       const ncategory = await category.save();
 
-      resolve({ message: "Category edited successfully", category: ncategory });
+      resolve({ message: 'Category edited successfully', category: ncategory });
     } catch (error: any) {
       return reject({
         message: error.message || error.msg,
@@ -244,15 +246,15 @@ export const changeCategoryStatus = (categoryId: string) => {
     try {
       if (!categoryId || !isValidObjectId(categoryId)) {
         return reject({
-          message: "Provide vaild category id",
+          message: 'Provide vaild category id',
           statusCode: 404,
         });
       }
 
       const category = await Category.findById(categoryId);
-      if (!category) throw new ThrowError("Category not found", 404);
+      if (!category) throw new ThrowError('Category not found', 404);
 
-      category.status = category.status === "Active" ? "Inactive" : "Active";
+      category.status = category.status === 'Active' ? 'Inactive' : 'Active';
 
       const ncategory = await category.save();
 
@@ -280,15 +282,15 @@ export const changeCategoryVisibility = (categoryId: string) => {
     try {
       if (!categoryId || !isValidObjectId(categoryId)) {
         return reject({
-          message: "Provide vaild category id",
+          message: 'Provide vaild category id',
           statusCode: 404,
         });
       }
 
       const category = await Category.findById(categoryId);
-      if (!category) throw new ThrowError("Category not found", 404);
+      if (!category) throw new ThrowError('Category not found', 404);
 
-      category.visibility = category.visibility === "Show" ? "Hide" : "Show";
+      category.visibility = category.visibility === 'Show' ? 'Hide' : 'Show';
 
       const ncategory = await category.save();
 
@@ -314,16 +316,16 @@ export const deleteCategory = (categoryId: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!categoryId || !isValidObjectId(categoryId))
-        throw new ThrowError("Provide valid category id", 400);
+        throw new ThrowError('Provide valid category id', 400);
 
       const category = await Category.findOne({
         _id: categoryId,
         isDeleted: false,
       });
 
-      if (!category) throw new ThrowError("Category not found", 404);
+      if (!category) throw new ThrowError('Category not found', 404);
 
-      category.status = "Inactive";
+      category.status = 'Inactive';
       category.isDeleted = true;
       category.deletedAt = new Date();
 
@@ -351,7 +353,7 @@ export const restoreCategory = (categoryId: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!categoryId || !isValidObjectId(categoryId))
-        throw new ThrowError("Provide valid category id", 400);
+        throw new ThrowError('Provide valid category id', 400);
 
       const category = await Category.findOne({
         _id: categoryId,
@@ -360,12 +362,12 @@ export const restoreCategory = (categoryId: string) => {
 
       if (!category) {
         return reject({
-          message: "Category not found",
+          message: 'Category not found',
           statusCode: 404,
         });
       }
 
-      category.status = "Active";
+      category.status = 'Active';
       category.isDeleted = false;
       category.deletedAt = undefined;
 
@@ -393,7 +395,7 @@ export const pDeleteCategory = (categoryId: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!categoryId || !isValidObjectId(categoryId))
-        throw new ThrowError("Provide valid category id", 400);
+        throw new ThrowError('Provide valid category id', 400);
 
       const category = await Category.findOne({
         _id: categoryId,
@@ -402,12 +404,12 @@ export const pDeleteCategory = (categoryId: string) => {
 
       if (!category) {
         return reject({
-          message: "Category not found",
+          message: 'Category not found',
           statusCode: 404,
         });
       }
 
-      if (NODE_ENV === "development") {
+      if (NODE_ENV === 'development') {
         await category.deleteOne();
         return resolve({
           message: `${category.name} category was deleted`,
@@ -433,9 +435,9 @@ export const pDeleteCategory = (categoryId: string) => {
 export const deleteAllCategory = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (NODE_ENV === "development") {
+      if (NODE_ENV === 'development') {
         await Category.deleteMany({});
-        return resolve({ message: "All category deleted" });
+        return resolve({ message: 'All category deleted' });
       }
       throw new ThrowError(
         `Not able to delete all categorys in ${NODE_ENV} mode`,
