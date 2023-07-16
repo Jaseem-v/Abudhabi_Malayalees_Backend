@@ -17,7 +17,7 @@ const { BUSINESS_ACCOUNTS, PERSONAL_ACCOUNTS, ADMINS } =
 export const getAdvertisements = (role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const query = ['SuperAdmin', 'Developer'].includes(role ?? '')
+      const query = ['SuperAdmin', 'DeveloperAdmin'].includes(role ?? '')
         ? {}
         : { isDeleted: false };
       const advertisements = await Advertisement.find({ ...query })
@@ -45,10 +45,51 @@ export const getAdvertisements = (role?: IRoles) => {
 };
 
 /**
- * To get all advertisements for customer
+ * To get all owned advertisements
  * @returns {Advertisements} advertisements
  */
-export const getAdvertisementsForCustomer = () => {
+export const getOwnedAdvertisements = (id: string, role: IRoles) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!id || !isValidObjectId(id))
+        throw new ThrowError('Provide vaild id', 404);
+
+      const query = ['SuperAdmin', 'DeveloperAdmin'].includes(role ?? '')
+        ? {}
+        : { isDeleted: false };
+
+      const advertisements = await Advertisement.find({
+        ...query,
+        createdBy: id,
+      })
+        .sort({
+          createdAt: -1,
+        })
+        .populate(
+          'createdBy',
+          'fname lname name email phone role username profilePicture'
+        )
+        .populate('category', 'name image status visibility');
+
+      resolve({
+        message: 'Advertisements Fetched',
+        advertisements,
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To get all approved advertisements
+ * @returns {Advertisements} advertisements
+ */
+export const getApprovedAdvertisements = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const advertisements = await Advertisement.find({
@@ -97,6 +138,52 @@ export const getAdvertisementsByType = (
         ...query,
         type,
         isDeleted: false,
+      })
+        .sort({
+          createdAt: -1,
+        })
+        .populate(
+          'createdBy',
+          'fname lname name email phone role username profilePicture'
+        )
+        .populate('category', 'name image status visibility');
+
+      resolve({
+        message: 'Advertisements Fetched',
+        advertisements,
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
+ * To get all owned advertisements by type
+ * @returns {Advertisements} advertisements
+ */
+export const getOwnedAdvertisementsByType = (
+  id: any,
+  type: IAdvertisement['type'],
+  role?: IRoles
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!id || !isValidObjectId(id))
+        throw new ThrowError('Provide vaild id', 404);
+
+      const query = ['SuperAdmin', 'DeveloperAdmin'].includes(role ?? '')
+        ? {}
+        : { isDeleted: false };
+
+      const advertisements = await Advertisement.find({
+        ...query,
+        createdBy: id,
+        type,
       })
         .sort({
           createdAt: -1,

@@ -10,9 +10,13 @@ import { config } from '../../config';
 import { guestAccess } from '../../middlewares/authmiddleware';
 const {
   getAdvertisements,
+  getOwnedAdvertisements,
   getAdvertisementsByRealEstate,
+  getOwnedAdvertisementsByRealEstate,
   getAdvertisementsByUserCar,
+  getOwnedAdvertisementsByUserCar,
   getAdvertisementsByJob,
+  getOwnedAdvertisementsByJob,
   getAdvertisement,
   addAdvertisement,
   editAdvertisement,
@@ -37,13 +41,21 @@ router
     s3Upload(AWS_S3_ADZ_RESOURCES, 'single', 'image'),
     addAdvertisement
   );
+router.route('/owned').get(allRoleAccess, getOwnedAdvertisements);
 router.route('/used-car').get(adminAccess, getAdvertisementsByUserCar);
+router
+  .route('/used-car/owned')
+  .get(allRoleAccess, getOwnedAdvertisementsByUserCar);
 router.route('/used-car/approved').get(guestAccess, getAdvertisementsByUserCar);
 router.route('/real-estate').get(adminAccess, getAdvertisementsByRealEstate);
+router
+  .route('/real-estate/owned')
+  .get(allRoleAccess, getOwnedAdvertisementsByRealEstate);
 router
   .route('/real-estate/approved')
   .get(guestAccess, getAdvertisementsByRealEstate);
 router.route('/job').get(adminAccess, getAdvertisementsByJob);
+router.route('/job/owned').get(allRoleAccess, getOwnedAdvertisementsByJob);
 router.route('/job/approved').get(guestAccess, getAdvertisementsByJob);
 router.route('/delete/all').delete(superAdminAccess, deleteAllAdvertisement);
 router
