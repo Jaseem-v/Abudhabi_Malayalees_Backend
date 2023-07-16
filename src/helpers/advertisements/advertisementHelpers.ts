@@ -48,7 +48,7 @@ export const getAdvertisements = (role?: IRoles) => {
  * To get all owned advertisements
  * @returns {Advertisements} advertisements
  */
-export const getOwnedAdvertisements = (id: string, role: IRoles) => {
+export const getOwnedAdvertisements = (id: string, role?: IRoles) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!id || !isValidObjectId(id))
@@ -219,7 +219,7 @@ export const getAdvertisement = (advertisementId: string, role?: IRoles) => {
       if (!advertisementId || !isValidObjectId(advertisementId))
         throw new ThrowError('Provide vaild advertisement id', 404);
 
-      const query = ['SuperAdmin', 'Developer'].includes(role ?? '')
+      const query = ['SuperAdmin', 'DeveloperAdmin'].includes(role ?? '')
         ? {}
         : { isDeleted: false };
       const advertisement = await Advertisement.findOne({
