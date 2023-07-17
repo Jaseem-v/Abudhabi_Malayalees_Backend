@@ -31,7 +31,7 @@ export const getAdvertisements: ApiParams = (req, res, next) => {
 };
 
 /**
- * Get all advertisements
+ * Get owned all advertisements
  * METHOD : GET
  * @param {*} req
  * @param {*} res
@@ -40,6 +40,30 @@ export const getAdvertisements: ApiParams = (req, res, next) => {
 export const getOwnedAdvertisements: ApiParams = (req, res, next) => {
   advertisementHelpers
     .getOwnedAdvertisements(req.client!.id, req.client!.role)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.advertisements,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
+ * Get owned all advertisements by id
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getOwnedAdvertisementsById: ApiParams = (req, res, next) => {
+  advertisementHelpers
+    .getOwnedAdvertisements(req.params.id, req.client!.role)
     .then((resp: any) => {
       res.status(200).json({
         success: true,
@@ -111,6 +135,38 @@ export const getOwnedAdvertisementsByRealEstate: ApiParams = (
 };
 
 /**
+ * Get all owned advertisements by real estate, id
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getOwnedAdvertisementsByRealEstateById: ApiParams = (
+  req,
+  res,
+  next
+) => {
+  advertisementHelpers
+    .getOwnedAdvertisementsByType(
+      req.params.id,
+      'REAL_ESTATE',
+      req.client!.role
+    )
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.advertisements,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
  * Get all advertisements by used car
  * METHOD : GET
  * @param {*} req
@@ -159,6 +215,34 @@ export const getOwnedAdvertisementsByUserCar: ApiParams = (req, res, next) => {
 };
 
 /**
+ * Get all owned advertisements by used car, id
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getOwnedAdvertisementsByUserCarById: ApiParams = (
+  req,
+  res,
+  next
+) => {
+  advertisementHelpers
+    .getOwnedAdvertisementsByType(req.params.id, 'USED_CAR', req.client!.role)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.advertisements,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
  * Get all advertisements by job
  * METHOD : GET
  * @param {*} req
@@ -192,6 +276,30 @@ export const getAdvertisementsByJob: ApiParams = (req, res, next) => {
 export const getOwnedAdvertisementsByJob: ApiParams = (req, res, next) => {
   advertisementHelpers
     .getOwnedAdvertisementsByType(req.client!.id, 'JOB', req.client!.role)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.advertisements,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
+ * Get all owned advertisements by job, id
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getOwnedAdvertisementsByJobById: ApiParams = (req, res, next) => {
+  advertisementHelpers
+    .getOwnedAdvertisementsByType(req.params.id, 'JOB', req.client!.role)
     .then((resp: any) => {
       res.status(200).json({
         success: true,

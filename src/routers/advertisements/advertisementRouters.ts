@@ -11,12 +11,16 @@ import { guestAccess } from '../../middlewares/authmiddleware';
 const {
   getAdvertisements,
   getOwnedAdvertisements,
+  getOwnedAdvertisementsById,
   getAdvertisementsByRealEstate,
   getOwnedAdvertisementsByRealEstate,
+  getOwnedAdvertisementsByRealEstateById,
   getAdvertisementsByUserCar,
   getOwnedAdvertisementsByUserCar,
+  getOwnedAdvertisementsByUserCarById,
   getAdvertisementsByJob,
   getOwnedAdvertisementsByJob,
+  getOwnedAdvertisementsByJobById,
   getAdvertisement,
   addAdvertisement,
   editAdvertisement,
@@ -42,21 +46,28 @@ router
     addAdvertisement
   );
 router.route('/owned').get(allRoleAccess, getOwnedAdvertisements);
+router.route('/owned/:id').get(allRoleAccess, getOwnedAdvertisementsById);
 router.route('/used-car').get(adminAccess, getAdvertisementsByUserCar);
+router.route('/used-car/approved').get(guestAccess, getAdvertisementsByUserCar);
 router
   .route('/used-car/owned')
   .get(allRoleAccess, getOwnedAdvertisementsByUserCar);
-router.route('/used-car/approved').get(guestAccess, getAdvertisementsByUserCar);
-router.route('/real-estate').get(adminAccess, getAdvertisementsByRealEstate);
 router
-  .route('/real-estate/owned')
-  .get(allRoleAccess, getOwnedAdvertisementsByRealEstate);
+  .route('/used-car/owned/:id')
+  .get(allRoleAccess, getOwnedAdvertisementsByUserCarById);
+router.route('/real-estate').get(adminAccess, getAdvertisementsByRealEstate);
 router
   .route('/real-estate/approved')
   .get(guestAccess, getAdvertisementsByRealEstate);
+router
+  .route('/real-estate/owned/:id')
+  .get(allRoleAccess, getOwnedAdvertisementsByRealEstateById);
 router.route('/job').get(adminAccess, getAdvertisementsByJob);
-router.route('/job/owned').get(allRoleAccess, getOwnedAdvertisementsByJob);
 router.route('/job/approved').get(guestAccess, getAdvertisementsByJob);
+router.route('/job/owned').get(allRoleAccess, getOwnedAdvertisementsByJob);
+router
+  .route('/job/owned/:id')
+  .get(allRoleAccess, getOwnedAdvertisementsByJobById);
 router.route('/delete/all').delete(superAdminAccess, deleteAllAdvertisement);
 router
   .route('/change-status/:aid')
