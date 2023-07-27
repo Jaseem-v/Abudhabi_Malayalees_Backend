@@ -31,6 +31,30 @@ export const getAdvertisements: ApiParams = (req, res, next) => {
 };
 
 /**
+ * Get all advertisements
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getApprovedAdvertisements: ApiParams = (req, res, next) => {
+  advertisementHelpers
+    .getApprovedAdvertisements()
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.advertisements,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
  * Get owned all advertisements
  * METHOD : GET
  * @param {*} req
