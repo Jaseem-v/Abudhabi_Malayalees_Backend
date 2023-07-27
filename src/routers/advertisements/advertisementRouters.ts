@@ -10,6 +10,7 @@ import { config } from '../../config';
 import { guestAccess } from '../../middlewares/authmiddleware';
 const {
   getAdvertisements,
+  getApprovedAdvertisements,
   getOwnedAdvertisements,
   getOwnedAdvertisementsById,
   getAdvertisementsByRealEstate,
@@ -45,6 +46,7 @@ router
     s3Upload(AWS_S3_ADZ_RESOURCES, 'single', 'image'),
     addAdvertisement
   );
+router.route('/approved').get(guestAccess, getApprovedAdvertisements);
 router.route('/owned').get(allRoleAccess, getOwnedAdvertisements);
 router.route('/owned/:id').get(allRoleAccess, getOwnedAdvertisementsById);
 router.route('/used-car').get(adminAccess, getAdvertisementsByUserCar);
