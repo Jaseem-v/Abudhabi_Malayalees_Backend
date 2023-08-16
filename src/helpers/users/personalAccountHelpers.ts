@@ -217,7 +217,6 @@ export const addPersonalAccount = (data: any, adminId?: string) => {
 
       const personalAccountExists = await PersonalAccount.findOne({
         $or: [{ email }, { phone }, { username }],
-        isDeleted: false
       });
 
       if (personalAccountExists)
