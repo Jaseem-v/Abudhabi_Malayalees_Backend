@@ -8,6 +8,7 @@ export interface IAdvertisement {
   createdBy: IPersonalAccount | IBusinessAccount | IAdmin | string;
   createdByRole: string;
   category?: string | ICategory;
+  title: string;
   desc: string;
   image: IImage | null;
   type: 'REAL_ESTATE' | 'USED_CAR' | 'JOB';

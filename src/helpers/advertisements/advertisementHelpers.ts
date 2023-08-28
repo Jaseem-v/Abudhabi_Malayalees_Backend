@@ -261,7 +261,7 @@ export const addAdvertisement = (
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { categoryId, desc, type, image, visibility } = data;
+      const { categoryId, title, desc, type, image, visibility } = data;
       if (
         !clientId ||
         !clientRole ||
@@ -272,6 +272,7 @@ export const addAdvertisement = (
           'DeveloperAdmin',
           'Admin',
         ].includes(clientRole) ||
+        !title ||
         !desc ||
         !type ||
         !['REAL_ESTATE', 'USED_CAR', 'JOB'].includes(type) ||
@@ -279,7 +280,7 @@ export const addAdvertisement = (
         !visibility
       )
         throw new ThrowError(
-          "Please Provide image, desc*, type('REAL_ESTATE', 'USED_CAR','JOB')*, categoryId(type === 'JOB') and visibility",
+          "Please Provide image, title*, desc*, type('REAL_ESTATE', 'USED_CAR','JOB')*, categoryId(type === 'JOB') and visibility",
           400
         );
 
@@ -308,6 +309,7 @@ export const addAdvertisement = (
             : clientRole === 'PersonalAccount'
             ? PERSONAL_ACCOUNTS
             : ADMINS,
+        title: title,
         desc: desc,
         type: type,
         image: null,
@@ -363,9 +365,10 @@ export const editAdvertisement = (advertisementId: string, data: any) => {
 
       if (!advertisement) throw new ThrowError('Advertisement not found', 404);
 
-      const { image, desc, visibility } = data;
+      const { image, title, desc, visibility } = data;
 
       // Update a values in db
+      advertisement.title = title || advertisement.title;
       advertisement.desc = desc || advertisement.desc;
       advertisement.visibility = visibility || advertisement.visibility;
 
