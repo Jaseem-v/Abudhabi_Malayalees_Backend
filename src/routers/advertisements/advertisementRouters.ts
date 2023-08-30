@@ -4,6 +4,7 @@ import {
   adminAccess,
   allRoleAccess,
   superAdminAccess,
+  userAccess,
 } from '../../middlewares';
 import { s3Upload } from '../../functions/multer';
 import { config } from '../../config';
@@ -11,6 +12,7 @@ import { guestAccess } from '../../middlewares/authmiddleware';
 const {
   getAdvertisements,
   getApprovedAdvertisements,
+  getUserAdvertisements,
   getOwnedAdvertisements,
   getOwnedAdvertisementsById,
   getAdvertisementsByRealEstate,
@@ -28,6 +30,7 @@ const {
   changeAdvertisementStatus,
   changeAdvertisementVisibility,
   removeAdvertisementImage,
+  deleteOwnedAdvertisement,
   deleteAdvertisement,
   restoreAdvertisement,
   pDeleteAdvertisement,
@@ -49,6 +52,8 @@ router
 router.route('/approved').get(guestAccess, getApprovedAdvertisements);
 router.route('/owned').get(allRoleAccess, getOwnedAdvertisements);
 router.route('/owned/:id').get(allRoleAccess, getOwnedAdvertisementsById);
+router.route('/user/:uid').get(getUserAdvertisements);
+router.route('/user/:aid').delete(userAccess, deleteOwnedAdvertisement);
 router.route('/used-car').get(adminAccess, getAdvertisementsByUserCar);
 router.route('/used-car/approved').get(guestAccess, getAdvertisementsByUserCar);
 router

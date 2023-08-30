@@ -55,6 +55,30 @@ export const getApprovedAdvertisements: ApiParams = (req, res, next) => {
 };
 
 /**
+ * Get all user advertisements
+ * METHOD : GET
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const getUserAdvertisements: ApiParams = (req, res, next) => {
+  advertisementHelpers
+    .getUserAdvertisements(req.params.uid)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+        data: resp.advertisements,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
+    });
+};
+
+/**
  * Get owned all advertisements
  * METHOD : GET
  * @param {*} req
@@ -477,6 +501,29 @@ export const removeAdvertisementImage: ApiParams = (req, res, next) => {
     })
     .catch((error: any) => {
       return next(new ErrorResponse(error.message, 402, error.code));
+    });
+};
+
+/**
+ * To delete a non deleted advertisement temporarily
+ * METHOD : DELETE
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export const deleteOwnedAdvertisement: ApiParams = (req, res, next) => {
+  advertisementHelpers
+    .deleteOwnedAdvertisement(req.params.aid, req.client!.id)
+    .then((resp: any) => {
+      res.status(200).json({
+        success: true,
+        message: resp.message,
+      });
+    })
+    .catch((error: any) => {
+      return next(
+        new ErrorResponse(error.message, error.statusCode, error.code)
+      );
     });
 };
 

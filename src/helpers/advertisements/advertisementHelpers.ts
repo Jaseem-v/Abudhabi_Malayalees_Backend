@@ -45,6 +45,44 @@ export const getAdvertisements = (role?: IRoles) => {
 };
 
 /**
+ * To get all user advertisements
+ * @returns {Advertisements} advertisements
+ */
+export const getUserAdvertisements = (userId: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!userId || !isValidObjectId(userId))
+        throw new ThrowError('Provide vaild userId', 404);
+
+      const advertisements = await Advertisement.find({
+        visibility: 'Show',
+        status: 'APPROVED',
+        createdBy: userId,
+      })
+        .sort({
+          createdAt: -1,
+        })
+        .populate(
+          'createdBy',
+          'fname lname name email phone role username profilePicture'
+        )
+        .populate('category', 'name image status visibility');
+
+      resolve({
+        message: 'Advertisements Fetched',
+        advertisements,
+      });
+    } catch (error: any) {
+      return reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+/**
  * To get all owned advertisements
  * @returns {Advertisements} advertisements
  */
@@ -562,6 +600,39 @@ export const removeAdvertisementImage = (advertisementId: string) => {
     } catch (error: any) {
       reject({
         message: error.message || error.msg,
+        code: error.code || error.name,
+      });
+    }
+  });
+};
+
+
+/**
+ * To delete a non deleted advertisement temporarily
+ * @param {String} advertisementId
+ */
+export const deleteOwnedAdvertisement = (advertisementId: string, userId: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!advertisementId || !isValidObjectId(advertisementId) || !userId || !isValidObjectId(userId))
+        throw new ThrowError('Provide valid advertisement id and user id', 400);
+
+      const advertisement = await Advertisement.findOne({
+        _id: advertisementId,
+        createdBy: userId, 
+      });
+
+      if (!advertisement) throw new ThrowError('Advertisement not found', 404);
+
+      await advertisement.deleteOne();
+
+      resolve({
+        message: `${advertisement.code} advertisement was deleted`,
+      });
+    } catch (error: any) {
+      reject({
+        message: error.message || error.msg,
+        statusCode: error.statusCode,
         code: error.code || error.name,
       });
     }
