@@ -9,8 +9,8 @@
     "start": "node dist/index.js",
     "prod": "rm -rf dist && yarn run build && export NODE_ENV=production && yarn run start",
     "prod:win": "rm -rf dist && yarn run build && set NODE_ENV=production && yarn run start",
-    "dev": "export NODE_ENV=development && ts-node-dev src/index.ts",
-    "dev:win": "set NODE_ENV=development && ts-node-dev src/index.ts",
+    "dev": "export NODE_ENV=development&& ts-node-dev src/index.ts",
+    "dev:win": "set NODE_ENV=development&& ts-node-dev src/index.ts",
     "build": "tsc -p ."
   },
   "dependencies": {

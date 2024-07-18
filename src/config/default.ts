@@ -7,6 +7,9 @@ const SERVER_ROOT_PATH = path.join(__dirname, "../../");
 const ENV_CONFIG =
   typeof ENV === "string" ? { path: SERVER_ROOT_PATH + ".env." + ENV } : {};
 
+
+  console.log(ENV_CONFIG);
+  
 dotenv.config(ENV_CONFIG);
 
 // App
