@@ -28,4 +28,4 @@ jobs:
         cache: 'npm'
     - run: npm i
     - run: cp /home/jaseem/environments/abudhabi/.env .
-    - run: pm2 restart abudhabi_malyalees
+    - run: pm2 restart abudhabi_server
